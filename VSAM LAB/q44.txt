@@ -1,0 +1,166 @@
+//q44
+000100 IDENTIFICATION DIVISION.                                     
+000200 PROGRAM-ID. BONUS.                                           
+000300 AUTHOR. SUMANTH.                                             
+000400* GENERATE EMPLOYEE BONUS AND NEW YEAR PRIZE REPORT           
+000500 ENVIRONMENT DIVISION.                                        
+000600 INPUT-OUTPUT SECTION.                                        
+000610 FILE-CONTROL.                                                
+000620     SELECT PRINT-FILE ASSIGN TO OUTPUT1                      
+000630     ORGANIZATION IS SEQUENTIAL.                              
+000640                                                              
+000700 DATA DIVISION.                                               
+000800 FILE SECTION.                                                
+000900 FD PRINT-FILE                                                
+001000     RECORDING MODE IS F                                      
+001100     RECORD CONTAINS 80 CHARACTERS                            
+001200     BLOCK CONTAINS 0 RECORDS.                                
+001300 01  PRINT-RECORD              PIC X(80).                     
+001400                                                              
+001500 WORKING-STORAGE SECTION.                                     
+001600 01  WS-BLANK-LINE             PIC X(80)  VALUE SPACES.       
+001700     EXEC SQL INCLUDE EMPLOYEE END-EXEC.                      
+001800     EXEC SQL INCLUDE BONUS END-EXEC.                         
+001900     EXEC SQL INCLUDE ITEM END-EXEC.                          
+002000     EXEC SQL INCLUDE SQLCA END-EXEC.                            
+002100 01  HOST-VARIABLES.                                             
+002200     05 HV-EMPLOYEE-NO         PIC X(5).                         
+002300     05 HV-EMPLOYEE-NAME       PIC X(25).                        
+002400     05 HV-BONUS-AMOUNT        PIC S9(7)V9(2) USAGE COMP-3.      
+002500     05 HV-ITEM-DESCRIPTION    PIC X(20).                        
+002600     05 HV-MATCH-FOUND-FLAG    PIC X(1).                         
+002700        88 MATCH-FOUND        VALUE 'Y'.                         
+002800        88 NO-MATCH-FOUND     VALUE 'N'.                         
+002900 01 WS-HEADING-1.                                                
+003000    05 FILLER                 PIC X(9)    VALUE SPACES.          
+003100    05 FILLER                 PIC X(33)                          
+003200       VALUE 'EMPLOYEE NEW YEAR BONUS AND PRIZE'.                
+003300    05 FILLER                 PIC X(6)     VALUE 'REPORT'.       
+003400    05 FILLER                 PIC X(32)    VALUE SPACES.         
+003500 01 WS-HEADING-2.                                                
+003600    05 FILLER                 PIC X(9)    VALUE SPACES.          
+003700    05 FILLER                 PIC X(40)                          
+003800       VALUE '----------------------------------------'.         
+003900    05 FILLER                 PIC X(31)    VALUE SPACES.         
+004000 01 WS-HEADING-3.                                                
+004100    05 FILLER                 PIC X(02)    VALUE SPACES.         
+004200    05 FILLER                 PIC X(11)    VALUE 'EMPLOYEE NO'.  
+004300    05 FILLER                 PIC X(2)     VALUE SPACES.         
+004400    05 FILLER                PIC X(13)    VALUE 'EMPLOYEE NAME'. 
+004500    05 FILLER                 PIC X(2)     VALUE SPACES.          
+004600    05 FILLER                 PIC X(12)    VALUE 'BONUS AMOUNT'.  
+004700    05 FILLER                 PIC X(2)     VALUE SPACES.          
+004800    05 FILLER                 PIC X(13)    VALUE 'NEW YEAR GIFT'. 
+004900    05 FILLER                 PIC X(23)    VALUE SPACES.          
+005000 01 WS-HEADING-4.                                                 
+005100    05 FILLER                 PIC X(02)    VALUE SPACES.          
+005200    05 FILLER                 PIC X(11)    VALUE '-----------'.   
+005300    05 FILLER                 PIC X(2)     VALUE SPACES.          
+005400    05 FILLER                 PIC X(13)    VALUE '-------------'. 
+005500    05 FILLER                 PIC X(2)     VALUE SPACES.          
+005600    05 FILLER                 PIC X(12)    VALUE '------------'.  
+005700    05 FILLER                 PIC X(2)     VALUE SPACES.          
+005800    05 FILLER                 PIC X(13)    VALUE '-------------'. 
+005900    05 FILLER                 PIC X(23)    VALUE SPACES.          
+006000 01 WS-DETAIL-LINE.                                               
+006100    05 FILLER                 PIC X(02)    VALUE SPACES.          
+006200    05 WS-EMP-NO              PIC X(11).                          
+006300    05 FILLER                 PIC X(2)     VALUE SPACES.          
+006400    05 WS-EMP-NAME            PIC X(13).                          
+006500    05 FILLER                 PIC X(2)     VALUE SPACES.          
+006600    05 WS-BONUS-AMOUNT        PIC Z,ZZZ,ZZ9.99.                   
+006700    05 FILLER                 PIC X(2)     VALUE SPACES.          
+006800    05 WS-ITEM-DESCRIPTION    PIC X(20).                          
+006900    05 FILLER                 PIC X(26)    VALUE SPACES.          
+007000 01 WS-EOF PIC X(1) VALUE 'N'.                     
+007100     88 EOF-Y                  VALUE 'Y'.          
+007200     88 EOF-N                  VALUE 'N'.          
+007300 01 WS-CURRENT-DATE.                               
+007400    05 WS-YEAR                PIC 9(4).            
+007500    05 WS-MONTH               PIC 9(2).            
+007600    05 WS-DAY                 PIC 9(2).            
+007700                                                   
+007800     EXEC SQL DECLARE EMP_BONUS_CURSOR CURSOR FOR  
+007900        SELECT B.EMPLOYEE_NO,                      
+008000               B.EMPLOYEE_NAME,                    
+008100               B.EMPLOYEE_BONUS                    
+008200        FROM BONUS_TABLE B                         
+008300        ORDER BY B.EMPLOYEE_NO                     
+008400        WITH UR                                    
+008500     END-EXEC.                                     
+008600                                                   
+008700 PROCEDURE DIVISION.                               
+008800 MAIN-PARA.                                        
+008900     PERFORM INITIALIZATION                        
+009000     PERFORM PROCESS-RECORDS UNTIL EOF-Y           
+009100     PERFORM TERMINATION                           
+009200     GOBACK.                                       
+009300                                                   
+009400 INITIALIZATION.                                   
+009500     OPEN OUTPUT PRINT-FILE                                  
+009510     DISPLAY 'OUTPUT FILE OPENED SUCCESSFULLY'               
+009600     WRITE PRINT-RECORD FROM WS-HEADING-1                    
+009700     WRITE PRINT-RECORD FROM WS-HEADING-2                    
+009800     WRITE PRINT-RECORD FROM WS-BLANK-LINE                   
+009900     WRITE PRINT-RECORD FROM WS-HEADING-3                    
+010000     WRITE PRINT-RECORD FROM WS-HEADING-4                    
+010100     EXEC SQL                                                
+010200        OPEN EMP_BONUS_CURSOR                                
+010300     END-EXEC.                                               
+010400     PERFORM FETCH-RECORD.                                   
+010500                                                             
+010600 PROCESS-RECORDS.                                            
+010700     MOVE SPACES TO WS-DETAIL-LINE                           
+010800     MOVE HV-EMPLOYEE-NO TO WS-EMP-NO                        
+010900     MOVE HV-EMPLOYEE-NAME TO WS-EMP-NAME                    
+011000     MOVE HV-BONUS-AMOUNT TO WS-BONUS-AMOUNT                 
+011100     PERFORM FIND-MATCHED-ITEM                               
+011200     WRITE PRINT-RECORD FROM WS-DETAIL-LINE                  
+011210     DISPLAY 'OUTPUT FILE WRITE SUCCESS FOR' HV-EMPLOYEE-NO  
+011300     PERFORM FETCH-RECORD.                                   
+011400                                                             
+011500 FETCH-RECORD.                                               
+011600     EXEC SQL                                                
+011700        FETCH EMP_BONUS_CURSOR                               
+011800        INTO :HV-EMPLOYEE-NO,                            
+011900             :HV-EMPLOYEE-NAME,                          
+012000             :HV-BONUS-AMOUNT                            
+012100     END-EXEC.                                           
+012200     EVALUATE SQLCODE                                    
+012300       WHEN 0                                            
+012400         CONTINUE                                        
+012500       WHEN 100                                          
+012600         MOVE 'Y' TO WS-EOF                              
+012700       WHEN OTHER                                        
+012800         DISPLAY 'SQL ERROR: ' SQLCODE                   
+012900         MOVE 'Y' TO WS-EOF                              
+013000     END-EVALUATE.                                       
+013100                                                         
+013200 FIND-MATCHED-ITEM.                                      
+013300     MOVE 'N' TO HV-MATCH-FOUND-FLAG                     
+013400     EXEC SQL                                            
+013500       SELECT I.ITEM_DESCRIPTION                         
+013600       INTO :HV-ITEM-DESCRIPTION                         
+013700       FROM ITEM_TABLE I                                 
+013800       WHERE SUBSTR(I.ITEM_NO, 5, 1) =                   
+013900             SUBSTR(:HV-EMPLOYEE-NO, 4, 1)               
+014000       FETCH FIRST 1 ROWS ONLY                           
+014100       WITH UR                                           
+014200     END-EXEC.                                           
+014300     EVALUATE SQLCODE                                      
+014400       WHEN 0                                              
+014500         MOVE 'Y' TO HV-MATCH-FOUND-FLAG                   
+014600         MOVE HV-ITEM-DESCRIPTION TO WS-ITEM-DESCRIPTION   
+014700       WHEN 100                                            
+014800         MOVE 'NONE AVAILABLE' TO WS-ITEM-DESCRIPTION      
+014900       WHEN OTHER                                          
+015000         DISPLAY 'SQL ERROR IN ITEM FETCH: ' SQLCODE       
+015100         MOVE 'SQL ERROR' TO WS-ITEM-DESCRIPTION           
+015200     END-EVALUATE.                                         
+015300                                                           
+015400 TERMINATION.                                              
+015500     EXEC SQL                                              
+015600        CLOSE EMP_BONUS_CURSOR                             
+015700     END-EXEC.                                             
+015800     CLOSE PRINT-FILE.                                     
+015900     DISPLAY 'OUTPUT FILE CLOSED SUCCESSFULLY'.            

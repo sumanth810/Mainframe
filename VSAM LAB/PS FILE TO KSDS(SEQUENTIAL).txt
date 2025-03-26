@@ -1,0 +1,112 @@
+//PS FILE TO KSDS(SEQUENTIAL)
+
+000100 IDENTIFICATION DIVISION.          
+000200 PROGRAM-ID. COB003.               
+000210*PS FILE TO KSDS(SEQUENTIAL)       
+000300 AUTHOR. SUMANTH.                  
+000400                                   
+000500 ENVIRONMENT DIVISION.             
+000600 INPUT-OUTPUT SECTION.             
+000700 FILE-CONTROL.                     
+000800     SELECT INP01 ASSIGN TO INPUT01
+000900     ORGANIZATION IS SEQUENTIAL    
+001000     ACCESS MODE IS SEQUENTIAL     
+001200     FILE STATUS IS WS-STATUS.     
+001300                                   
+001400     SELECT OUT01 ASSIGN TO VALID01
+001500     ORGANIZATION IS INDEXED       
+001510     RECORD KEY IS OUT-AGENT-ID    
+001600     ACCESS MODE IS SEQUENTIAL     
+001700     FILE STATUS IS WS-STATUS.     
+001800                                   
+001900 DATA DIVISION.                    
+002000 FILE SECTION.                     
+002100 FD INP01                          
+002200     RECORD CONTAINS 80 CHARACTERS    
+002300     BLOCK CONTAINS 800 CHARACTERS    
+002400     RECORDING MODE IS F              
+002500     DATA RECORD IS INP-RECORD.       
+002600 01 INP-RECORD.                       
+002700     05 AGENT-ID PIC 9(03).           
+002800     05 AGENT-NAME PIC X(15).         
+002900     05 AGENT-TEAM PIC X(06).         
+003000     05 AGENT-DIVISION PIC X(10).     
+003100     05 AGENT-SCORE PIC 9(04).        
+003200     05 FILLER PIC X(42).             
+003300                                      
+003400 FD OUT01                             
+003500     RECORD CONTAINS 80 CHARACTERS    
+003600*    BLOCK CONTAINS 800 CHARACTERS    
+003700*    RECORDING MODE IS F              
+003800     DATA RECORD IS VAL-RECORD.       
+003900 01 VAL-RECORD.                       
+003910     05 OUT-AGENT-ID PIC 9(03).       
+003920     05 OUT-AGENT-NAME PIC X(15).     
+003930     05 OUT-AGENT-TEAM PIC X(06).     
+003940     05 OUT-AGENT-DIVISION PIC X(10). 
+003950     05 OUT-AGENT-SCORE PIC 9(04).    
+003960     05 FILLER PIC X(42).             
+004000                                      
+004100 WORKING-STORAGE SECTION.                    
+004200 01 WS-STATUS PIC X(02).                     
+004300*01 WS-KEY.                                  
+004400*    05 WS-KEYS-VALUE PIC 9(03).             
+004500 01 WS-EOF-STATUS PIC X(01).                 
+004600     88 EOF VALUE 'Y'.                       
+004700     88 NOT-EOF VALUE 'N'.                   
+004800                                             
+004900 PROCEDURE DIVISION.                         
+005200     PERFORM A01-OPEN.                       
+005300     SET NOT-EOF TO TRUE.                    
+005500     PERFORM A02-READ UNTIL EOF.             
+005600     PERFORM A04-CLOSE.                      
+005700     STOP RUN.                               
+005800                                             
+005900 A01-OPEN.                                   
+006000     OPEN INPUT INP01.                       
+006100     IF WS-STATUS = '00'                     
+006200        DISPLAY 'INP01 FILE OPEN SUCCESSFUL' 
+006300     ELSE                                    
+006400        DISPLAY 'INP01 FILE OPEN FAILED'     
+006500     END-IF.                                 
+006600     OPEN OUTPUT OUT01.                      
+006700     IF WS-STATUS = '00'                     
+006800        DISPLAY 'OUT01 FILE OPEN SUCCESSFUL' 
+006900     ELSE                                       
+007000        DISPLAY 'OUT01 FILE OPEN FAILED'        
+007100     END-IF.                                    
+007200                                                
+008000 A02-READ.                                      
+008100     READ INP01                                 
+008300      AT END DISPLAY 'LAST RECORD'              
+008400        SET EOF TO TRUE                         
+008500      NOT AT END                                
+008510        DISPLAY INP-RECORD                      
+008700        PERFORM A03-WRITE-OUTPUT                
+008800     END-READ                                   
+008900     IF WS-STATUS = '00'                        
+009000        DISPLAY 'INPUT FILE READ SUCCESSFUL'    
+009100     ELSE                                       
+009200        DISPLAY 'INPUT FILE READ FAILED'        
+009300     END-IF.                                    
+009400                                                
+009500 A03-WRITE-OUTPUT.                              
+009600     MOVE AGENT-ID TO OUT-AGENT-ID.             
+009610     MOVE AGENT-NAME TO OUT-AGENT-NAME.         
+009620     MOVE AGENT-TEAM TO OUT-AGENT-TEAM.         
+009630     MOVE AGENT-DIVISION TO OUT-AGENT-DIVISION. 
+009640     MOVE AGENT-SCORE TO OUT-AGENT-SCORE.       
+009700     WRITE VAL-RECORD.                          
+009800     IF WS-STATUS = '00'                         
+009900        DISPLAY 'OUTPUT FILE WRITE SUCCESSFUL'   
+010000     ELSE                                        
+010100        DISPLAY 'OUTPUT FILE WRITE FAILED'       
+010200     END-IF.                                     
+010300                                                 
+010400 A04-CLOSE.                                      
+010500     CLOSE INP01.                                
+010600     IF WS-STATUS = '00'                         
+010700        DISPLAY 'INP01 FILE CLOSESUCCESSFUL'     
+010800     ELSE                                        
+010900        DISPLAY 'INP01 FILE CLOSEFAILED'         
+011000     END-IF.                                     

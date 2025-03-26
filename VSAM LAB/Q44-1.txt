@@ -1,0 +1,181 @@
+44) Write a Report from Employee Table, Bonus Table and Items Table and create a Report of all
+employees with a corresponding New year prize. Get New year gift from Items table such that
+last digit of employee no. and last digit of item no. matches. Use Indicator variables and With UR
+Clause.
+
+EMPLOYEE NEW YEAR BONUS AND PRIZE REPORT
+----------------------------------------
+
+EMPLOYEE NO EMPLOYEE NAME BONUS AMOUNT NEW YEAR GIFT
+----------- ------------- ------------ -------------
+
+ 000100 000100 IDENTIFICATION DIVISION.                                         
+ 000200 000200 PROGRAM-ID. Q46.                                                 
+ 000300 000300 AUTHOR. KUMAR.                                                   
+ 000400 000400* GENERATE EMPLOYEE BONUS AND NEW YEAR PRIZE REPORT               
+ 000500 000500                                                                  
+ 000600 000600 ENVIRONMENT DIVISION.                                            
+ 000700 000700 INPUT-OUTPUT SECTION.                                            
+ 000800 000800 FILE-CONTROL.                                                    
+ 000900 000900     SELECT PRINT-FILE ASSIGN TO OUTPUT1                          
+ 001000 001000     ORGANIZATION IS SEQUENTIAL.                                  
+ 001100 001100                                                                  
+ 001200 001200 DATA DIVISION.                                                   
+ 001300 001300 FILE SECTION.                                                    
+ 001400 001400 FD  PRINT-FILE                                                   
+ 001500 001500     RECORDING MODE IS F                                          
+ 001600 001600     RECORD CONTAINS 80 CHARACTERS                                
+ 001700 001700     BLOCK CONTAINS 0 RECORDS.                                    
+ 001800 001800 01  PRINT-RECORD              PIC X(80).                         
+ 001900 001900                                                                  
+ 002000 002000  WORKING-STORAGE SECTION.                                        
+ 002100 002100 01  WS-BLANK-LINE             PIC X(80)  VALUE SPACES.           
+ 002200 002200     EXEC SQL INCLUDE EMPTABLE END-EXEC.                          
+ 002300 002300     EXEC SQL INCLUDE BONUSTAB END-EXEC.                          
+ 002400 002400     EXEC SQL INCLUDE ITEMTAB END-EXEC.                           
+ 002500 002500     EXEC SQL INCLUDE SQLCA END-EXEC.                             
+ 002600 002600 01  HOST-VARIABLES.                                              
+ 002700 002700     05 HV-EMPLOYEE-NO         PIC X(5).                          
+ 002800 002800     05 HV-EMPLOYEE-NAME       PIC X(25).                         
+ 002900 002900     05 HV-BONUS-AMOUNT        PIC S9(7)V9(2) USAGE COMP-3.       
+ 003000 003000     05 HV-ITEM-DESCRIPTION    PIC X(20).                         
+ 003100 003100     05 HV-MATCH-FOUND-FLAG    PIC X(1).                          
+ 003200 003200        88 MATCH-FOUND        VALUE 'Y'.                          
+ 003300 003300        88 NO-MATCH-FOUND     VALUE 'N'.                          
+ 003400 003400 01 WS-HEADING-1.                                                 
+ 003500 003500     05 FILLER                 PIC X(09)    VALUE SPACES.         
+ 003600 003600     05 FILLER                 PIC X(33)                          
+ 003700 003700        VALUE 'EMPLOYEE NEW YEAR BONUS AND PRIZE'.                
+ 003800 003800     05 FILLER                 PIC X(6)     VALUE 'REPORT'.       
+ 003900 003900     05 FILLER                 PIC X(32)    VALUE SPACES.         
+ 004000 004000 01 WS-HEADING-2.                                                 
+ 004100 004100     05 FILLER                 PIC X(09)    VALUE SPACES.         
+ 004200 004200     05 FILLER                 PIC X(40)                          
+ 004300 004300        VALUE '----------------------------------------'.         
+ 004400 004400     05 FILLER                 PIC X(31)    VALUE SPACES.         
+ 004500 004500 01 WS-HEADING-3.                                                 
+ 004600 004600     05 FILLER                 PIC X(02)    VALUE SPACES.         
+ 004700 004700     05 FILLER                 PIC X(11)    VALUE 'EMPLOYEE NO'.  
+ 004800 004800     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 004900 004900     05 FILLER                PIC X(13)    VALUE 'EMPLOYEE NAME'. 
+ 005000 005000     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 005100 005100     05 FILLER                 PIC X(12)    VALUE 'BONUS AMOUNT'. 
+ 005200 005200     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 005300 005300     05 FILLER                 PIC X(13)    VALUE 'NEW YEAR GIFT'.
+ 005400 005400     05 FILLER                 PIC X(23)    VALUE SPACES.         
+ 005500 005500 01 WS-HEADING-4.                                                 
+ 005600 005600     05 FILLER                 PIC X(02)    VALUE SPACES.         
+ 005700 005700     05 FILLER                 PIC X(11)    VALUE '-----------'.  
+ 005800 005800     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 005900 005900     05 FILLER                 PIC X(13)    VALUE '-------------'.
+ 006000 006000     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 006100 006100     05 FILLER                 PIC X(12)    VALUE '------------'. 
+ 006200 006200     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 006300 006300     05 FILLER                 PIC X(13)    VALUE '-------------'.
+ 006400 006400     05 FILLER                 PIC X(23)    VALUE SPACES.         
+ 006500 006500 01  WS-DETAIL-LINE.                                              
+ 006600 006600     05 FILLER                 PIC X(02)    VALUE SPACES.         
+ 006700 006700     05 WS-EMP-NO              PIC X(11).                         
+ 006800 006800     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 006900 006900     05 WS-EMP-NAME            PIC X(13).                         
+ 007000 007000     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 007100 007100     05 WS-BONUS-AMOUNT        PIC Z,ZZZ,ZZ9.99.                  
+ 007200 007200     05 FILLER                 PIC X(2)     VALUE SPACES.         
+ 007300 007300     05 WS-ITEM-DESCRIPTION    PIC X(20).                         
+ 007400 007400     05 FILLER                 PIC X(26)    VALUE SPACES.         
+ 007500 007500 01 WS-EOF PIC X(1) VALUE 'N'.                                    
+ 007600 007600     88 EOF-Y                  VALUE 'Y'.                         
+ 007700 007700     88 EOF-N                  VALUE 'N'.                         
+ 007800 007800 01  WS-CURRENT-DATE.                                             
+ 007900 007900     05 WS-YEAR                PIC 9(4).                          
+ 008000 008000     05 WS-MONTH               PIC 9(2).                          
+ 008100 008100     05 WS-DAY                 PIC 9(2).                          
+ 008200 008200                                                                  
+ 008300 008300     EXEC SQL DECLARE EMP_BONUS_CURSOR CURSOR FOR                 
+ 008400 008400         SELECT B.EMPLOYEE_NO,                                    
+ 008500 008500                B.EMPLOYEE_NAME,                                  
+ 008600 008600                B.EMPLOYEE_BONUS                                  
+ 008700 008700         FROM BONUS B                                             
+ 008800 008800         ORDER BY B.EMPLOYEE_NO                                   
+ 008900 008900         WITH UR                                                  
+ 009000 009000     END-EXEC.                                                    
+ 009100 009100                                                                  
+ 009200 009200 PROCEDURE DIVISION.                                              
+ 009300 009300 0000-MAIN-PARA.                                                  
+ 009400 009400     PERFORM 1000-INITIALIZATION                                  
+ 009500 009500     PERFORM 2000-PROCESS-RECORDS UNTIL EOF-Y                     
+ 009600 009600     PERFORM 3000-TERMINATION                                     
+ 009700 009700     GOBACK.                                                      
+ 009800 009800                                                                  
+ 009900 009900 1000-INITIALIZATION.                                             
+ 010000 010000     OPEN OUTPUT PRINT-FILE                                       
+ 010010 010010     DISPLAY 'Q46: OUTPUT FILE OPENED SUCCESSFULLY '              
+ 010100 010100     MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE                
+ 010200 010200     WRITE PRINT-RECORD FROM WS-HEADING-1                         
+ 010300 010300     WRITE PRINT-RECORD FROM WS-HEADING-2                         
+ 010400 010400     WRITE PRINT-RECORD FROM WS-BLANK-LINE                        
+ 010500 010500     WRITE PRINT-RECORD FROM WS-HEADING-3                         
+ 010600 010600     WRITE PRINT-RECORD FROM WS-HEADING-4                         
+ 010610 010610     DISPLAY 'Q46: PROGRAM INITIALIZATION COMPLETE AT '           
+ 010620 010620             WS-YEAR '-' WS-MONTH '-' WS-DAY                      
+ 010700 010700     EXEC SQL                                                     
+ 010800 010800       OPEN EMP_BONUS_CURSOR                                      
+ 010900 010900     END-EXEC.                                                    
+ 011000 011000     PERFORM 2100-FETCH-RECORD.                                   
+ 011100 011100 2000-PROCESS-RECORDS.                                            
+ 011200 011200     MOVE SPACES TO WS-DETAIL-LINE                                
+ 011300 011300     MOVE HV-EMPLOYEE-NO TO WS-EMP-NO                             
+ 011400 011400     MOVE HV-EMPLOYEE-NAME TO WS-EMP-NAME                         
+ 011500 011500     MOVE HV-BONUS-AMOUNT TO WS-BONUS-AMOUNT                      
+ 011600 011600     PERFORM 2500-FIND-MATCHED-ITEM                               
+ 011700 011700     WRITE PRINT-RECORD FROM WS-DETAIL-LINE                       
+ 011710 011710     DISPLAY 'Q46: OUTPUT FILE WRITE SUCCESS: ' HV-EMPLOYEE-NO    
+ 011800 011800     PERFORM 2100-FETCH-RECORD.                                   
+ 011900 011900 2100-FETCH-RECORD.                                               
+ 012000 012000     EXEC SQL                                                     
+ 012100 012100        FETCH EMP_BONUS_CURSOR                                    
+ 012200 012200        INTO :HV-EMPLOYEE-NO,                                     
+ 012300 012300             :HV-EMPLOYEE-NAME,                                   
+ 012400 012400             :HV-BONUS-AMOUNT                                     
+ 012500 012500     END-EXEC.                                                    
+ 012600 012600     EVALUATE SQLCODE                                             
+ 012700 012700       WHEN 0                                                     
+ 012800 012800         CONTINUE                                                 
+ 012900 012900       WHEN 100                                                   
+ 013000 013000         MOVE 'Y' TO WS-EOF                                       
+ 013100 013100       WHEN OTHER                                                 
+ 013200 013200         DISPLAY 'SQL ERROR: ' SQLCODE                            
+ 013300 013300         MOVE 'Y' TO WS-EOF                                       
+ 013400 013400     END-EVALUATE.                                                
+ 013500 013500 2500-FIND-MATCHED-ITEM.                                          
+ 013600 013600     MOVE 'N' TO HV-MATCH-FOUND-FLAG                              
+ 013700 013700     EXEC SQL                                                     
+ 013800 013800       SELECT I.ITEM_DESCRIPTION                                  
+ 013900 013900       INTO :HV-ITEM-DESCRIPTION                                  
+ 014000 014000       FROM ITEMS I                                               
+ 014100 014100       WHERE SUBSTR(I.ITEM_NO, 5, 1) =                            
+ 014200 014200             SUBSTR(:HV-EMPLOYEE-NO, 5, 1)                        
+ 014300 014300       FETCH FIRST 1 ROWS ONLY                                    
+ 014400 014400       WITH UR                                                    
+ 014500 014500     END-EXEC.                                                    
+ 014600 014600     EVALUATE SQLCODE                                             
+ 014700 014700       WHEN 0                                                     
+ 014800 014800         MOVE 'Y' TO HV-MATCH-FOUND-FLAG                          
+ 014900 014900         MOVE HV-ITEM-DESCRIPTION TO WS-ITEM-DESCRIPTION          
+ 015000 015000       WHEN 100                                                   
+ 015100 015100         MOVE 'NONE AVAILABLE' TO WS-ITEM-DESCRIPTION             
+ 015200 015200       WHEN OTHER                                                 
+ 015300 015300         DISPLAY 'SQL ERROR IN ITEM FETCH: ' SQLCODE              
+ 015400 015400         MOVE 'SQL ERROR' TO WS-ITEM-DESCRIPTION                  
+ 015500 015500     END-EVALUATE.                                                
+ 015600 015600 3000-TERMINATION.                                                
+ 015700 015700     EXEC SQL                                                     
+ 015800 015800       CLOSE EMP_BONUS_CURSOR                                     
+ 015900 015900     END-EXEC.                                                    
+ 016000 016000     CLOSE PRINT-FILE.                                            
+ 016100 016100     DISPLAY 'Q46: OUTPUT FILE CLOSED SUCCESSFULLY AT '           
+ 016200 016200              WS-YEAR '-' WS-MONTH '-' WS-DAY                     
+ 016300 016300     DISPLAY 'Q46: PROGRAM COMPLETED SUCCESSFULLY AT '            
+ 016400 016400              WS-YEAR '-' WS-MONTH '-' WS-DAY.                    
+ ****** **************************** Bottom of Data ****************************
+                                                                                                                                 

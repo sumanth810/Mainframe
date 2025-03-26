@@ -1,0 +1,110 @@
+ 000700 ENVIRONMENT DIVISION.               
+ 000800 INPUT-OUTPUT SECTION.               
+ 000900 FILE-CONTROL.                       
+ 001000     SELECT INP01 ASSIGN TO INPUTRR  
+ 001100     ORGANIZATION IS SEQUENTIAL      
+ 001200     ACCESS MODE IS SEQUENTIAL       
+ 001300     FILE STATUS IS WS-STATUS.       
+ 001400*                                    
+ 001500     SELECT OUT01 ASSIGN TO VALIDRR  
+ 001600     ORGANIZATION IS RELATIVE        
+ 001700     ACCESS MODE IS RANDOM           
+ 001710     RELATIVE KEY IS R-KEY           
+ 001800     FILE STATUS IS WS-STATUS.       
+ 001900 DATA DIVISION.                      
+ 002000 FILE SECTION.                       
+ 002100                                     
+ 002200 FD INP01                            
+ 002300     RECORD CONTAINS 80 CHARACTERS   
+ 002400     BLOCK CONTAINS 800 CHARACTERS   
+ 002500     RECORDING MODE IS F             
+ 002600     DATA RECORD IS INP-RECORD.      
+ 002700 01 INP-RECORD.                      
+ 002800     05 POLICY-ID PIC 9(5).          
+ 002900     05 POLICY-TERM PIC 9(5).        
+002900     05 POLICY-TERM PIC 9(5).       
+003000     05 POLICY-LOB PIC X(2).        
+003100     05 POLICY-TYPE PIC X(15).      
+003200     05 POLICY-NUMPIC PIC X(5).     
+003300     05 POLICY-STATUS PIC X(7).     
+003400     05 FILLER PIC X(41).           
+003500                                    
+003600 FD OUT01                           
+003700     RECORD CONTAINS 80 CHARACTERS  
+003800     BLOCK CONTAINS 800 CHARACTERS  
+003900     DATA RECORD IS VAL-RECORD.     
+004000 01 VAL-RECORD.                     
+004100     05 VALID-ID PIC 9(5).          
+004200     05 VALID-TERM PIC 9(5).        
+004300     05 VALID-LOB PIC X(2).         
+004400     05 VALID-TYPE PIC X(15).       
+004500     05 VALID-NUMPIC PIC X(5).      
+004600     05 VALID-STATUS PIC X(7).      
+004700     05 FILLER PIC X(41).           
+004800 WORKING-STORAGE SECTION.           
+004810 01 R-KEY PIC 9(5).                 
+004900 01 WS-STATUS PIC X(02).            
+005000 01 WS-FILE-EOF-STATUS PIC X(1).    
+005100     88 EOF VALUE 'Y'.              
+005200     88 NOT-EOF VALUE 'N'.          
+ 005400 PROCEDURE DIVISION.                        
+ 005500     PERFORM A001-OPEN.                     
+ 005600     SET NOT-EOF TO TRUE.                   
+ 005610     MOVE 1 TO R-KEY.                       
+ 005700     PERFORM A002-READ UNTIL EOF.           
+ 005800     PERFORM A006-CLOSE.                    
+ 005900     STOP RUN.                              
+ 006000 A001-OPEN.                                 
+ 006100     OPEN INPUT INP01.                      
+ 006200     IF WS-STATUS = '00'                    
+ 006300      DISPLAY 'FILE INP01 OPEN SUCCESSFUL'  
+ 006400     ELSE                                   
+ 006500      DISPLAY 'FILE INP01 OPEN FAILURE'     
+ 006600     END-IF.                                
+ 006700     OPEN OUTPUT OUT01.                     
+ 006800     IF WS-STATUS = '00'                    
+ 006900      DISPLAY 'FILE OUT01 OPEN SUCCESSFUL'  
+ 007000     ELSE                                   
+ 007100      DISPLAY 'FILE OUT01 OPEN FAILURE'     
+ 007200     END-IF.                                
+ 007300 A002-READ.                                 
+ 007400                                            
+ 007500     READ INP01                             
+ 007600     AT END DISPLAY 'LAST RECORD'           
+007700         SET EOF TO TRUE                                 
+007800     NOT AT END                                          
+007900       PERFORM A004-WRITE-OUTPUT                         
+008000     END-READ.                                           
+008100     IF WS-STATUS = '00'                                 
+008200       DISPLAY 'INP01 FILE READ OPERATION SUCCESSFULL'   
+008300     ELSE                                                
+008400       DISPLAY 'INP01 FILE READ OPERATION FAILED'        
+008500     END-IF.                                             
+008600 A004-WRITE-OUTPUT.                                      
+008700     MOVE POLICY-ID TO VALID-ID.                         
+008800     MOVE POLICY-TERM TO VALID-TERM.                     
+008900     MOVE POLICY-LOB TO VALID-LOB.                       
+009000     MOVE POLICY-TYPE TO VALID-TYPE.                     
+009100     MOVE POLICY-NUMPIC TO VALID-NUMPIC.                 
+009200     MOVE POLICY-STATUS TO VALID-STATUS.                 
+009300     WRITE VAL-RECORD.                                   
+009310     ADD 1 TO R-KEY.                                     
+009400     IF WS-STATUS = '00'                                 
+009500       DISPLAY 'OUT01 FILE WRITE OPERATION SUCCESSFULL'  
+009600     ELSE                                                
+009700       DISPLAY 'OUT01 FILE WRITE OPERATION FAILED'       
+009800     END-IF.    
+ 010000 A006-CLOSE.                              
+ 010100     CLOSE INP01.                         
+ 010200     IF WS-STATUS = '00'                  
+ 010300       DISPLAY 'INP01 CLOSED SUCCESSFULLY'
+ 010400     ELSE                                 
+ 010500       DISPLAY 'INP01=CLOSED FAILED'      
+ 010600     END-IF.                              
+ 010700                                          
+ 010800     CLOSE OUT01.                         
+ 010900     IF WS-STATUS = '00'                  
+ 011000       DISPLAY 'OUT01 CLOSED SUCCESSFULLY'
+ 011100     ELSE                                 
+ 011200       DISPLAY 'OUT01 CLOSED FAILED'      
+ 011300     END-IF.                                                                       

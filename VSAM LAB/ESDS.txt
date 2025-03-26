@@ -1,0 +1,103 @@
+****** ***************************** Top of Data **********************
+000100 000100 IDENTIFICATION DIVISION.                                 
+000200 000200 PROGRAM-ID. ESDS01.                                      
+000300 000300 AUTHOR. KUMAR.                                           
+000400 000400                                                          
+000500 000500 ENVIRONMENT DIVISION.                                    
+000600 000600 INPUT-OUTPUT SECTION.                                    
+000700 000700 FILE-CONTROL.                                            
+000800 000800     SELECT INP01 ASSIGN TO AS-INPUT01                    
+000900 000900     ORGANIZATION IS SEQUENTIAL                           
+001000 001000     ACCESS MODE IS SEQUENTIAL                            
+001100 001100     FILE STATUS IS WS-STATUS.                            
+001200 001200                                                          
+001300 001300     SELECT OUT01 ASSIGN TO VALID01                       
+001400 001400     ORGANIZATION IS SEQUENTIAL                           
+001500 001500     ACCESS MODE IS SEQUENTIAL                            
+001700 001700     FILE STATUS IS WS-STATUS.                            
+001800 001800                                                          
+001900 001900 DATA DIVISION.                                           
+002000 002000 FILE SECTION.                                            
+002100 002100 FD INP01                                                 
+002200 002200     RECORD CONTAINS 80 CHARACTERS                        
+002300 002300     BLOCK CONTAINS 800 CHARACTERS                        
+002500 002500     DATA RECORD IS INP-RECORD.                           
+002600 002600 01 INP-RECORD.                                           
+ 002700 002700     05 EMP-ID PIC 9(05).                                         
+ 002800 002800     05 EMP-NAME PIC X(15).                                       
+ 002900 002900     05 EMP-DEPT PIC X(08).                                       
+ 003000 003000     05 EMP-LOCATION PIC X(10).                                   
+ 003100 003100     05 EMP-SALARY PIC 9(07).                                     
+ 003110 003110     05 EMP-BONUS PIC 9(04).                                      
+ 003200 003200     05 FILLER PIC X(31).                                         
+ 003300 003300 FD OUT01                                                         
+ 003400 003400     RECORD CONTAINS 80 CHARACTERS                                
+ 003401 003401     BLOCK CONTAINS 800 CHARACTERS                                
+ 003410 003410     RECORDING MODE IS F                                          
+ 003500 003500     DATA RECORD IS VAL-RECORD.                                   
+ 003600 003600 01 VAL-RECORD PIC X(80).                                         
+ 004300 004300                                                                  
+ 004400 004400 WORKING-STORAGE SECTION.                                         
+ 004500 004500 01 WS-STATUS PIC X(02).                                          
+ 004600 004600 01 WS-FILE-EOF-STATUS PIC X(01).                                 
+ 004700 004700     88 EOF VALUE 'Y'.                                            
+ 004800 004800     88 NOT-EOF VALUE 'N'.                                        
+ 004900 004900                                                                  
+ 005000 005000 PROCEDURE DIVISION.                                              
+ 005100 005100     PERFORM A001-OPEN.                                           
+ 005200 005200     SET NOT-EOF TO TRUE.                                         
+ 005300 005300     PERFORM A002-READ UNTIL EOF.                                 
+ 005400 005400     PERFORM A004-CLOSE.                                          
+ 005500 005500     STOP RUN.                                                    
+ 005600 005600 A001-OPEN.                                                       
+ 005700 005700     OPEN INPUT INP01.                                            
+ 005800 005800     IF WS-STATUS = '00'                                          
+ 005900 005900        DISPLAY 'INPUT FILE OPEN SUCCESSFUL'                      
+ 006000 006000     ELSE                                                         
+ 006100 006100        DISPLAY 'INPUT FILE OPEN FAILED'                          
+ 006200 006200     END-IF.                                                      
+ 006300 006300     OPEN OUTPUT OUT01.                                           
+ 006400 006400     IF WS-STATUS = '00'                                          
+ 006500 006500        DISPLAY 'OUTPUT FILE OPEN SUCCESSFUL'                     
+ 006600 006600     ELSE                                                         
+ 006700 006700        DISPLAY 'OUTPUT FILE OPEN FAILED'                         
+ 006800 006800     END-IF.                                                      
+ 006900 006900 A002-READ.                                                       
+ 007000 007000     READ INP01                                                   
+ 007100 007100       AT END DISPLAY 'LAST RECORD'                               
+ 007200 007200         SET EOF TO TRUE                                          
+ 007300 007300       NOT AT END                                                 
+ 007400 007400         DISPLAY INP-RECORD                                       
+ 007500 007500         PERFORM A003-WRITE-OUTPUT                                
+ 007600 007600     END-READ.                                                    
+ 007700 007700     IF WS-STATUS = '00'                                          
+ 007800 007800        DISPLAY 'INPUT FILE READ SUCCESSFUL'                      
+ 007900 007900     ELSE                                                         
+ 008000 008000        DISPLAY 'INPUT FILE READ FAILED'                       
+ 008100 008100     END-IF.                                                   
+ 008200 008200                                                               
+ 008300 008300 A003-WRITE-OUTPUT.                                            
+ 008310 008310     MOVE INP-RECORD TO VAL-RECORD.                            
+ 008900 008900     WRITE VAL-RECORD.                                         
+ 009000 009000     IF WS-STATUS = '00'                                       
+ 009100 009100        DISPLAY 'OUTPUT FILE WRITE SUCCESSFUL'                 
+ 009200 009200     ELSE                                                      
+ 009300 009300        DISPLAY 'OUTPUT FILE WRITE FAILED'                     
+ 009400 009400     END-IF.                                                   
+ 009500 009500                                                               
+ 009600 009600 A004-CLOSE.                                                   
+ 009700 009700     CLOSE INP01.                                              
+ 009800 009800     IF WS-STATUS = '00'                                       
+ 009900 009900        DISPLAY 'INPUT FILE CLOSE SUCCESSFUL'                  
+ 010000 010000     ELSE                                                      
+ 010100 010100        DISPLAY 'INPUT FILE CLOSE FAILED'                      
+ 010200 010200     END-IF.                                                   
+ 010300 010300     CLOSE OUT01.                                              
+ 010400 010400     IF WS-STATUS = '00'                                       
+ 010500 010500        DISPLAY 'OUTPUT FILE CLOSE SUCCESSFUL'                 
+ 010600 010600     ELSE                                                      
+ 010700 010700        DISPLAY 'OUTPUT FILE CLOSE FAILED'                     
+ 010800 010800     END-IF.                                                   
+
+
+THIS ESDS (INPUT) TO PS FILE (OUTPUT)

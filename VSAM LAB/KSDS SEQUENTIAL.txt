@@ -1,0 +1,110 @@
+000100 000100 IDENTIFICATION DIVISION.                                         
+000200 000200 PROGRAM-ID. COBKSDSS.                                            
+000300 000300 AUTHOR. UPENDRA.                                                 
+000400 000400*                                                                 
+000500 000500 ENVIRONMENT DIVISION.                                            
+000600 000600 INPUT-OUTPUT SECTION.                                            
+000700 000700 FILE-CONTROL.                                                    
+000800 000800     SELECT POLICY ASSIGN TO INPPS                                
+000900 000900     ORGANIZATION IS INDEXED                                      
+001000 001000     ACCESS MODE IS SEQUENTIAL                                    
+001100 001100     RECORD KEY IS P-NUM                                          
+001200 001200     FILE STATUS IS WS-STATUS.                                    
+001300 001300                                                                  
+001400 001400     SELECT VALID1 ASSIGN TO VALIDPS                              
+001500 001500     ORGANIZATION IS SEQUENTIAL                                   
+001600 001600     ACCESS MODE IS SEQUENTIAL                                    
+001700 001700     FILE STATUS IS WS-STATUS.                                    
+001800 001800                                                                  
+001900 001900 DATA DIVISION.                                                   
+002000 002000 FILE SECTION.                                                    
+002100 002100 FD POLICY                                                        
+002200 002200     RECORD CONTAINS 80 CHARACTERS                                
+002300 002300     BLOCK CONTAINS 400 CHARACTERS                                
+002500 002500     DATA RECORD IS POL-RECORD.                                   
+002600 002600 01 POL-RECORD.                                                   
+002700 002700     05 P-NUM PIC 9(5).                                           
+002800 002800     05 P-NAME PIC X(15).                                         
+002900 002900     05 P-LOC PIC X(15).                                          
+003000 003000     05 P-YEAR-PREMIUM PIC 9(5).                                  
+003100 003100     05 P-DUE PIC 9(5).                                           
+003200 003200     05 FILLER PIC X(35).                                         
+003300 003300 FD VALID1                                                        
+003400 003400     RECORD CONTAINS 80 CHARACTERS                                
+003500 003500     BLOCK CONTAINS 400 CHARACTERS                                
+003600 003600     RECORDING MODE IS F                                          
+003700 003700     DATA RECORD IS VAL-RECORD.                                   
+003800 003800 01 VAL-RECORD PIC X(80).                                         
+003900 003900                                                                  
+004000 004000 WORKING-STORAGE SECTION.                                         
+004100 004100 01 WS-STATUS PIC X(02).                                          
+004200 004200 01 WS-EOF-STATUS PIC X(01).                                      
+004300 004300     88 EOF VALUE 'Y'.                                            
+004400 004400     88 NOT-EOF VALUE 'N'.                                        
+004500 004500 01 WS-KEY.                                                       
+004600 004600     05 WS-KEY-VALUE PIC 9(5).                                    
+004700 004700 PROCEDURE DIVISION.                                              
+004800 004800     ACCEPT WS-KEY-VALUE.                                         
+004900 004900     PERFORM A001-OPEN.                                           
+005000 005000     SET NOT-EOF TO TRUE.                                         
+005100 005100     MOVE WS-KEY-VALUE TO P-NUM.                                  
+005200 005200     PERFORM A002-START.                                          
+005300 005300     PERFORM A005-CLOSE.                                          
+005400 005400     STOP RUN.                                                    
+005500 005500 A001-OPEN.                                                       
+005600 005600     OPEN INPUT POLICY.                                           
+005700 005700     IF WS-STATUS = '00'                                          
+005800 005800        DISPLAY 'FILE POLICY OPEN SUCCESSFULL'                    
+005900 005900     ELSE                                                         
+006000 006000        DISPLAY 'FILE POLICY OPEN FAILED'                         
+006100 006100     END-IF.                                                      
+006200 006200     OPEN OUTPUT VALID1.                                          
+006300 006300     IF WS-STATUS = '00'                                          
+006400 006400        DISPLAY 'FILE VALID OPEN SUCCESSFULL'                     
+006500 006500     ELSE                                                         
+006600 006600        DISPLAY 'FILE VALID OPEN FAILED'                          
+006700 006700     END-IF.                                                      
+006800 006800                                                                  
+006810 006810 A002-START.                                                      
+006820 006820     START POLICY                                                 
+006830 006830         KEY IS EQUAL TO P-NUM                                    
+006840 006840             INVALID KEY DISPLAY 'KEY NOT FOUND'                  
+006850 006850         NOT INVALID KEY PERFORM A003-READ UNTIL EOF              
+006860 006860     END-START.                                                   
+006900 006900 A003-READ.                                                       
+007000 007000     READ POLICY                                                  
+007010 007010          NEXT RECORD                                            
+007020 007020          AT END DISPLAY 'LAST RECORD'                           
+007300 007300      SET EOF TO TRUE                                            
+007400 007400     NOT AT END                                                  
+007600 007600      DISPLAY P-NUM                                              
+007700 007700      PERFORM A004-WRITE-OUTPUT                                  
+007800 007800     END-READ.                                                   
+007900 007900     IF WS-STATUS = '00'                                         
+008000 008000        DISPLAY 'POLICY FILE READ OPERATION SUCCESSFUL'          
+008100 008100     ELSE                                                        
+008200 008200        DISPLAY 'POLICY FILE READ OPERATION FAILED'              
+008300 008300     END-IF.                                                     
+008400 008400                                                                 
+008500 008500 A004-WRITE-OUTPUT.                                              
+008600 008600     MOVE POL-RECORD TO VAL-RECORD.                              
+008700 008700     WRITE VAL-RECORD.                                           
+008800 008800     IF WS-STATUS = '00'                                         
+008900 008900        DISPLAY 'VALID FILE WRITE OPERATION SUCCESSFUL'          
+009000 009000     ELSE                                                        
+009100 009100        DISPLAY 'VALID FILE WRITE OPERATION FAILED'              
+009200 009200     END-IF.                                                     
+009300 009300                                                                 
+009400 009400 A005-CLOSE.                                                     
+009500 009500     CLOSE POLICY.                                               
+009600 009600     IF WS-STATUS = '00'                                         
+009700 009700        DISPLAY 'POLICY CLOSE SUCCESSFULL'                        
+009800 009800     ELSE                                                         
+009900 009900        DISPLAY 'POLICY CLOSE FAILED'                             
+010000 010000     END-IF.                                                      
+010100 010100     CLOSE VALID1.                                                
+010200 010200     IF WS-STATUS = '00'                                          
+010300 010300        DISPLAY 'VALID CLOSE SUCCESSFULL'                         
+010400 010400     ELSE                                                         
+010500 010500        DISPLAY 'VALID CLOSE FAILED'                              
+010600 010600     END-IF.                                                      

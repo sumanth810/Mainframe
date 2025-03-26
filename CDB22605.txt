@@ -1,0 +1,161 @@
+ ---1----+----2----+----3----+----4----+----5----+----6----+----7--
+ ***************************** Top of Data ************************
+  IDENTIFICATION DIVISION.                                         
+  PROGRAM-ID. CDB22605.                                            
+                                                                   
+ ******************************************************************
+ * TITLE      - INSERT RECORDS FROM FILE INTOTABLE                 
+ *                                                                 
+ * FUNCTION   - READ THE EMPLOYEE DETAILS FROM EMPLOYEE FILE       
+ *              INSERT INTO EMPLOYEE_TABLE                         
+ *                                                                 
+ * CALLING MODULES   - NIL.                                        
+ *                                                                 
+ * CALLED  MODULES   - NIL.                                        
+ *                                                                 
+ * INPUT FILE        - MATE26.EMPLOYEE.FILE.                       
+ *                                                                 
+ * OUTPUT FILE       - NIL.                                        
+ *                                                                 
+ * TABLE USED        - EMPLOYEE_TABLE                              
+ *                                                                 
+ * DATABASE USED     - DBMATE1                                     
+ *                                                                 
+ ******************************************************************
+                                                                   
+ *>>>>>>>>>>--------------------------------------------<<<<<<<<<<*
+ *>> MAINTENANCE LOG:                                              
+ *>>------------------------------------------------------------<<*
+ *>>  DATE    | CREATED BY   | SHORT DESCRIPTION OF CHANGES MADE   
+ *>>29/12/2015| MATE26       | INITIAL VERSION                     
+                                                                   
+ *>>>>>>>>>>--------------------------------------------<<<<<<<<<<*
+ *>>  DATE    | CHANGED BY   | SHORT DESCRIPTION OF CHANGES MADE   
+ *>>DD/MM/YYYY|              |                                     
+ *>>>>>>>>>>--------------------------------------------<<<<<<<<<<*
+                                                                   
+  ENVIRONMENT DIVISION.                                            
+  INPUT-OUTPUT SECTION.                                            
+  FILE-CONTROL.                                                    
+                                                                   
+      SELECT EMP-FILE                                              
+             ASSIGN TO EMPFILE.                                    
+                                                                   
+  DATA DIVISION.                                                   
+  FILE SECTION.                                                    
+                                                                   
+  FD  EMP-FILE                                                     
+       LABEL RECORDS ARE STANDARD                                  
+       RECORDING MODE IS F                                         
+       RECORD CONTAINS 100 CHARACTERS.                             
+                                                                   
+  01  EMP-REC                         PIC X(100).                  
+                                                                   
+  WORKING-STORAGE SECTION.                                         
+                                                                   
+      EXEC SQL                                                     
+       INCLUDE SQLCA                                               
+      END-EXEC.                                                    
+                                                                   
+      EXEC SQL                                                     
+       INCLUDE EMPLOYEE                                            
+      END-EXEC.                                                    
+                                                                   
+  01  WS-EMP-REC.                                                  
+                                                                   
+      05 WS-EMP-NO                     PIC X(06).                  
+      05 WS-EMP-NAME                   PIC X(25).                  
+      05 WS-EMP-DES                    PIC X(15).                  
+      05 WS-EMP-PROJ                   PIC X(20).                  
+      05 WS-EMP-LOC                    PIC X(10).                  
+      05 WS-EMP-GENDER                 PIC X(01).                  
+      05 WS-EMP-SAL                    PIC 9(10).                  
+      05 FILLER                        PIC X(13).                  
+                                                                  
+  01  WS-COND-EOF                      PIC X(01).                 
+                                                                  
+      88 WS-COND-EOF-TRUE                         VALUE 'Y'.      
+      88 WS-COND-EOF-FALSE                        VALUE 'N'.      
+                                                                  
+  01  WS-COUNTER.                                                 
+                                                                  
+      05 WS-COUNTER-REC                PIC 9(02).                 
+      05 WS-COUNTER-CHANGE             PIC 9(10).                 
+      05 WS-SQLCODE                    PIC  ZZZZZZZZ9-.           
+                                                                  
+  PROCEDURE DIVISION.                                             
+  00000-MAIN-PARA.                                                
+                                                                  
+      PERFORM 01000-INIT-PARA.                                    
+      PERFORM 01100-OPEN-FILE-PARA.                               
+      PERFORM 20000-READ-EMP-FILE-PARA                            
+        UNTIL WS-COND-EOF-TRUE.                                   
+      PERFORM 90000-END-JOB-PARA.                                 
+      GOBACK.                                                     
+                                                                  
+  01000-INIT-PARA.                                                
+       MOVE 'N'                        TO WS-COND-EOF.            
+                                                                   
+  01100-OPEN-FILE-PARA.                                            
+      OPEN INPUT EMP-FILE.                                         
+                                                                   
+  20000-READ-EMP-FILE-PARA.                                        
+      DISPLAY '***** READ EMP FILE PARA *****'.                    
+                                                                   
+      READ EMP-FILE INTO WS-EMP-REC                                
+           AT END                                                  
+           MOVE 'Y'                    TO WS-COND-EOF              
+           NOT AT END                                              
+              PERFORM 21000-INSERT-RECORD-TABLE-PARA               
+      END-READ.                                                    
+                                                                   
+  21000-INSERT-RECORD-TABLE-PARA.                                  
+      DISPLAY '***** INSERT RECORD TABLE PARA *****'.              
+                                                                   
+      MOVE WS-EMP-NO                   TO EMPLOYEE-NO.             
+      MOVE WS-EMP-NAME                 TO EMPLOYEE-NAME.           
+      MOVE WS-EMP-PROJ                 TO EMPLOYEE-DEPT.           
+      MOVE WS-EMP-LOC                  TO EMPLOYEE-LOCATION.       
+      MOVE WS-EMP-SAL                  TO EMPLOYEE-SALARY.         
+      ADD  1                           TO WS-COUNTER-REC.          
+                                                                   
+      EXEC SQL                                                     
+        INSERT INTO EMPLOYEE_TABLE                                 
+               (EMPLOYEE_NO,                                       
+                EMPLOYEE_NAME,                                     
+                EMPLOYEE_DEPT,                                     
+                EMPLOYEE_LOCATION,                                 
+                EMPLOYEE_SALARY)                                   
+        VALUES                                                     
+               (:EMPLOYEE-NO,                                      
+                :EMPLOYEE-NAME,                                    
+                :EMPLOYEE-DEPT,                                    
+                :EMPLOYEE-LOCATION,                                
+                :EMPLOYEE-SALARY)                                  
+      END-EXEC.                                                    
+                                                                   
+      EVALUATE SQLCODE                                             
+          WHEN 0                                                   
+               DISPLAY ' RECORD ADDED SUCCESSFULLY'                
+               ADD 1                   TO WS-COUNTER-CHANGE        
+          WHEN -803                                                
+               DISPLAY ' DUPLICATE RECORD FOUND '                  
+          WHEN OTHER                                               
+               DISPLAY ' SQL CODE ERROR WHILE INSERT'              
+               MOVE SQLCODE            TO WS-SQLCODE               
+               DISPLAY ' SQLCODE IS : ' WS-SQLCODE                 
+      END-EVALUATE.                                                
+                                                                   
+ ***************************************************************** 
+ * PARAGRAPH TO END THE JOB BY CLOSING THE FILE                    
+ * AND DISPLAY THE RECORDS READ AND CHANGE.                        
+ ***************************************************************** 
+  90000-END-JOB-PARA.                                              
+       CLOSE EMP-FILE.                                             
+       DISPLAY ' NUMBER OF RECORDS INSERTED      : '               
+               WS-COUNTER-CHANGE.                                  
+       DISPLAY ' NUMBER OF RECORDS READ FROM INPUT FILE IS : '     
+               WS-COUNTER-REC.                                     
+       DISPLAY ' ***** PROGRAM ENDED SUCCESSFULLY ***** '.         
+       DISPLAY '            **** THE END **** '.                   
+                                                                   			   

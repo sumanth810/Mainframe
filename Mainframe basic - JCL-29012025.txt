@@ -1,0 +1,1168 @@
+Mainframe (Legacy) - Technology platform
+
+INfra (H/W) - O/S - Z/OS. --> System Administration (Admin)
+        Resources--> Memory,CPU,Server etc.
+        MVS--> Multiple virtual storage.
+
+
+JCL        --> Job control language (JOB). It is used to run/execute the programs written in Cobol.IT is used to run IBM utility programs.
+COBOL      --> Programming language. Common business oriented language. (Coding language). 
+FILES      --> used to store operational Data.
+Database   --> Used to store data in relational form (Rows*Columns). DB2/IMS
+ISPF/TSO   ==> Mainframe screen. Menu, commands.
+LPARs/Subsytem--> 
+
+Roles:
+System/Enterprise Admin --> infra side.
+Developers:---> Write and/or modify code/programs. Test the programs (Unit test).
+Tester:-> Integration and UAT (User acceptance test)
+Production support:-> monitor the code implemented production, Fix any issues
+DBA:-> Work on creation and optimization of database.
+
+
+
+
+
+
+
+C1       C2	C3	  C4	  C5
+name  	age	educationcompany designation
+
+Goutham  24 	BE	 WIPRO	 Trainee            	-> R0w1
+Roshni   23	BE	 WIPRO	 Irainee		--> R0w2
+Pranchan 40     BE	 XXX	 Trainer		--> R0w3
+
+
+
+V1 - 100
+V2 - 200
+
+result: 20000
+
+
+Program: PGM01
+
+
+MULTIPLY V1 by V2
+
+
+--------------------------------------------------ISPF--------------------------------------------------------------------------------------
+
+Login Screen of ISPF.
+
+
+Files/Dataset.
+Data --> collection of records.
+
+Types:
+1. Physical Sequential file/PS file/Flat file --> Store operational data/records. Data is accessed sequentially.
+2. Partitioned dataset/PDS                    --> Store members. Members can be Cobol program, JCL, (Copybooks etc.)
+3. Library                                    --> Store Load modules
+3. Generation Data group/GDG                  --> Store operational data/records.
+4. VSAM                                       --> Store operational and non operational data/records.
+
+
+File name: Max 44 characters but one word should not be more than 8 characters  
+
+
+OZADM.PRANCHAN.FILE01                       10CYL        4 CYL Primary      6 CYL Secondary
+
+4 records - 2 CYL,  4CYL
+
+6 more records - 4 CYL
+
+6 more records
+
+Properties:
+
+
+SPACE: Primary, Secondary
+
+CYL
+TRK
+MB
+KB
+RECORDS
+
+
+Record format -> Fixed BYTE (FB) /  Variable(VB)
+Record length ->  40 
+
+
+OZADM.PRANCHAN.FILE01 
+                                                        actual length of each record          RECORD FORMAT=FB         RECORD FORMAT=VB         
+----+----1----+----2----+----3----+----4
+PRANCHAN MUMBAI WIPRO TRAINER                  --> Record1        29                            40                    29 + 4 bytes (RBA)  = 33
+SURAJ PUNE WIPRO TRAINEE                       --> Record2        24				40                    24 + 4 bytes (RBA)  = 28
+SRITI CUTTACK WIPRO TRAINEE                    --> Record3        28				40                    28 + 4 bytes (RBA)  = 32
+MOHAN VIZAG WIPRO TRAINEE                      --> Record4        25				40                    25 + 4 bytes (RBA)  = 29
+
+                                                                                               160 bytes                                    122 bytes
+
+
+
+
+
+-----------------------------------------------------------24/01-JCL---------------------------------------------------------------------
+
+JCL: Job control language.
+
+Batch: Set of jobs that are running/executing.
+
+
+1. Run or execute cobol programs.
+2. Run or execute IBM utility programs.
+3. SORT
+
+
+
+
+Structure:
+
+JCL consist of 3 major statements:
+
+1: JOB statement
+2. EXEC statement
+3. DD statement
+4. SYSIN statement
+
+
+
+Coding sheet/screen:
+PDS: rec length: 80, Record format (Recfm) : FB
+Screensize of MF = 80 bytes
+
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+//OZA101$ JOB <parameters>
+//STEP001 EXEC <parameters>
+//INP001  DD <parameters>
+
+
+
+first 2 bytes:-  //
+3rd bytes:- NAME --> Can be given by you/developers. max name length: 8 bytes. 
+		     Start with alphabet. 
+		     Numbers and special characters(#,@,$) can be at the end.
+
+		JOB statement--> JOB Name
+		EXEC statement--> Step name
+		DD statement--> DD name.
+
+             * -->  Comment. Comments are statements that are not processed by Mainframe. They are used by developers/programmers for their 					understanding purpose only.
+
+After Name, 1 byte of Space (min), it will be followed by Operation.
+
+		JOB statement--> JOB
+		EXEC statement--> EXEC
+		DD statement--> DD
+
+After operation, 1 byte of Space (min), it will be followed by operands/parameters.
+
+
+//Name Operation Operands(parameters)
+
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+//OZA101$ JOB <parameters>
+//*STEP001 EXEC <parameters>                                          --> Comment. Ignored by the OS compiler.                        
+//INP001  DD <parameters>
+//STEP002 EXEC <parameters>                          
+// INP002  DD <parameters>                                            --> Space in 3 column. This statement will become Null statement.
+//STEP003 EXEC <parameters>                                               Null statement and all the subsequent statement will br ignored by 
+//INP003  DD <parameters>						  compiler. Null statement is considered as End of the job/jcl.
+
+
+
+JOb Statement/Card:
+1st statement of your jcl.
+operation=JOB
+In one JCL there can be only one JOB statement.
+
+e.g.  //OZA101$ JOB <parameters>
+
+*In case of multiple parameters, Each parameters will be separated by Comma (,).
+
+Positional Parameters.
+Accounting information.  (account number)  --> Account on which charges are applied by IBM. Mandatory.
+Programmer name--> Optional. only to identify who has written or executed the job. No actual use. 'programmer name'
+
+Keyword parameters.
+
+CLASS: - Classifies the job as huge/high running or Small/Low running jobs and based on classification, CPU/Resources are allocated to the job.
+
+Values: A-Z,0-9
+
+Syntax: CLASS=<Value>
+   e.g. CLASS=A
+
+
+MSGCLASS: 
+Values: A-Z,0-9
+
+Job execution related messages is stored automatically in a device called as SPOOL for 2-3 days only.
+
+Job execution related messages is stored in a output device (JHS) additional to Spool.
+
+Syntax: MSGCLASS=<Value>
+   e.g. MSGCLASS=A
+
+
+MSGLEVEL. --> Decides/controls what amount of information about a job should be stored in Spool or JHS.
+
+Syntax: MSGLEVEL=(<Value1>, <Value2>)
+   e.g. MSGLEVEL=(1,1)
+
+Value1: 0,1,2
+Value2: 0,1
+
+MSGLEVEL=(1,1)   --> 1,1 is the most appropriate value. It will display all the messages for a job.
+
+
+PRTY (PRIORITY): Assigns priority to the job of same class.
+
+Values: 0-15.
+e.g. PRTY = 15
+
+TIME: (minutes, seconds)  --> Controls execution time of a job. If the job exceeds the time mentioned in TIME parameter, then job will fail with S322 error. S322 error: return code which denotes, time limit exceeded.
+
+
+TIME=1440
+TIME=NOLIMT
+TIME=MAXIMUM
+For the above values, OS does not apply any control over time.
+
+REGION: Allocates amount of virtual memory to execute a job.
+
+Region=5M     --> OS will allocate 5 MB of virtual storage to the job
+REGION=0M     --> OS dynamically allocated memory.
+
+
+NOTIFY: Displays execution message on the Screen.
+
+NOTIFY = <Mainframe ID> --> Displays execution message on the Screen of the user whose mainframe ID is mentioned.
+NOTIFY=&SYSUID  --> OS automatically find out who submitted the job and the message will be displayed on the screen of the person who submitted 	            the job for execution.
+
+
+RESTART: Executes a job from a particular step mentioned in Restart parameter.
+
+RESTART=STEPNAME
+
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+//OZA101$ JOB <parameters>
+//STEP001 EXEC <parameters>                                                                                  
+//INP001  DD <parameters>
+//STEP002 EXEC <parameters>                     --> RC: 00/0004                  
+//INP002  DD <parameters>                                          
+//STEP003 EXEC <parameters>                      --> Step003: ABEND. RC: 0008                                            
+//INP003  DD <parameters>
+//STEP004 EXEC <parameters>                      --> bypassed                                             
+//INP004  DD <parameters>						 
+
+
+After adding restart parameter:
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+//OZA101$ JOB <parameters>, RESTART=STEP003      --> restarts the job from Step003
+//STEP001 EXEC <parameters>                      --> Step001 will be bypassed                                                                                 
+//INP001  DD <parameters>
+//STEP002 EXEC <parameters>                      --> Step002 will be bypassed                   
+//INP002  DD <parameters>                                          
+//STEP003 EXEC <parameters>                      --> Job will start from Step003                                            
+//INP003  DD <parameters>
+//STEP004 EXEC <parameters>                                                                   
+//INP004  DD <parameters>						 
+
+
+EXEC Statement:
+
+Should be written after job statement.
+In one JCL, there can be 255 Exec statements.
+Each EXEC statement represents one Step
+There cannot be duplicate names for Exec statement in a JCL
+EXEC statement is used to execute/run program or PROC which is passed in the EXEC statement.
+
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+
+//Name EXEC <Parameters>
+//STEP001 EXEC <parameters>                                         
+
+
+Parameters:
+
+1.
+PGM=<name of Program>              --> Program: Cobol program/IBM Utility programs/SORT program. Positional parameter. Mandatory parameter
+PROC name 
+
+//STEP001 EXEC PGM=SORT           --> Execute SORT program. 
+
+
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+//OZA101$ JOB <parameters>
+//STEP001 EXEC <parameters>                                                                                  
+//INP001  DD <parameters>
+//STEP002 EXEC <parameters>                                     
+//INP002  DD <parameters>                                          
+//STEP003 EXEC <parameters>                                                                 
+//INP003  DD <parameters>
+//STEP004 EXEC <parameters>                                                                   
+//INP004  DD <parameters>						 
+
+2.
+PARM: It is used to pass value inside the Cobol program.
+
+e.g. //STEP001 EXEC PGM=PGM001, PARM='PRANCHAN' 
+e.g. //STEP001 EXEC PGM=PGM001, PARM=150 
+
+3. REGION and TIME parameters can also be coded in EXEC statement.
+
+
+---------------------------------------------------------------25/12-------------------------------------------------------------------------
+DD statement:
+ Max 3273 DD statement for every exec statement.
+ DD names cannot be duplicate.
+ DD statement is used to pass file names that contain data to the program/PROC mentioned in the EXEC statement.
+ Name-->DD name --> Logical file name.
+ Actual file name -> Physical file.
+ DSN: Data Set Name.
+
+ 2 types of operation on a file.
+ READ (Input operation): File is classified as Input file.
+ Write (Output operation): File is classified as Output file.
+ 
+----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
+
+//DDName DD <Parameters>
+//INP001 DD <parameters>   
+
+1. DSN=<Filename>                       --> Physical file/Flat file/dataset.
+
+OZA120.AGENT.FILE
+
+//STEP001 EXEC PGM=SORT
+//INP001 DD DSN=OZA120.AGENT.FILE     --> Passed Physical file 'OZA120.AGENT.FILE' to the PGM SORT.
+
+
+2: DISP (Disposition)
+Input operation:
+DISP=SHR    --> SHR is most commonly used for input files. SHR--> Any one can used a file for READ operation.
+DISP=OLD    --> OLD: Files can used only with exclusive access.
+
+Output operation:
+
+DISP=<value1>,<Value2>,<Value3>
+
+Value 1:
+NEW  --> There is no file which is existing. Create a new file.
+MOD  --> JCl will check if there is a existing file. If yes, then modify the existing file. If no, Then create a new file.
+
+Value 2: Used to specify the status of file if the step executes successfully. RC=00/04
+
+CATLG      --> File will remain in the system and a calatog entry will be created in MF OS. 
+UNCATLG    --> File will remain in the system and a calatog entry will be removed from MF OS.
+DELETE     --> File will deleted from the system and the calatog entry will be removed from MF OS.
+PASS       --> Used for temporary files only. File will only be passed to subsequent steps. no catlg entry will be created for the file.
+
+
+//STEP001 EXEC PGM=SORT
+//INP001 DD DSN=OZA120.AGENT.FILE,
+            DISP=(NEW,CATLG,V3)
+
+
+Value 3: Used to specify the status of file if the step fails/abnormal termination. RC=08/12/16 
+
+CATLG      --> File will remain in the system and a calatog entry will be created in MF OS. 
+UNCATLG    --> File will remain in the system and a calatog entry will be removed from MF OS.
+DELETE     --> File will deleted from the system and the calatog entry will be removed from MF OS.
+
+e.g1
+//STEP001 EXEC PGM=SORT                  
+//INP001 DD DSN=OZA120.AGENT.FILE,
+            DISP=(NEW,CATLG,CATLG)  --> OZA120.AGENT.FILE is created in system and catalog entry is created if the Step is successful/fails.
+
+
+e.g2
+//STEP001 EXEC PGM=SORT                   
+//INP001 DD DSN=OZA120.AGENT.FILE,
+            DISP=(NEW,CATLG,DELETE)  --> OZA120.AGENT.FILE is created if the step is successful but the file will deleted and catlg entry will 					         be removed if the step fails.
+
+
+
+Temporary file:  There is no physical dataset. &&TEMP
+
+//INP001 DD DSN=&&TEMP,
+	 DISP=(NEW,PASS,DELETE)
+
+step1     file1
+
+step2    i/p: File1  O/P: file2  DISP=(NEW,PASS,DELETE)
+
+step3     i/p: File2  O/P: file3
+
+
+3. SPACE: only for O/P files.
+
+SPACE=(unit of space, Quantity1, Quantity2, Dir, RLSE) 
+
+
+Unit of space: CYL/TRK/RECORD/KB/MB.  mor commonly used are: CYL/TRK
+Quantity1: Amount of Primary space. Any whole number.
+Quantity2 : Amount of Secondary space. Any whole number.
+Dir: Mention Directory on for PDS. not included for PS (physical Sequential)/Flat files.
+
+RLSE: Release the space which is not used, back to OS.
+
+OZA120.AGENT.FILE
+
+SPACE=(CYL,(10,05),RLSE)
+
+
+15
+
+OZA120.AGENT.FILE  SPACE: 10, 5
+
+001	001	001	PHARMACY	675840	APPROVED    11 CYL      15 CYL   --> 4 CYL back to OS
+001	001	001	CLINIC		23190	APPROVED
+001	001	001	LAB		786541	APPROVED
+001	001	001	HOSPITAL	390230	APPROVED
+001	002	001	PHARMACY	754021	APPROVED
+001	002	001	LAB		13908	REJECTED
+002	001	001	PHARMACY	2500	REJECTED
+002	001	001	CLINIC		25000	APPROVED
+002	001	001	LAB		524000	APPROVED
+002	002	001	CLINIC		22300	REJECTED
+
+
+
+3. UNIT: Device where files are stored. for O/P files
+
+DISK    UNIT=SYSDA
+TAPE    UNIT=TAPE    . Files cannot be accessed directly from TAPE. You have to recall the files from tape to disk and them access it.
+
+4. VOLUME. for O/P files.
+
+Volume-<Serial number>        Serial number of the device where files will be stored.
+
+
+5. DCB. Data control block. Related to data/records of the files.
+
+DCB=(DSORG=,RECFM=,LRECL=,BLKSIZE= )
+
+DSORG: Dataset organisation. Type of file. PS: Physical Sequential File. PO: PDs.
+RECFN: Record format (FB/VB)
+LRECL: Record length
+BLKSIZE: blocksize. Multiple of record length
+
+e.g.
+
+I/P
+
+//STEP001 EXEC PGM=SORT                            --> EXEC statement                
+//INP001 DD DSN=OZA120.AGENT.FILE,                 --> DD statement. 
+//            DISP=SHR                             --> SHR/OLD
+
+
+O/P
+
+//STEP001 EXEC PGM=SORT                            --> EXEC statement                
+//INP001 DD DSN=OZA120.AGENT.FILE,                 --> DD statement. Input operation/Input file
+//            DISP=SHR                             --> SHR/OLD
+//OUT001 DD DSN=OZA120.AGENT.FILE.OP,               --> DD statement. Output operation/Output file
+//		DISP=(NEW,CATLG,DELETE),
+//		SPACE=(CYL,(10,5),RLSE),
+//		UNIT=SYSDA,
+//		VOLUME=<Serial number>,
+//		DCB=(DSORG=PS,RECFM=FB,LRECL=80,BLKSIZE=400)
+
+
+
+4.  SYSIN  : Used to pass instruction/commands/values to program.
+
+//SYSIN DD *
+    instructions/command/values.
+/*
+
+e.g.
+
+//SYSIN     DD *
+  SORT FIELDS=(1,6,CH,A)                            ---> Sort statements
+/*
+
+5. SYSOUT:  Used to display specific messages of a job in spool/JHS
+
+//SYSOUT DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+
+
+
+Sample JCL example:
+
+//OZA101$  JOB (123),'IBMMAINFRAMER',CLASS=C,MSGCLASS=S,MSGLEVEL=(1,1),      --> Job statement
+//          NOTIFY=&SYSUID  
+//STEP01    EXEC PGM=SORT                           --> EXEC statement
+//SYSOUT    DD SYSOUT=*                             --> SYSOUT Statement
+//SORTIN    DD DSN=OZA101.SORT.INPUT.FILE,DISP=SHR  ---> DD statement for Input file
+//SORTOUT   DD DSN=OZA101.SORT.OUTPUT.FILE,         ---> DD statement for Output file
+//          DISP=(NEW,CATLG,DELETE),
+//          UNIT=SYSDA,
+//          SPACE=(CYL,(1,4),RLSE),
+//          DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//SYSIN     DD *                                    --> SYSIN statement
+  SORT FIELDS=(1,6,CH,A)                            ---> Sort statements
+/*
+
+
+
+--------------------------------------------------27/01-SORT (DFSORT/SYNCSORT)----------------------------------------------------------------
+
+JCL/cobol program/PROC  --> Stored in a file--> Partitioned Dataset/PDS-->Members
+
+--------------------------------------------------28/01-IBM Utility program-------------------------------------------------------------------
+
+IDCAMS --> used to create GDG and VSAM files.
+
+IEBCOPY --> Used to copy members from one PDS to another PDS.
+
+IEBGENER --> Used to copy data/records from one file to another file without sorting.
+
+IEFBR14 --> Used to create/Delete PS files.
+
+IKJEFT01 --> Used to bind and run Cobol+DB2 programs.
+
+
+
+--------------------------------------------------28/01-GDG-------------------------------------------------------------------
+
+GDG: Generation Data Group.
+
+2 parts - 1. GDG BASE  2. Version.
+
+OZA100.SACHIN.FILE --> GDG Base.         --> IDCAMS. Doesnot contain any records.
+
+OZA100.SACHIN.FILE.G0001V00   --> Versions --> Version1 --> SORT/IEFBR14/Cobol pgm/IEBGENER.   --> Contains records
+OZA100.SACHIN.FILE.G0002V00		   --> Version2
+OZA100.SACHIN.FILE.G0003V00		   --> Version3
+          :
+          :
+OZA100.SACHIN.FILE.G0255V00		   --> Version255
+
+
+
+In order create a new version, In the output DD statement Use GDG Base(+1)
+If you want to read or access, current/latest version use Use GDG Base(0)
+If you want to read or access, one version prior to the latest version use Use GDG Base(-1)
+If you want to read or access, 3 version prior to the latest version use Use GDG Base(-2)
+In order to create a version, first it is mandatory that GDG base is created (using IDCAMS) or it is already present
+For one GDG base, there can be max up to 255 versions.
+
+e.g.
+
+Sample JCL example:
+
+//OZA101$  JOB (123),'IBMMAINFRAMER',CLASS=C,MSGCLASS=S,MSGLEVEL=(1,1),      --> Job statement
+//          NOTIFY=&SYSUID  
+//STEP01    EXEC PGM=SORT                           --> EXEC statement
+//SYSOUT    DD SYSOUT=*                             --> SYSOUT Statement
+//SORTIN    DD DSN=OZA101.SORT.INPUT.FILE,DISP=SHR  ---> DD statement for Input file
+//SORTOUT   DD DSN=OZA100.SACHIN.FILE(+1),         ---> DD statement for Output file (GDG version)
+//          DISP=(NEW,CATLG,DELETE),
+//          UNIT=SYSDA,
+//          SPACE=(CYL,(1,4),RLSE),
+//          DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//SYSIN     DD *                                    --> SYSIN statement
+  SORT FIELDS=(1,6,CH,A)                            ---> Sort statements
+/*
+
+Sample JCL example:
+
+OZA100.SACHIN.FILE.G0001V00   --> Versions --> Version1 
+OZA100.SACHIN.FILE.G0002V00		   --> Version2
+OZA100.SACHIN.FILE.G0003V00		   --> Version3
+
+//OZA101$  JOB (123),'IBMMAINFRAMER',CLASS=C,MSGCLASS=S,MSGLEVEL=(1,1),      --> Job statement
+//          NOTIFY=&SYSUID  
+//STEP01    EXEC PGM=SORT                           --> EXEC statement
+//SYSOUT    DD SYSOUT=*                             --> SYSOUT Statement
+//SORTIN    DD DSN=OZA100.SACHIN.FILE(0),DISP=SHR  ---> DD statement to read current version of GDG.
+//SORTOUT   DD DSN=OZA100.SACHIN.FILE(+1),         ---> DD statement to create new GDG version.
+//          DISP=(NEW,CATLG,DELETE),
+//          UNIT=SYSDA,
+//          SPACE=(CYL,(1,4),RLSE),
+//          DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//SYSIN     DD *                                    --> SYSIN statement
+  SORT FIELDS=(1,6,CH,A)                            ---> Sort statements
+/*
+
+
+Parameters to create GDG base:
+
+1. Define:   Created the GDG base
+ 	Define GDG(name(GDG base name))
+
+2. Limit: decide how many version of GDG base that can be created. MAX versions that we can give is 255.
+
+3. EMTPY/NOEMPTY:  Decides what to be done once the limit of version is full. Default parameter is NOEEMPTY
+
+   EMPTY:  
+
+OZA100.SACHIN.FILE  --> GDG BASE.  Limit = 05 
+
+OZA100.SACHIN.FILE.G0001V00   --> Versions --> Version1 
+OZA100.SACHIN.FILE.G0002V00		   --> Version2
+OZA100.SACHIN.FILE.G0003V00		   --> Version3
+OZA100.SACHIN.FILE.G0004V00		   --> Version4
+OZA100.SACHIN.FILE.G0005V00		   --> Version5
+
+6th Version????
+
+EMPTY  --> When we try to create 6th version, All 5 previous versions will be deleted and new version will be created.
+
+OZA100.SACHIN.FILE.G0001V00        --> new version
+
+NOEMPTY --> When we try to create 6th version, only the oldest versions will be deleted and new version will be created.
+
+OZA100.SACHIN.FILE.G0001V00   --> Versions --> Version1 --> Deleted
+OZA100.SACHIN.FILE.G0002V00		   --> Version2
+OZA100.SACHIN.FILE.G0003V00		   --> Version3
+OZA100.SACHIN.FILE.G0004V00		   --> Version4
+OZA100.SACHIN.FILE.G0005V00		   --> Version5
+OZA100.SACHIN.FILE.G0006V00		   --> Version6
+
+
+SCRATCH/NO SCRATCH: Default is NOSCRATCH.
+
+NO SCRATCH: --> When you want to delete a GDG base, NOSCRATCH--> the GDG base will be Uncatalogued. but not physically deleted.
+SCRATCH     --> the GDG base will be Uncatalogued as well as physically deleted.
+
+
+
+--------------------------------------------------------29/01-cataloged procedures---------------------------------------------------------
+
+
+Set of JCL statements (Steps) written separately in a different PDS and called and executed by the JOB with the help of EXEC statement in the JOB.
+One job can have max 255 PROCs
+You cannot run/execute a PROC directly. PROC are executes inside a JOb with the help of EXEC statement.
+PROC cannot have JOB statement.
+Inside a PROC, you cannot have SYSIN DD*
+
+
+JOB:
+
+/OZA101$  JOB (123),'IBMMAINFRAMER',CLASS=C,MSGCLASS=S,MSGLEVEL=(1,1),      --> Job statement
+//          NOTIFY=&SYSUID  
+//PROCLIB JCLLIB ORDER=OZA@@@.PROCLIB                       --> Proclib statement. Name: PROCLIB (any name as per choice), Operation: JCLLIB
+//*                                                             OZA@@@.PROCLIB --> the PDS where proc-PROC001 is present.
+//STEP001 EXEC PROC001                      
+
+
+
+
+Separate PDS. --> OZA@@@.PROCLIB-->Members-->Procedures.
+
+//PROC001 PROC                                     --> PROC statement. PROC001 --> PROC name  
+//STEP01    EXEC PGM=SORT                           --> EXEC statement
+//SYSOUT    DD SYSOUT=*                             --> SYSOUT Statement
+//SORTIN    DD DSN=OZA100.SACHIN.FILE(0),DISP=SHR  ---> DD statement to read current version of GDG.
+//SORTOUT   DD DSN=OZA100.SACHIN.FILE(+1),         ---> DD statement to create new GDG version.
+//          DISP=(NEW,CATLG,DELETE),
+//          UNIT=SYSDA,
+//          SPACE=(CYL,(1,4),RLSE),
+//          DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)
+//SYSIN     DD *                                    --> SYSIN statement
+  SORT FIELDS=(1,6,CH,A)                            ---> Sort statements
+/*
+
+
+other types of procedures:
+
+Nested Procedures.      --> Procedure inside a procedure.
+Instream procedures.    --> Procedure inside a job.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PDS and members:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

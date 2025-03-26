@@ -1,0 +1,772 @@
+----------------------------------------------------------VSAM 17/02----------------------------------------------------------------------.
+
+is a type of dataset.
+Secured.
+Has more space. Space is distributed. Records can be added anywhere in the file based on sequence.
+used to store huge volumes of data (mostly historical data)
+records can be accessed Sequentially or Random. High speed data retrieval / Faster data access.
+VSAM Dataset components: 
+     CLUSTER --> BASE.
+     DATA  --> Data is written.
+     INDEX --> KSDS
+
+4Types.
+
+ESDS - Entry Sequence Dataset. Equivalent to PS file with Security. Data cannot be added/deleted/modified manually.
+Access mode: Sequential. Data retrieval is time consuming just like PS file.
+Free space is at the bottom. records can be added at the end.
+Data once written cannot be deleted. It can be overwritten/reused.
+No concept of KEY. Data is accessed sequentially.
+
+ESDS VSAM Dataset components: 
+     CLUSTER --> BASE.
+     DATA  --> Data is written.
+
+Control interval 
+
+Records/Data  + information Free space + RDF + CIDF   --> Actual Size of each control interval
+RDF: Record definition field. information about record length. 3 bytes
+CIDF: Control interval definition field. information about Control interval. 4 bytes.
+
+
+Control Area: Summation of one or more control intervals.
+
+CI/CA SPLIT ??????  --> interview question
+
+  
+
+CREATE ESDS VSAM CLUSTER. --> IDCAMS. SYSIN DD* --> Instructions. (DEFINE command and other properties)
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//SYIN DD *
+  DEFINE CLUSTER (NAME(OZAXXX.VSAM.ESDS)  -                                 --> NAME(OZAXXX.VSAM.ESDS) --> Name of the VSAM cluster. Can be any name.
+                  CYLS (5,10)             -                                 --> SPACE (primary qty, Sec Qty), CYL/TRK/FB/MB/REC
+                  VOLUME (SER number)     - 
+                  CISZ (number)           -                                 --> Size of Control interval. Multiple of 512 . mostly used: 4096  
+                  RECORDSIZE (AVG,MAX)    -                                 --> RECORDSIZE/RECSZ : Length of record. 
+                                                                                Variable Byte: AVG < MAX,   FIXED BYTE: AVG = MAX      
+                  NONINDEXED              -                                 -->  NONINDEXED:- the file is a ESDS VSAM file. KSDS:- INDEXED. RRDS:= NUMBERED.
+                  REUSE                   -                                 -->  Reuse free space for further addition of records in the file. 
+                  FREESPACE(% Primary Space, % Secondary space)             -->  Percentage of free space to be released back to O/S
+                  SHAREOPTIONS(Value1, Value2))                             -->  Value1: Cross region (shared my multiple jobs/Users in the same MVS system).value1 = 1-4
+
+                                                                         Value2: Cross system. (shared my multiple jobs/Users in the different MVS system).value1 = 1-4
+                                                                                Default: SHAREOPTIONS(1, 3)
+                                                                                    1: Only one job can write data in the file or Other jobs can only read data from file.
+                                                                                    2: Only one job can write data in the file and Other jobs can only read data from file.
+                                                                                    3&4: allows multiple users to read & write concurrently. No restriction.
+                                                                                                     .
+    
+       
+OZA100.SPORTS.VSAM.ESDS
+                                                               AVG              MAX
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark CSK 60303990387                             29
+M S DHONI CSK 30202870255                                 25  
+KEIRON POLLARD MI 060504230385                            30 
+BRENDON MCCULLUM CSK 030503870335                         33 
+JASPRIT BUMRAH MI 060303990387                            30           
+DWAYNE SMITH CSK 40504500423                              28 
+DUPLESSIS CSK 030303530287                                26 
+VIRAT KOHLI RCB	030504120350                              28
+CHRIS GAYLE RCB	060303990387                              28   29                50
+
+
+
+
+OZA100.SPORTS.VSAM.ESDS
+                                             
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387  0001     50  
+M S DHONI	        CSK	030202870255  0003     50
+KEIRON POLLARD	        MI	060504230385  0005     50
+BRENDON MCCULLUM        CSK	030503870335  0007     50
+JASPRIT BUMRAH	        MI	060303990387  0008     50          
+DWAYNE SMITH  	        CSK	040504500423  0010     50
+DUPLESSIS	        CSK	030303530287  0015     50
+VIRAT KOHLI	        RCB	030504120350  0026     50
+CHRIS GAYLE	        RCB	060303990387  0027     50       50                  50 
+
+
+KSDS - Key Sequence Dataset. Most commonly used.
+Access mode: Sequential or Random. Random access is possible with the help of KEY. Data retrieval/Access is faster.
+             Key should be Unique and in increasing order of Sequence. Numeric/Alphanumeric.
+             Distributed free space is available, Records can be added in the middle based on sequence of the KEY.
+             Records can be deleted. and free space created after record deletion can be reused.
+KSDS VSAM Dataset components: 
+     CLUSTER --> BASE.
+     DATA  --> Data is written.
+     INDEX --> Stores the KEY. is present only for KSDS datasets.        
+
+RANDOM --> Access only the record which matches the key
+e.g. KEY=0004
+
+DWAYNE SMITH  	        CSK	040504500423
+
+
+SQUENTIAL--> Access the record which matches the key and all the records sequentially after that record.
+e.g. KEY=0004
+
+DWAYNE SMITH  	        CSK	040504500423
+DUPLESSIS	        CSK	030303530287
+VIRAT KOHLI	        RCB	030504120350
+CHRIS GAYLE	        RCB	060303990387
+
+
+JASPRIT BUMRAH	        MI	060303990387  0008
+
+Michale Stark	        CSK	060303990387  0001
+
+KEIRON POLLARD	        MI	060504230385  0005
+
+
+
+OZA100.SPORTS.VSAM.KSDS
+                                             KEY
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387 0001
+M S DHONI	        CSK	030202870255 0003 
+KEIRON POLLARD	        MI	060504230385 0005
+BRENDON MCCULLUM        CSK	030503870335 0007
+JASPRIT BUMRAH	        MI	060303990387 0008          
+DWAYNE SMITH  	        CSK	040504500423 0010
+DUPLESSIS	        CSK	030303530287 0015
+VIRAT KOHLI	        RCB	030504120350 0026
+CHRIS GAYLE	        RCB	060303990387 0027 
+
+
+
+
+
+CREATE KSDS VSAM CLUSTER. --> IDCAMS. SYSIN DD* --> Instructions. (DEFINE command and other properties)
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//SYIN DD *
+  DEFINE CLUSTER (NAME(OZAXXX.VSAM.KSDS)  -                                 --> NAME(OZAXXX.VSAM.KSDS) --> Name of the VSAM cluster. Can be any name.
+                  KEYS (Length, offset)    -                                --> Defines the length and starting position of record that is considered as key.
+                  CYLS (5,10)             -                                 --> SPACE (primary qty, Sec Qty), CYL/TRK/FB/MB/REC
+                  VOLUME (SER number)     - 
+                  CISZ (number)           -                                 --> Size of Control interval. Multiple of 512 . mostly used: 4096  
+                  RECORDSIZE (AVG,MAX)    -                                 --> RECORDSIZE/RECSZ : Length of record. 
+                                                                                Variable Byte: AVG < MAX,   FIXED BYTE: AVG = MAX      
+                  INDEXED              -                                    -->  NONINDEXED:- the file is a ESDS VSAM file. KSDS:- INDEXED. RRDS:= NUMBERED.
+                  REUSE                   -                                 -->  Reuse free space for further addition of records in the file. 
+                  FREESPACE(% Primary Space, % Secondary space)             -->  Percentage of free space to be released back to O/S
+                  SHAREOPTIONS(Value1, Value2))                             -->  Value1: Cross region (shared my multiple jobs/Users in the same MVS system).value1 = 1-4
+                                                                         Value2: Cross system. (shared my multiple jobs/Users in the different MVS system).value1 = 1-4
+                                                                                Default: SHAREOPTIONS(1, 3)
+                                                                                    1: Only one job can write data in the file or Other jobs can only read data from file.
+                                                                                    2: Only one job can write data in the file and Other jobs can only read data from file.
+                                                                                    3&4: allows multiple users to read & write concurrently. No restriction.
+                  TO/FOR                                                    --> Expiration date. TO <DATE> ,  FOR <number of days>
+
+
+OZA100.SPORTS.VSAM.KSDS  (50 bytes)
+KEYS (5, 0)    -  
+
+RBA(record byte address)
+                                             KEY
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387 0001
+M S DHONI	        CSK	030202870255 0003 
+KEIRON POLLARD	        MI	060504230385 0005
+BRENDON MCCULLUM        CSK	030503870335 0007
+JASPRIT BUMRAH	        MI	060303990387 0008          
+DWAYNE SMITH  	        CSK	040504500423 0010
+DUPLESSIS	        CSK	030303530287 0015
+VIRAT KOHLI	        RCB	030504120350 0026
+CHRIS GAYLE	        RCB	060303990387 0027 
+
+
+
+
+RRDS - Relative record data set. Fastest dataset.
+
+Access mode: Random. Random access is possible with the help of record number. Data retrieval/Access is faster.
+             Record number should be Unique and in increasing order of Sequence.
+             Distributed free slots is available. 
+             Records can be deleted. and free space created after record deletion can be reused.
+
+RRDS VSAM Dataset components: 
+     CLUSTER --> BASE.
+     DATA  --> Data is written.
+     
+JASPRIT BUMRAH	        MI	060303990387 0005 
+JOFRA ARCHER            MI      060303990387 0005 
+
+
+OZA100.SPORTS.VSAM.RRDS
+ 
+Rec 
+num                                            
+     ----+----1----+----2----+----3----+----4----+----5
+0001 Michale Stark	        CSK	060303990387 
+0002 M S DHONI	        CSK	030202870255  
+0003 KEIRON POLLARD	        MI	060504230385 
+0004 BRENDON MCCULLUM        CSK	030503870335 
+0005 JOFRA ARCHER            MI      060303990387           
+0006 DWAYNE SMITH  	        CSK	040504500423 
+0007 DUPLESSIS	        CSK	030303530287 
+0008 VIRAT KOHLI	        RCB	030504120350 
+0009 CHRIS GAYLE	        RCB	060303990387 
+
+CREATE RRDS VSAM CLUSTER. --> IDCAMS. SYSIN DD* --> Instructions. (DEFINE command and other properties)
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//SYIN DD *
+  DEFINE CLUSTER (NAME(OZAXXX.VSAM.RRDS)  -                                 --> NAME(OZAXXX.VSAM.RRDS) --> Name of the VSAM cluster. Can be any name.
+                  CYLS (5,10)             -                                 --> SPACE (primary qty, Sec Qty), CYL/TRK/FB/MB/REC
+                  VOLUME (SER number)     - 
+                  CISZ (number)           -                                 --> Size of Control interval. Multiple of 512 . mostly used: 4096  
+                  RECORDSIZE (AVG,MAX)    -                                 --> RECORDSIZE/RECSZ : Length of record. 
+                                                                                Variable Byte: AVG < MAX,   FIXED BYTE: AVG = MAX      
+                  NUMBERED              -                                    -->  NONINDEXED:- the file is a ESDS VSAM file. KSDS:- INDEXED. RRDS:= NUMBERED.
+                  REUSE                   -                                 -->  Reuse free space for further addition of records in the file. 
+                  FREESPACE(% Primary Space, % Secondary space)             -->  Percentage of free space to be released back to O/S
+                  SHAREOPTIONS(Value1, Value2))                             -->  Value1: Cross region (shared my multiple jobs/Users in the same MVS system).value1 = 1-4
+                                                                         Value2: Cross system. (shared my multiple jobs/Users in the different MVS system).value1 = 1-4
+                                                                                Default: SHAREOPTIONS(1, 3)
+                                                                                    1: Only one job can write data in the file or Other jobs can only read data from file.
+                                                                                    2: Only one job can write data in the file and Other jobs can only read data from file.
+                                                                                    3&4: allows multiple users to read & write concurrently. No restriction.
+
+
+
+
+LDS -  Linear Dataset.
+
+
+
+
+
+VSAM files are operated through IBM utility program - IDCAMS
+Operations: CREATION/DELETION/DATA LOADING/DATA COPYING/LISTCAT/PRINT  etc.
+
+
+
+OZA100.TEMP  5 CYL 80 FB
+
+
+
+----------------------------------------------------------VSAM(IDCAMS) commands 18/02-------------------------------------------------------------------------------
+
+1. DEFINE : Create VSAM DATASETS.
+
+
+2. ALTER: Change properties of a VSAM dataset.
+
+   e.g.  Change Name   --> NEW NAME
+   e.g.  ADD volume    --> ADD VOLUME
+   e.g.  REMOVE volume --> REMOVE VOLUME
+   e.g.  Change Key    --> KEY (length, offset)
+   e.g.  change record size --> RECORDSIZE (avg , max)
+   e.g.  change the % of free space to be released --> [FREESPACE(CI-percentage CA-percentage)]
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//SYIN DD *
+  ALTER  OZAXXX.VSAM.RRDS                         -                            --> Existing/original VSAM dataset                          
+         NEW NAME (OZAXXX.VSAM.RRDS1)             -                            --> Name of the original VSAM dataset changed to New name 
+         ADD VOLUME (ser number)                  -                            --> Added volume serial number to VSAM
+         KEY (new length, new offset)             -                            --> Changed the value of Key parameter
+         RECORDSIZE (new avg , new max)                                        --> Changed the value of Record size parameter 
+         ERASE/NOERASE                                                         --> ERASE:- When a VSAM cluster is deleted, The data component is overwritten with binary 0.
+                                                                                   Used to change the property of VSAM to ERASE or NOERASE.                      
+	
+
+
+3. REPRO: Load data into VSAM dataset.
+          Copy the data from PS Dataset/GDG to VSAM dataset,
+                        From VSAM Dataset to VSAM Dataset,
+                        From VSAM dataset to PS File/GDG.
+                        both the datasets should be existing. but the output VSAM dataset would be empty.
+
+
+e.g.1: REPRO Using DD names
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+
+  
+
+
+e.g.2 REPRO without Using DD names
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//SYIN DD *
+  REPRO INDATASET (File name 1)                                                  --> file name of the input file from where the data is to be copied
+        OUTDATASET (File name 2)                                                 --> file name of the Output file where the data is copied
+
+
+
+e.g.3 COPY only particular records from one VSAM dataset to another VSAM dataset.
+
+ESDS: FROMADDRES / TOADDRESS
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+        FROMADDRESS(RBA)                                                 
+        TOADDRESS(RBA)
+      
+
+RBA(record byte address) 50 Fixed RBA for 1st record: 0. For other records, it will be multiple of records length.
+
+file name 1:   OZAXXX.VSAM.KSDS
+                                             KEY    RBA 
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387 0001   0
+M S DHONI	        CSK	030202870255 0003   50
+KEIRON POLLARD	        MI	060504230385 0005   100
+BRENDON MCCULLUM        CSK	030503870335 0007   150
+JASPRIT BUMRAH	        MI	060303990387 0008   200         
+DWAYNE SMITH  	        CSK	040504500423 0010   250
+DUPLESSIS	        CSK	030303530287 0015   300
+VIRAT KOHLI	        RCB	030504120350 0026   350
+CHRIS GAYLE	        RCB	060303990387 0027   400
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = OZAXXX.VSAM.KSDS, DISP=SHR                                     --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = OZAXXX.VSAM.KSDS.OUT, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                          --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                         --> DD name of the Output file where the data is copied
+        FROMADDRESS(100)                                                         --> Copies the records from RBA 100                                            
+        TOADDRESS(300)                                                           --> Copies the records Upto RBA 300  
+
+
+file name 2:   OZAXXX.VSAM.KSDS>OUT
+                                             KEY    RBA 
+----+----1----+----2----+----3----+----4----+----5
+
+KEIRON POLLARD	        MI	060504230385 0005   100
+BRENDON MCCULLUM        CSK	030503870335 0007   150
+JASPRIT BUMRAH	        MI	060303990387 0008   200         
+DWAYNE SMITH  	        CSK	040504500423 0010   250
+DUPLESSIS	        CSK	030303530287 0015   300
+
+
+KSDS
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+        FROMKEY(Key value)                                                         --> Copies the records from Key                                            
+        TOKEY(Key value)                                                           --> Copies the records Upto Key  
+
+
+OZAXXX.VSAM.KSDS   KEY=0005
+
+SELECT....
+RECORD KEY Is ID
+
+WS SECTION:
+
+WS_NUMBER  PIC 9 (05) VALUE '0008'      WS_NUMBER = 0008  
+
+01 WS-PRANCHAN.
+   05 WS-ROHIT  PIC 9(05).
+
+ACCEPT WS-ROHIT                        WS-ROHIT = 0008                                   
+
+JCL
+
+SYSIN DD*
+0008 
+
+FD
+
+NAME
+DEPT
+ROLL NO
+ID --> KEY
+
+
+MOVE 0008 TO ID                        1  ID = 0008
+
+MOVE WS_NUMBER TO ID                   2 ID = 0008
+
+MOVE WS-ROHIT TO ID                    3 ID = 0008
+
+
+
+READ file name
+KEY IS ID
+
+
+                                             KEY
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387 0001
+M S DHONI	        CSK	030202870255 0003 
+KEIRON POLLARD	        MI	060504230385 0005
+BRENDON MCCULLUM        CSK	030503870335 0007
+JASPRIT BUMRAH	        MI	060303990387 0008          
+DWAYNE SMITH  	        CSK	040504500423 0010
+DUPLESSIS	        CSK	030303530287 0015
+VIRAT KOHLI	        RCB	030504120350 0026
+CHRIS GAYLE	        RCB	060303990387 0027 
+
+
+MOVE 0005 TO WS-RECORD-KEY
+
+      START <LOGICAL FILE NAME>
+         KEY IS EQUAL TO WS-RECORD-KEY
+         INVALID KEY <Statement> 
+         NOT INVALID KEY  <Perform READ operation>
+      END-START
+         
+      READ <logical file name>                                                    --> Reads next records from the file where the pointer is set.
+       NEXT RECORD
+         AT END  <Statement>
+         NOT AT END <Statement>
+
+
+
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = OZAXXX.VSAM.KSDS, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = OZAXXX.VSAM.KSDS.OUT, DISP=SHR                              --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+        FROMKEY(0007)                                                         --> Copies the records from Key 0007                                           
+        TOKEY(0026)                                                           --> Copies the records Upto Key 0026
+
+
+OZAXXX.VSAM.KSDS.OUT
+                                             KEY
+----+----1----+----2----+----3----+----4----+----5
+BRENDON MCCULLUM        CSK	030503870335 0007
+JASPRIT BUMRAH	        MI	060303990387 0008          
+DWAYNE SMITH  	        CSK	040504500423 0010
+DUPLESSIS	        CSK	030303530287 0015
+VIRAT KOHLI	        RCB	030504120350 0026
+
+
+
+
+RRDS
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+        FROMNUMBER(record number)                                                         --> Copies the records from record number                                            
+        TONUMNER(record  number)                                                           --> Copies the records Upto record number 
+
+
+
+e.g.3 SKIP particular records and copy remaining records from one dataset to another VSAM dataset.
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  REPRO INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+        OUTFILE (OUT001)                                                 --> DD name of the Output file where the data is copied
+        SKIP (number)                                                    --> Skips the number of records and copies the remaining records.
+
+
+
+
+4. LISTCAT: See the properties of VSAM dataset.
+
+
+5. PRINT: Display the records (SYSPRINT) present in VSAM file
+
+e.g.1
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  PRINT INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+                                                                         
+
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  PRINT INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+  SKIP (number)                                                          --> Skips the number of records and prints the remaining records.
+  CHAR/HEX/DUMP                                                          --> CHAR/HEX/DUMP.
+  COUNT (number)                                                         --> Display the number of records.
+      
+
+--> how to check of the VSAM file is empty?
+    Write a IDCAMS JCL with PRINT command and parameter as COUNT (1). MAX CC = 04 --> VSAM file is empty.
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//INP001 DD DSN = <file name1>, DISP=SHR                                  --> file name1 is the file from which the records are copied to file name2 
+//OUT001 DD DSN = <file name2>, DISP=SHR                                 --> file name2 is the file where the records are copied from file name2 
+//SYIN DD *
+  PRINT INFILE (INP001)                                                  --> DD name of the input file from where the data is to be copied
+  COUNT(1)                                                              --> Display the number of records.
+
+
+
+
+6. VERIFY: Verify the status of VSAM file.
+
+7. DELETE: Delete the VSAM dataset.
+
+----------------------------------------------------------VSAM(IDCAMS) commands Backup and Recover 19/02-------------------------------------------------------------
+
+Backup and Recover utility.
+
+8. EXPORT  --> Exporting the data from one file to another file (Backup file).
+
+//JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//DD NAME DD DSN=<VSAM file name>                                         --> Backup VSAM file name where records from original/source vsam will be exported.
+//SYIN DD *
+  EXPORT entryname -                                                       --> Name of the original VSAM whose data/records is to be exported/ Original vsam dataset whose
+									       backup is to be created.
+  OUTDATASET(VSAM dataset) / OUTFILE(DD NAME)                              --> OUTDATASET/OUTFILE is the VSAM Datset/DD name of the VSAM dataset where the records from 										original VSAM dataset is to be exported. OUTDATASET/OUTFILE--> Back up file /Dataset.
+  INHIBITSOURCE / NOINHIBITSOURCE                                          --> INHIBITSOURCE:- Original/source VSAM dataset cannot be used for any operation.
+                                                                               NOINHIBITSOURCE  :- Original/source VSAM dataset can be used for any operation.
+  INHIBITTARGET / NOINHIBITTARGET                                          --> INHIBITTARGET:- Backup/Target VSAM dataset cannot be used for any operation other than 	       												retrieval back to original VSAM.
+									       NOINHIBITTARGET:- Backup/Target VSAM dataset can also be used for any operation 
+  TEMPORARY / PERMANENT                                                    --> TEMPORARY:- Once the data is exported from original/source VSAM to Backup VSAM, the source 												dataset is not deleted.
+  									        PERMANENT:- Once the data is exported from original/source VSAM to Backup/target VSAM, the 												source dataset will be deleted. 
+  PURGE / NO PURGE                                                         -->  If PERMANENT parameter is specified, source dataset vsam will be deleted once data is 										        exported. But PERMANENT will not be able to delete the source dataset if Expiration date is 									        mentioned whole creating the Source VSAM and the expiration date is not yet reached. 
+										PURGE: - It will delete the dataset irrespective of Expiration Date.
+										NO PURGE: - It will not delete the dataset until of Expiration Date is reached.
+											                        
+
+
+
+
+9. IMPORT --> Importing the data from one file (Backup file) back to original(source) file . Data Retrieval.
+
+/JOB CARD / JOB STATEMENT
+//STEP001 EXEC PGM=IDCAMS
+//xx
+//yy
+//SYIN DD *
+  IMPORT -
+  INFILE (DDNAME) / INDATASET (VSAM file name) - 
+  OUTFILE (DDNAME) / OUTDATASET (VSAM file name) - 
+  INTOEMPTY                                                                --> Data will be retrieved back to the source dataset only if source dataset id empty.
+
+
+
+
+---------------------------------------------------- Alternate Index-----------------------------------------------------------------------------------------------------
+
+KSDS file: Key1
+ Access records with help of Key.
+ Index:- Key1
+
+Alternate index: Creating an alternate Key. SO that we can access the VAM with the help of alternate Key. Key2
+Alternate Index:- Key2
+
+
+Create an Alternate index
+ Create a Alternate Index file for base/original VSAM cluster ->  DEFINE AIX
+ Create alternate Key
+
+//JOBNAME1 JOB 'IBMMAINFRAMER',JOB CLASS=C,PRTY=10,MSGCLASS=C,
+//            MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*
+//STEP001  EXEC PGM=IDCAMS
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD  *
+   DEFINE AIX                           -
+      (NAME(racfid.VSAM.KSDSAIX.TEST)   -                                Name:- Name of the alternate index file/cluster
+      RELATE(racfid.VSAM.KSDSFILE.TEST) -                                Relate:- Name of the Base VSAM file/cluster
+      CISZ(4096)                        -
+      FREESPACE(20,20)                  -
+      KEYS(20,7)                        -                                Alternate key of AIX.
+      UNIQUEKEY/NONUNIQUEKEY            -                                UNIQUEKEY:- Alternate key must be Unique. NONUNIQUEKEY:- Alternate key can be Non Unique
+      UPGRADE / NOUPGRADE               -                                UPGRADE:- If any changes are made to base VSAM, the changes will be automatically reflected in AIX 
+      RECORDSIZE(80,80))                -
+/*
+
+
+Create a Path
+  Create a path file. Path file acts as a bridge between base VSAM and Alternate index file
+
+
+//JOBNAME1 JOB 'IBMMAINFRAMER',JOB CLASS=C,PRTY=10,MSGCLASS=C,
+//            MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*
+//STEP001  EXEC PGM=IDCAMS
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD  *
+  DEFINE PATH                         -
+    NAME(racfid.VSAM.KSDSAIX.TEST.PATH) -                                   --> alternate-index-path-name
+    PATHENTRY(racfid.VSAM.KSDSAIX.TEST))                                    --> alternate-index-name
+
+Build Index
+ Loads the Alternate Index file with data from base VSAM.
+
+
+//JOBNAME3 JOB 'IBMMAINFRAMER',JOB CLASS=C,PRTY=10,MSGCLASS=C,
+//            MSGLEVEL=(1,1),NOTIFY=&SYSUID
+//*
+//STEP001  EXEC PGM=IDCAMS
+//SYSPRINT DD  SYSOUT=*
+//SYSIN    DD  *
+   BLDINDEX                              -
+    INDATASET(racfid.VSAM.KSDSFILE.TEST) -                                 --> Base VSAM file/cluster
+    OUTDATASET(racfid.VSAM.KSDSAIX.TEST))                                  --> alternate-index-filename
+/*
+
+
+OZAXXX.VSAM.KSDS   KEY (4,45)  --> INDEX
+
+PRINT INDATASET OZAXXX.VSAM.KSDS
+      FROMKEY (0005)
+      TOKEY (0005)
+
+OZAXXX.VSAM.KSDS.AIX  Alternate KEY(03, 24) --> AIX
+
+Spool: 
+KEIRON POLLARD	        MI	060504230385 0005
+
+
+                                             KEY
+----+----1----+----2----+----3----+----4----+----5
+Michale Stark	        CSK	060303990387 0001
+M S DHONI	        CSK	030202870255 0003 
+KEIRON POLLARD	        MI	060504230385 0005
+BRENDON MCCULLUM        CSK	030503870335 0007
+JASPRIT BUMRAH	        MI	060303990387 0008          
+DWAYNE SMITH  	        CSK	040504500423 0010
+DUPLESSIS	        CSK	030303530287 0015
+VIRAT KOHLI	        RCB	030504120350 0026
+CHRIS GAYLE	        RCB	060303990387 0027 
+
+
+
+-------------------------------------------------------------------CI/CA Split -22/02----------------------------------------------------------------------------------
+
+CI: Control Interval
+CA: Control Area
+
+CI Split: When Space of a CI within one CA is full, and we want to add more records, then a new CI will be created within the same CA and half of the records from the original CI will be moved to the new CI. This process is called CI Split.
+
+CA SPLIT: If there is no space available to add CI inside Control area, then a new Control Area is crated and half of Control interval from original control area is moved to the new control Area. This process is called as Control Area Split.
+
+VSAM:
+CLuster
+DATA
+INDEX (KSDS only)
+
+DATA: Records are stored.
+
+Control Interval1.
+ Record+SPACE+RDF+CIDF  50% space
+
+Control Interval2.  50% Space
+
+Control Interval3.  50% Space
+
+Control Interval4.????
+
+Control Area.
+  Collection of CIs C1 1,2
+
+
+Control Area1.
+
+3,4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

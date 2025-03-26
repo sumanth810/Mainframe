@@ -1,0 +1,156 @@
+LAB TEST
+Create a Student table with following details:-
+Student Number X(05)
+Student Name X(25)
+Student Total marks 9(03) (5 Subjects - Max marks 500)
+Athletic X(01)
+Write a COBOL DB2 program to give a moderation to student marks by ten percentage whose athletic
+field contain a value of &#39;Y&#39; and marks fall between 200 and 300.
+Create a report about the values updated in the Student table. The Report should be in the following
+format.
+----|----1----|----2----|----3----|----4----|----5----|----6----|----7
+                STUDENT MODERATION REPORT
+                *************************
+*****************************************************************************
+STUDENT NUMBER  STUDENT NAME        TOTAL MARKS
+*****************************************************************************
+XXXXX           XXXXXXXXXXXX        999
+XXXXX           XXXXXXXXXXXX        999
+XXXXX           XXXXXXXXXXXX        999
+XXXXX           XXXXXXXXXXXX        999
+XXXXX           XXXXXXXXXXXX        999
+ 
+        TOTAL NUMBER OF STUDENT RECEIVED MODERATION : 999
+*****************************************************************************
+
+
+ ****** ***************************** Top of Data ******************************
+ 000100 000100 IDENTIFICATION DIVISION.                                         
+ 000200 000200 PROGRAM-ID. STUD01.                                              
+ 000300 000300 AUTHOR. KUMAR.                                                   
+ 000400 000400*APPLY MODERATION TO STUDENT MARKS AND GENERATE REPORT            
+ 000500 000500 ENVIRONMENT DIVISION.                                            
+ 000600 000600 INPUT-OUTPUT SECTION.                                            
+ 000700 000700 FILE-CONTROL.                                                    
+ 000800 000800     SELECT PRINT-FILE ASSIGN TO OUTPUT1                          
+ 000900 000900     ORGANIZATION IS SEQUENTIAL.                                  
+ 001000 001000                                                                  
+ 001100 001100 DATA DIVISION.                                                   
+ 001200 001200 FILE SECTION.                                                    
+ 001300 001300 FD  PRINT-FILE                                                   
+ 001400 001400     RECORDING MODE IS F                                          
+ 001500 001500     RECORD CONTAINS 80 CHARACTERS.                               
+ 001600 001600 01  PRINT-RECORD          PIC X(80).                             
+ 001700 001700                                                                  
+ 001800 001800 WORKING-STORAGE SECTION.                                         
+ 001900 001900 01  WS-BLANK-LINE         PIC X(80) VALUE SPACES.                
+ 002000 002000 01  WS-HEADING-1          PIC X(80) VALUE                        
+ 002100 002100     '               STUDENT MODERATION REPORT'.                  
+ 002200 002200 01  WS-HEADING-2          PIC X(80) VALUE                        
+ 002300 002300     '               *************************'.                  
+ 002400 002400 01  WS-HEADING-3          PIC X(80) VALUE                        
+ 002500 002500     '**********************************************************'.
+ 002600 002600 01  WS-HEADING-4          PIC X(80) VALUE                        
+ 002700 002700     'STUDENT NUMBER  STUDENT NAME        TOTAL MARKS'.           
+ 002800 002800 01  WS-DETAIL-LINE.                                              
+ 003000 003000     05 WS-STUDENT-NUMBER   PIC X(5).                             
+ 003100 003100     05 FILLER              PIC X(11) VALUE SPACES.               
+ 003200 003200     05 WS-STUDENT-NAME     PIC X(12).                            
+ 003300 003300     05 FILLER              PIC X(8)  VALUE SPACES.               
+ 003400 003400     05 WS-TOTAL-MARKS      PIC ZZZ9..                            
+ 003500 003500     05 FILLER              PIC X(40) VALUE SPACES.               
+ 003800 003800 01  WS-SUMMARY-LINE       PIC X(80) VALUE SPACES.                
+ 003900 003900 01  WS-MARKS-WORK         PIC S9(9) COMP VALUE 0.                
+ 004000 004000 01  WS-MODERATED-MARKS    PIC S9(9) COMP VALUE 0.                
+ 004100 004100 01  WS-COUNTER-MOD        PIC 9(3)  VALUE 0.                     
+ 004200 004200 01  WS-SQLCODE-DISP        PIC ZZZZZZZZ9-.                       
+ 004300 004300                                                                  
+ 004400 004400     EXEC SQL                                                     
+ 004500 004500       INCLUDE SQLCA                                              
+ 004600 004600     END-EXEC.                                                    
+ 004700 004700     EXEC SQL                                                     
+ 004800 004800       INCLUDE STUDENT                                            
+ 004900 004900     END-EXEC.                                                    
+ 005000 005000     EXEC SQL                                                     
+ 005100 005100       DECLARE STUD-CSR CURSOR FOR                                
+ 005200 005200         SELECT STUDENT_NUMBER, STUDENT_NAME, TOTAL_MARKS,        
+ 005300 005300                ATHLETIC                                          
+ 005400 005400         FROM STUDENT                                             
+ 005500 005500         WITH UR                                                  
+ 005600 005600     END-EXEC.                                                    
+ 005700 005700                                                                  
+ 005800 005800 PROCEDURE DIVISION.                                              
+ 005900 005900 0000-MAIN-PARA.                                                  
+ 006000 006000     PERFORM 1000-INITIALIZE                                      
+ 006100 006100     PERFORM 2000-PROCESS-RECORDS                                 
+ 006200 006200         UNTIL SQLCODE NOT = 0                                    
+ 006300 006300     PERFORM 3000-TERMINATE                                       
+ 006400 006400     STOP RUN.                                                    
+ 006500 006500                                                                  
+ 006600 006600 1000-INITIALIZE.                                                 
+ 006700 006700     OPEN OUTPUT PRINT-FILE                                       
+ 006800 006800     DISPLAY 'OUTPUT FILE OPENED SUCCESSFULLY'                    
+ 006900 006900     WRITE PRINT-RECORD FROM WS-HEADING-1                         
+ 007000 007000     WRITE PRINT-RECORD FROM WS-HEADING-2                         
+ 007100 007100     WRITE PRINT-RECORD FROM WS-BLANK-LINE                        
+ 007200 007200     WRITE PRINT-RECORD FROM WS-HEADING-3                         
+ 007300 007300     WRITE PRINT-RECORD FROM WS-HEADING-4                         
+ 007310 007310     WRITE PRINT-RECORD FROM WS-HEADING-3                         
+ 007400 007400     EXEC SQL                                                     
+ 007500 007500       OPEN STUD-CSR                                              
+ 007600 007600     END-EXEC.                                                    
+ 007700 007700                                                                  
+ 007800 007800 2000-PROCESS-RECORDS.                                            
+ 007900 007900     EXEC SQL                                                     
+ 008000 008000       FETCH STUD-CSR                                             
+ 008100 008100       INTO :STUDENT-NUMBER, :STUDENT-NAME, :TOTAL-MARKS,         
+ 008200 008200            :ATHLETIC                                             
+ 008300 008300     END-EXEC.                                                    
+ 008400 008400     EVALUATE SQLCODE                                             
+ 008500 008500       WHEN 0                                                     
+ 008600 008600          PERFORM 2100-APPLY-MODERATION                           
+ 009400 009400       WHEN 100                                                   
+ 009500 009500          CONTINUE                                                
+ 009600 009600       WHEN OTHER                                                 
+ 009700 009700          MOVE SQLCODE TO WS-SQLCODE-DISP                         
+ 009800 009800          DISPLAY 'Q43: SQL ERROR DURING FETCH: ' WS-SQLCODE-DISP 
+ 009900 009900     END-EVALUATE.                                                
+ 010000 010000                                                                  
+ 010100 010100 2100-APPLY-MODERATION.                                           
+ 010200 010200     MOVE TOTAL-MARKS TO WS-MARKS-WORK                            
+ 010300 010300     MOVE WS-MARKS-WORK TO WS-MODERATED-MARKS                     
+ 010400 010400     IF ATHLETIC = 'Y' AND WS-MARKS-WORK >= 200                   
+ 010500 010500           AND WS-MARKS-WORK <= 300                               
+ 010510 010510        COMPUTE WS-MODERATED-MARKS = WS-MARKS-WORK * 1.10         
+ 010600 010600        PERFORM 2200-UPDATE-STUDENT                               
+ 011120 011120     END-IF.                                                      
+ 011300 011300                                                                  
+ 011310 011310 2200-UPDATE-STUDENT.                                             
+ 011320 011320     EXEC SQL                                                     
+ 011330 011330       UPDATE STUDENT                                             
+ 011340 011340       SET TOTAL_MARKS = :WS-MODERATED-MARKS                      
+ 011350 011350       WHERE STUDENT_NUMBER = :STUDENT-NUMBER                     
+ 011360 011360     END-EXEC.                                                    
+ 011370 011370     MOVE STUDENT-NUMBER TO WS-STUDENT-NUMBER                     
+ 011380 011380     MOVE STUDENT-NAME TO WS-STUDENT-NAME                         
+ 011390 011390     MOVE WS-MODERATED-MARKS TO WS-TOTAL-MARKS                    
+ 011391 011391     WRITE PRINT-RECORD FROM WS-DETAIL-LINE                       
+ 011392 011392     ADD 1 TO WS-COUNTER-MOD                                      
+ 011393 011393     DISPLAY 'MODERATION APPLIED FOR STUDENT: ' STUDENT-NUMBER.   
+ 011394 011394                                                                  
+ 011400 011400 3000-TERMINATE.                                                  
+ 011500 011500     EXEC SQL                                                     
+ 011600 011600       CLOSE STUD-CSR                                             
+ 011700 011700     END-EXEC.                                                    
+ 011800 011800     WRITE PRINT-RECORD FROM WS-BLANK-LINE                        
+ 011900 011900     MOVE SPACES TO WS-SUMMARY-LINE                               
+ 012000 012000     MOVE 'TOTAL NUMBER OF STUDENT RECEIVED MODERATION : ' TO     
+ 012100 012100                        WS-SUMMARY-LINE                           
+ 012200 012200     MOVE WS-COUNTER-MOD TO WS-SUMMARY-LINE(53:3)                 
+ 012300 012300     WRITE PRINT-RECORD FROM WS-SUMMARY-LINE                      
+ 012310 012310     WRITE PRINT-RECORD FROM WS-HEADING-3                         
+ 012400 012400     CLOSE PRINT-FILE                                             
+ 012500 012500     DISPLAY 'OUTPUT FILE CLOSED SUCCESSFULLY '                   
+ 012600 012600     DISPLAY 'PROGRAM COMPLETED SUCCESSFULLY '.                   
+ ****** **************************** Bottom of Data ****************************
+                                                                                

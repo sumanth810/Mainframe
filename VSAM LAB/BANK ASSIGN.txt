@@ -1,0 +1,328 @@
+# DB2 Assignment
+
+## Table Creation and Data Population
+
+1. Using SPUFI, create a table SAFE_BANK with the below columns, to keep track of the details of customer transactions in the bank:
+
+   | Column Name | Data Type & Length | Constraints |
+   |-------------|-------------------|-------------|
+   | CUST_ID | Integer | Primary key |
+   | ACC_TYPE | Char - 3 | Accepted values: SAV - savings account, CUR - current account, RD - recurring deposit. (CUST_ID,ACC_TYPE) together forms the Composite Primary key |
+
+2. Using SPUFI, create a table CUST_DETAIL with the below columns, to keep track of customer details:
+
+   | Column Name | Data Type & Length | Constraints |
+   |-------------|-------------------|-------------|
+   | CUST_ID_DETAIL | Integer | Primary key |
+   | CUST_NAME | Varchar - 10 | Not Null |
+   | CUST_ST | Char - 2 | Null |
+
+3. Using SPUFI, create a table ST_DETAIL with the below columns, to keep the track of state details:
+
+   | Column Name | Data Type & Length | Constraints |
+   |-------------|-------------------|-------------|
+   | CUST_ST_DETAIL | Char - 2 | Primary key |
+   | ST_NAME | Varchar - 15 | Not null |
+
+4. Using SPUFI, create a table ACCT_CONS with the below columns, to keep track of consolidated acct details and customer details:
+
+   | Column Name | Data Type & Length | Constraints |
+   |-------------|-------------------|-------------|
+   | CUST_ID | Integer | Primary key |
+   | ACC_TYPE | Char - 3 | Accepted values: SAV - savings account, CUR - current account, RD - recurring deposit |
+   | CUST_ID_DETAIL | Integer | Not null |
+   | CUST_NAME | Varchar - 10 | Not null |
+   | CUST_ST | Char - 2 | Not null |
+   | CUST_ST_DETAIL | Char - 2 | Not null |
+   | ST_NAME | Varchar - 15 | Not null |
+   | CUST_ACC_BALANCE | Decimal - 8,2 | Not null |
+
+5. Using SPUFI, insert the below sample values into the corresponding tables:
+
+   *SAFE_BANK table: Sample Values:*
+   | CUST_ID | ACC_TYPE |
+   |---------|----------|
+   | 100656003 | SAV |
+   | 100424007 | CUR |
+   | 100646003 | SAV |
+   | 100626003 | SAV |
+
+   *CUST_DETAIL table: Sample Values:*
+   | CUST_ID_DETAIL | CUST_NAME | CUST_ST |
+   |----------------|-----------|---------|
+   | 100656003 | John | TN |
+   | 100424007 | Mike | AP |
+   | 100646003 | Steve | TN |
+   | 100428332 | David | NULL |
+   | 100626003 | Muller | KR |
+
+   *ST_DETAIL table: Sample Values:*
+   | CUST_ST_DETAIL | ST_NAME |
+   |----------------|---------|
+   | TN | Tamilnadu |
+   | AP | Andhra Pradesh |
+   | KR | Karnataka |
+   | KE | Kerala |
+
+## COBOL Program Requirements
+
+6. Using a COBOL program:
+   
+   a. Using a cursor, join the tables SAFE_BANK, CUST_DETAIL, ST_DETAIL to extract the details of the customers - CUST_ID, ACC_TYPE, CUST_ID_DETAIL, CUST_NAME, CUST_ST, CUST_ST_DETAIL, ST_NAME having Savings account and current account (ACC_TYPE = SAV and CUR). Perform the below operation after fetching the record from the cursor:
+
+      i. Using null value handling technique, verify whether the field CUST_ST holds any null value. If any null values are present, then do not process that record and continue processing the next record. For records without null values in CUST_ST field, continue processing the next step.
+
+   b. For every record fetched from the table, insert the record into the ACCT_CONS table. Before inserting the record to the ACCT_CONS table, do the following changes:
+
+      i. If the ACC_TYPE is SAV then, populate the value 1500.00 to CUST_ACC_BALANCE field and change the ACC_TYPE to RD.
+
+      ii. If the ACC_TYPE is CUR then, populate the value 500.00 to CUST_ACC_BALANCE field and change the ACC_TYPE to SAV.
+
+   c. Write the inserted records into the output file in the below format:
+
+      *Note*: One space between each field and the length is 80 bytes.
+
+      
+      CUSTIDACCTYPE CUSTIDDETAIL CUSTNAME  CUSTST CUSTSTDETAIL STNAME           CUSTACCBALANCE
+      X(10) X(3)    X(10)        X(10)     X(2)   X(2)         X(15)            9(06)9(02)
+      
+
+7. Compile and execute the above COBOL program.
+
+8. Using Spufi, from the ACCT_CONS table, retrieve the list of customers having ACC_TYPE 'SAV' and order by CUST_ID. Use GROUP By keyword to perform this operation.
+
+
+
+
+-------------------------------------------------------------------------------
+VIEW       OZA135.KUMAR.DAY3.COBOL(BANK02) - 01.10         Columns 00001 00072 
+****** ***************************** Top of Data ******************************
+000100 000100 IDENTIFICATION DIVISION.                                         
+000200 000200 PROGRAM-ID. BANK02.                                              
+000300 000300 AUTHOR. KUMAR.                                                   
+000400 000400 ENVIRONMENT DIVISION.                                            
+000500 000500 INPUT-OUTPUT SECTION.                                            
+000600 000600 FILE-CONTROL.                                                    
+000700 000700     SELECT OUTPUT-FILE ASSIGN TO OUTPUT1                         
+000800 000800     ORGANIZATION IS SEQUENTIAL                                   
+000900 000900     ACCESS MODE IS SEQUENTIAL                                    
+001000 001000     FILE STATUS IS WS-OUTPUT-STATUS.                             
+001100 001100                                                                  
+001200 001200 DATA DIVISION.                                                   
+001300 001300 FILE SECTION.                                                    
+001400 001400 FD  OUTPUT-FILE                                                  
+001500 001500     RECORDING MODE IS F                                          
+001600 001600     RECORD CONTAINS 80 CHARACTERS                                
+001700 001700     BLOCK CONTAINS 0 RECORDS.                                    
+001800 001800 01  OUTPUT-RECORD             PIC X(80).                         
+001900 001900 WORKING-STORAGE SECTION.                                         
+002000 002000 01  WS-OUTPUT-STATUS          PIC XX VALUE SPACES.               
+002100 002100 01  WS-SWITCHES.                                                 
+002200 002200     05 WS-END-OF-CURSOR       PIC X VALUE 'N'.                   
+002300 002300        88 END-OF-CURSOR      VALUE 'Y'.                          
+002400 002400 01  WS-OUTPUT-AREAS.                                             
+002500 002500     05 WS-CUSTID              PIC 9(10)       VALUE ZEROES.      
+002600 002600     05 WS-ACCTYPE             PIC X(3)        VALUE SPACES.      
+002700 002700     05 WS-CUSTIDDETAIL        PIC 9(10)       VALUE ZEROES.      
+002800 002800     05 WS-CUSTNAME            PIC X(10)       VALUE SPACES.      
+002900 002900     05 WS-CUSTST              PIC X(2)        VALUE SPACES.      
+003000 003000     05 WS-CUSTSTDETAIL        PIC X(2)        VALUE SPACES.      
+003100 003100     05 WS-STNAME              PIC X(15)       VALUE SPACES.      
+003200 003200     05 WS-CUSTACCBALANCE      PIC 9(6)V99     VALUE ZEROES.      
+003210 003210     05 WS-CUSTACCBALANCE-EDIT PIC Z(5)9.99    VALUE SPACES.      
+003300 003300 01  WS-OUTPUT-RECORD.                                            
+003400 003400     05 OUT-CUSTID             PIC X(10).                         
+003410 003410     05 FILLER PIC X(1) VALUE SPACE.                              
+003500 003500     05 OUT-ACCTYPE            PIC X(3).                          
+003510 003510     05 FILLER PIC X(1) VALUE SPACE.                              
+003600 003600     05 OUT-CUSTIDDETAIL       PIC X(10).                         
+003610 003610     05 FILLER PIC X(1) VALUE SPACE.                              
+003700 003700     05 OUT-CUSTNAME           PIC X(10).                         
+ 003710 003710     05 FILLER PIC X(1) VALUE SPACE.                              
+ 003800 003800     05 OUT-CUSTST             PIC X(2).                          
+ 003810 003810     05 FILLER PIC X(1) VALUE SPACE.                              
+ 003900 003900     05 OUT-CUSTSTDETAIL       PIC X(2).                          
+ 003910 003910     05 FILLER PIC X(1) VALUE SPACE.                              
+ 004000 004000     05 OUT-STNAME             PIC X(15).                         
+ 004010 004010     05 FILLER PIC X(1) VALUE SPACE.                              
+ 004100 004100     05 OUT-CUSTACCBALANCE     PIC X(8).                          
+ 004110 004110     05 FILLER PIC X(1) VALUE SPACE.                              
+ 004200 004200     05 FILLER                 PIC X(13)       VALUE SPACES.      
+ 004300 004300     EXEC SQL                                                     
+ 004400 004400       INCLUDE SAFEBANK                                           
+ 004500 004500     END-EXEC.                                                    
+ 004900 004900     EXEC SQL                                                     
+ 005000 005000       INCLUDE STTAB                                              
+ 005100 005100     END-EXEC.                                                    
+ 005200 005200     EXEC SQL                                                     
+ 005300 005300       INCLUDE ACCTCONS                                           
+ 005400 005400     END-EXEC.                                                    
+ 005500 005500     EXEC SQL                                                     
+ 005600 005600       INCLUDE SQLCA                                              
+ 005700 005700     END-EXEC.                                                    
+ 005710 005710 01  HV-SAFE-BANK.                                                
+ 005720 005720     05 HV-CUST-ID          PIC S9(9) USAGE COMP.                 
+ 005730 005730     05 HV-ACC-TYPE         PIC X(3).                             
+ 005740 005740 01  HV-CUST-DETAIL.                                              
+ 005750 005750     05 HV-CUST-ID-DETAIL   PIC S9(9) USAGE COMP.                 
+ 005760 005760     05 HV-CUST-NAME        PIC X(10).                            
+ 005770 005770     05 HV-CUST-ST          PIC X(2).                             
+ 005780 005780 01  HV-ST-DETAIL.                                                
+ 005790 005790     05 HV-CUST-ST-DETAIL   PIC X(2).                             
+ 005791 005791     05 HV-ST-NAME          PIC X(15).                            
+ 005792 005792 01  HV-ACCT-CONS.                                                
+ 005793 005793     05 HV-CUST-ACC-BALANCE PIC S9(6)V9(2) USAGE COMP-3.          
+ 005794 005794 01 WS-CONSTANTS.                                                 
+ 005795 005795     05 WS-SAV PIC X(3) VALUE 'SAV'.                              
+ 005796 005796     05 WS-CUR PIC X(3) VALUE 'CUR'.                              
+ 005800 005800     EXEC SQL                                                     
+ 005900 005900       DECLARE CUSTOMER_CURSOR CURSOR FOR                         
+ 006000 006000       SELECT SB.CUST_ID, SB.ACC_TYPE,                            
+ 006100 006100              CD.CUST_ID_DETAIL, CD.CUST_NAME, CD.CUST_ST,        
+ 006200 006200              SD.CUST_ST_DETAIL, SD.ST_NAME                       
+ 006300 006300       FROM SAFE_BANK SB                                          
+ 006400 006400       JOIN CUST_DETAIL CD ON SB.CUST_ID = CD.CUST_ID_DETAIL      
+ 006500 006500       JOIN ST_DETAIL SD ON CD.CUST_ST = SD.CUST_ST_DETAIL        
+ 006600 006600       WHERE SB.ACC_TYPE = :WS-SAV                                
+ 006610 006610          OR SB.ACC_TYPE = :WS-CUR                                
+ 006700 006700       ORDER BY SB.CUST_ID                                        
+ 006800 006800     END-EXEC.                                                    
+ 006900 006900 PROCEDURE DIVISION.                                              
+ 007000 007000 0000-MAIN-PARA.                                                  
+ 007100 007100     PERFORM 1000-INITIALIZATION.                                 
+ 007200 007200     PERFORM 2000-PROCESS-RECORDS UNTIL END-OF-CURSOR.            
+ 007300 007300     PERFORM 3000-TERMINATION.                                    
+ 007400 007400     GOBACK.                                                      
+ 007500 007500                                                                  
+ 007600 007600 1000-INITIALIZATION.                                             
+ 007700 007700     OPEN OUTPUT OUTPUT-FILE.                                     
+ 007800 007800     EXEC SQL                                                     
+ 007900 007900       OPEN CUSTOMER_CURSOR                                       
+ 008000 008000     END-EXEC.                                                    
+ 008100 008100     IF SQLCODE NOT = 0                                           
+ 008200 008200        DISPLAY 'CURSOR OPEN ERROR: ' SQLCODE                     
+ 008300 008300        MOVE 'Y' TO WS-END-OF-CURSOR                              
+ 008400 008400     END-IF.                                                      
+ 008500 008500 2000-PROCESS-RECORDS.                                            
+ 008600 008600     EXEC SQL                                                     
+ 008700 008700       FETCH CUSTOMER_CURSOR                                      
+ 008800 008800       INTO :HV-CUST-ID, :HV-ACC-TYPE,                            
+ 008900 008900            :HV-CUST-ID-DETAIL, :HV-CUST-NAME, :HV-CUST-ST,       
+ 009000 009000            :HV-CUST-ST-DETAIL, :HV-ST-NAME                       
+ 009100 009100     END-EXEC.                                                    
+ 009200 009200     IF SQLCODE = 0                                               
+ 009300 009300        PERFORM 2100-PROCESS-CURRENT-RECORD                       
+ 009400 009400     ELSE                                                         
+ 009500 009500        IF SQLCODE = 100                                          
+ 009600 009600           MOVE 'Y' TO WS-END-OF-CURSOR                           
+ 009700 009700        ELSE                                                      
+ 009800 009800           DISPLAY 'FETCH ERROR: ' SQLCODE                        
+ 009900 009900           MOVE 'Y' TO WS-END-OF-CURSOR                           
+ 010000 010000        END-IF                                                    
+ 010100 010100     END-IF.                                                      
+ 010200 010200 2100-PROCESS-CURRENT-RECORD.                                     
+ 010300 010300     MOVE HV-CUST-ID TO WS-CUSTID.                                
+ 010400 010400     MOVE HV-ACC-TYPE TO WS-ACCTYPE.                              
+ 010500 010500     MOVE HV-CUST-ID-DETAIL TO WS-CUSTIDDETAIL.                   
+ 010600 010600     MOVE HV-CUST-NAME TO WS-CUSTNAME.                            
+ 010700 010700     MOVE HV-CUST-ST TO WS-CUSTST.                                
+ 010800 010800     MOVE HV-CUST-ST-DETAIL TO WS-CUSTSTDETAIL.                   
+ 010900 010900     MOVE HV-ST-NAME TO WS-STNAME.                                
+ 011000 011000     IF WS-CUSTST = SPACES                                        
+ 011100 011100        GO TO 2100-EXIT                                           
+ 011200 011200     END-IF.                                                      
+ 011300 011300     PERFORM 2200-INSERT-INTO-ACCT-CONS.                          
+ 011400 011400     PERFORM 2300-WRITE-OUTPUT-RECORD.                            
+ 011410 011410 2100-EXIT.                                                       
+ 011420 011420     EXIT.                                                        
+ 011500 011500 2200-INSERT-INTO-ACCT-CONS.                                      
+ 011700 011700     MOVE WS-CUSTID TO HV-CUST-ID.                                
+ 011800 011800     MOVE WS-CUSTIDDETAIL TO HV-CUST-ID-DETAIL.                   
+ 011900 011900     MOVE WS-CUSTNAME TO HV-CUST-NAME.                            
+ 012000 012000     MOVE WS-CUSTST TO HV-CUST-ST.                                
+ 012100 012100     MOVE WS-CUSTSTDETAIL TO HV-CUST-ST-DETAIL.                   
+ 012200 012200     MOVE WS-STNAME TO HV-ST-NAME.                                
+ 012600 012600     PERFORM 2210-PROCESS-SAV-ACCOUNT.                            
+ 012700 012700     PERFORM 2220-PROCESS-CUR-ACCOUNT.                            
+ 013500 013500     EXEC SQL                                                     
+ 013600 013600        INSERT INTO ACCT_CONS                                     
+ 013700 013700        (CUST_ID, ACC_TYPE, CUST_ID_DETAIL, CUST_NAME,            
+ 013800 013800         CUST_ST, CUST_ST_DETAIL, ST_NAME, CUST_ACC_BALANCE)      
+ 013900 013900        VALUES                                                    
+ 014000 014000        (:HV-CUST-ID, :HV-ACC-TYPE, :HV-CUST-ID-DETAIL,           
+ 014100 014100         :HV-CUST-NAME, :HV-CUST-ST, :HV-CUST-ST-DETAIL,          
+ 014200 014200         :HV-ST-NAME, :HV-CUST-ACC-BALANCE)                       
+ 014300 014300     END-EXEC.                                                    
+ 014400 014400     IF SQLCODE NOT = 0                                           
+ 014500 014500        DISPLAY 'INSERT ERROR: ' SQLCODE                          
+ 014600 014600     END-IF.                                                      
+ 014610 014610 2210-PROCESS-SAV-ACCOUNT.                                        
+ 014620 014620     IF WS-ACCTYPE = 'SAV'                                        
+ 014630 014630        MOVE 1500.00 TO HV-CUST-ACC-BALANCE                       
+ 014640 014640        MOVE 'RD' TO HV-ACC-TYPE                                  
+ 014650 014650     END-IF.                                                      
+ 014660 014660 2220-PROCESS-CUR-ACCOUNT.                                        
+ 014670 014670     IF WS-ACCTYPE = 'CUR'                                        
+ 014680 014680        MOVE 500.00 TO HV-CUST-ACC-BALANCE                        
+ 014690 014690        MOVE 'SAV' TO HV-ACC-TYPE                                 
+ 014691 014691     END-IF.                                                      
+ 014700 014700 2300-WRITE-OUTPUT-RECORD.                                        
+ 014800 014800     MOVE SPACES TO WS-OUTPUT-RECORD.                             
+ 014900 014900     MOVE WS-CUSTID TO OUT-CUSTID.                                
+ 015000 015000     MOVE HV-ACC-TYPE TO OUT-ACCTYPE.                             
+ 015100 015100     MOVE WS-CUSTIDDETAIL TO OUT-CUSTIDDETAIL.                    
+ 015200 015200     MOVE WS-CUSTNAME TO OUT-CUSTNAME.                            
+ 015300 015300     MOVE WS-CUSTST TO OUT-CUSTST.                                
+ 015400 015400     MOVE WS-CUSTSTDETAIL TO OUT-CUSTSTDETAIL.                    
+ 015500 015500     MOVE WS-STNAME TO OUT-STNAME.                                
+ 015600 015600     MOVE HV-CUST-ACC-BALANCE TO WS-CUSTACCBALANCE.               
+ 015601 015601     MOVE WS-CUSTACCBALANCE TO WS-CUSTACCBALANCE-EDIT.            
+ 015610 015610     MOVE WS-CUSTACCBALANCE-EDIT TO OUT-CUSTACCBALANCE.           
+ 015700 015700     WRITE OUTPUT-RECORD FROM WS-OUTPUT-RECORD.                   
+ 015800 015800     IF WS-OUTPUT-STATUS NOT = '00'                               
+ 015900 015900        DISPLAY 'ERROR WRITING OUTPUT RECORD: ' WS-OUTPUT-STATUS  
+ 016000 016000     END-IF.                                                      
+ 016100 016100 3000-TERMINATION.                                                
+ 016200 016200     EXEC SQL                                                     
+ 016300 016300        CLOSE CUSTOMER_CURSOR                                     
+ 016400 016400     END-EXEC.                                                    
+ 016500 016500     CLOSE OUTPUT-FILE.                                           
+ ****** **************************** Bottom of Data ****************************
+                                                                                
+                                                                                
+RUN JCL
+
+ VIEW       OZA135.KUMAR.JCL(CBLDBRUN) - 01.40              Columns 00001 00072 
+ ****** ***************************** Top of Data ******************************
+ 000001 //OZA135EX JOB OZA,OZA,MSGLEVEL=(1,1),                                  
+ 000002 //             CLASS=A,MSGCLASS=A,NOTIFY=&SYSUID,REGION=0M              
+ 000003 //**********************************************************************
+ 000004 //***      SAMPLE JCL TO RUN COBOL + DB2 PROGRAM                     ***
+ 000005 //***      KEEP USERID IN PLACE OF OZAXXX                            ***
+ 000006 //***      PROGRAM AND PLAN NAME SHOULD BE SAME                      ***
+ 000007 //***      LOADLIB ===> LOAD MODULE LIBRARY                          ***
+ 000008 //*** NOTE: NEVER USE OZAXXXPL AS A PLAN NAME                        ***
+ 000009 //**********************************************************************
+ 000010 //RUNPGM   EXEC PGM=IKJEFT01                                            
+ 000011 //STEPLIB  DD DISP=SHR,DSN=DSNA10.DBAG.SDSNEXIT                         
+ 000012 //         DD DISP=SHR,DSN=DSNA10.SDSNLOAD                              
+ 000013 //         DD DISP=SHR,DSN=CEE.SCEERUN                                  
+ 000014 //SYSTSPRT DD SYSOUT=*                                                  
+ 000015 //SYSOUT   DD SYSOUT=*                                                  
+ 000016 //SYSPRINT DD SYSOUT=*                                                  
+ 000017 //*CUSTFILE DD DSN=OZA135.KUMAR.CUSTOMER.INPUT,DISP=SHR                 
+ 000018 //OUTPUT1 DD DSN=OZA135.KUMAR.CUST.PERDET,                              
+ 000019 //           DISP=(MOD,CATLG,DELETE),                                   
+ 000020 //           SPACE=(CYL,(1,1),RLSE),                                    
+ 000021 //           DCB=(RECFM=FB,LRECL=80,BLKSIZE=0)                          
+ 000022 //SYSTSIN  DD *                                                         
+ 000023     DSN SYSTEM(DBAG)                                                    
+ 000024        RUN PROGRAM(BANK02)   -                                          
+ 000025        PLAN(BANK0221)         -                                         
+ 000026        LIBRARY('OZA135.KUMAR.LOADLIB')                                  
+ 000027     END                                                                 
+ 000028 /*                                                                      
+ 000029 //                                                                      
+ ****** **************************** Bottom of Data ****************************
+                                                                                
+                                                                                

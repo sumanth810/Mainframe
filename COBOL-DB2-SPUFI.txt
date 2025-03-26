@@ -1,0 +1,919 @@
+-----------------------------------------------------------------------
+--  CREATE A TABLE FOR BONUS                                           
+--  HAVING PRIMARY KEY IS BONUS_ID                                     
+-----------------------------------------------------------------------
+--  CREATE TABLE BONUS_TABLE                                           
+--         (BONUS_ID              CHAR(10)  NOT NULL,                  
+--          EMPLOYEE_NO           CHAR(06)  NOT NULL,                  
+--          EMPLOYEE_BONUS        DECIMAL(12,2) NOT NULL WITH DEFAULT, 
+--          PRIMARY KEY ( BONUS_ID ),                                  
+--          FOREIGN KEY (EMPLOYEE_NO)                                  
+--          REFERENCES EMPLOYEE_TABLE (EMPLOYEE_NO)                    
+--          ON DELETE CASCADE)                                         
+--      IN DBMATE1.TSMATE26;                                           
+                                                                       
+---------------------------------------------------------------------- 
+--  CREATE AN INDEX FOR THE BONUS_TABLE                                
+------------------------------------------------------------
+--  CREATE UNIQUE                                           
+--   INDEX INDEX_BONUS_ID                                   
+--      ON BONUS_TABLE   (BONUS_ID);                        
+                                                            
+------------------------------------------------------------
+--  A. INSERT VALID RECORDS INTO BONUS_TABLE                
+------------------------------------------------------------
+--  INSERT INTO BONUS_TABLE                                 
+--         (BONUS_ID,                                       
+--          EMPLOYEE_NO,                                    
+--          EMPLOYEE_BONUS)                                 
+--       VALUES                                             
+--          ('B01000','U47906',5000);                       
+                                                            
+--  INSERT INTO BONUS_TABLE                                 
+--         (BONUS_ID,                                       
+--          EMPLOYEE_NO,                            
+--          EMPLOYEE_BONUS)                         
+--       VALUES                                     
+--          ('B01001','U47882',3000);               
+                                                    
+--  INSERT INTO BONUS_TABLE                         
+--         (BONUS_ID,                               
+--          EMPLOYEE_NO,                            
+--          EMPLOYEE_BONUS)                         
+--       VALUES                                     
+--          ('B01002','U47852',4000);               
+                                                    
+----------------------------------------------------
+--  B. INSERT VALID RECORDS INTO BONUS_TABLE        
+----------------------------------------------------
+--  INSERT INTO BONUS_TABLE                         
+--         (BONUS_ID,                               
+--          EMPLOYEE_NO,                                     
+--          EMPLOYEE_BONUS)                                  
+--       VALUES                                              
+--          ('B01004','U56306',5000);                        
+-------------------------------------------------------------
+--  RESULT :                                                 
+--  SNT408I SQLCODE = -530,                                  
+--  ERROR:  THE INSERT OR UPDATE VALUE OF FOREIGN KEY        
+--          EMPLOYEE IS INVALID                              
+-------------------------------------------------------------
+                                                             
+                                                             
+-------------------------------------------------------------
+--  C. UPDATE EMPLOYEE_NO OF ANY RECORD IN BONUS TABLE       
+-------------------------------------------------------------
+--  UPDATE BONUS_TABLE                                       
+--     SET EMPLOYEE_NO = 'U47907'                            
+--   WHERE EMPLOYEE_NO = 'U47852';                            
+                                                              
+--------------------------------------------------------------
+--  SELECT ALL FIELDS FROM BONUS TABLE                        
+--------------------------------------------------------------
+    SELECT *                                                  
+      FROM BONUS_TABLE;                                       
+                                                              
+--------------------------------------------------------------
+--  DELETE ANY RECORD FROM EMPLOYEE_TABLE                     
+--  WHETHER CORRESPONDING RECORD IS DELETED FROM BONUS TABLE. 
+--------------------------------------------------------------
+    DELETE                                                    
+      FROM EMPLOYEE_TABLE                                     
+     WHERE EMPLOYEE_NO = 'U47882';                            
+                                                              
+--------------------------------------------------------------
+--  SELECT ALL FIELDS FROM BONUS TABLE            
+--------------------------------------------------
+    SELECT *                                      
+      FROM BONUS_TABLE;                           
+
+
+
+
+
+
+
+
+
+
+-- DROP   TABLE CUSTOMER_TABLE;                                   
+-- DROP   INDEX INDEX_CUST_ACCTNO;                                
+------------------------------------------------------------------
+--  CREATE THE TABLE WITH NAME CUSTOMER_TABLE                     
+--  PRIMARY KEY IS CUST_ACCTNO                                    
+------------------------------------------------------------------
+-- CREATE TABLE CUSTOMER_TABLE                                    
+--        (CUST_ACCTNO         CHAR (05)    NOT NULL,             
+--         CUST_NAME           CHAR (25)    NOT NULL,             
+--         CUST_ADDR           CHAR (20)    NOT NULL,             
+--         CUST_GENDER         CHAR (01)    NOT NULL,             
+--         CUST_ACTYPE         CHAR (01)    NOT NULL,             
+--         CUST_DTOPEN         DATE         NOT NULL WITH DEFAULT,
+--         CUST_BALANCE     DECIMAL (09,02),                      
+--         PRIMARY KEY      (CUST_ACCTNO))                        
+--         IN DBMATE1.TSMATE26;                                   
+------------------------------------------------------
+--  CREATE AN INDEX FOR THE CUSTOMER_TABLE            
+------------------------------------------------------
+--  CREATE UNIQUE                                     
+--   INDEX IDX_CUST_ACCTNO3                           
+--      ON CUSTOMER_TABLE   (CUST_ACCTNO);            
+                                                      
+------------------------------------------------------
+--  SELECT ALL FIELDS FROM SYSTEM TABLES              
+--  WHERE DATABASE NAME IS DBMATE1                    
+------------------------------------------------------
+-- SELECT *                                           
+--   FROM SYSIBM.SYSTABLES                            
+--  WHERE DBNAME='DBMATE1';                           
+                                                      
+--  INSERT THE RECORD IN TABLE CUSTOMER_TABLES                          
+----------------------------------------------------------------------  
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--       VALUES                                                         
+--              ('A0001','SURESH','TRIVANDRUM','M','S',DEFAULT,15000);  
+                                                                        
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--       VALUES                                                         
+--             ('A0002','KRISHNA','CHENNAI','M','C','2015-12-21',25000);
+                                                                        
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--       VALUES                                                         
+--             ('A0003','KISHORE','CHENNAI','M','C',DEFAULT,10000);     
+                                                                        
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--       VALUES                                                         
+--            ('A0004','NIRMAL','BANGALORE','M','C','2015-12-23',15000);
+                                                                        
+                                                                        
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--       VALUES                                                         
+--            ('A0005','LAKSHMI','PUNE','F','S','2015-12-23',30000);    
+                                                                        
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,          
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                 
+--       VALUES                                                   
+--       ('A0006','KRITHIKA','TRIVANDRUM','F','S',DEFAULT,50000); 
+                                                                  
+--  INSERT INTO CUSTOMER_TABLE                                    
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,          
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                 
+--       VALUES                                                   
+--       ('A0007','SUDHAN','COCHIN','M','C','2015-12-23',100000); 
+                                                                  
+--  INSERT INTO CUSTOMER_TABLE                                    
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,          
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                 
+--       VALUES                                                   
+--       ('A0008','RAMANDEEP','PUNE','M','C','2015-12-23',45000); 
+--  INSERT INTO CUSTOMER_TABLE                                        
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,              
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                     
+--       VALUES                                                       
+--       ('A0009','PRAVEEN','CHENNAI','M','S',DEFAULT,50000 );        
+                                                                      
+--  INSERT INTO CUSTOMER_TABLE                                        
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,              
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                     
+--       VALUES                                                       
+--       ('A0010','AJIMON','TRIVANDRUM','M','S','2015-12-23',50000 ); 
+                                                                      
+----------------------------------------------------------------------
+--  SHOW ALL FIELDS DATA OF CUSTOMER_TABLE                            
+----------------------------------------------------------------------
+--  SELECT *                                                          
+--    FROM CUSTOMER_TABLE;                                            
+---------------------------------------------------------------------- 
+--  UPDATE A0009 ADDRESS AS TRIVANDRUM AND SELECT AND VIEW THE RESULTS 
+---------------------------------------------------------------------- 
+-- UPDATE CUSTOMER_TABLE                                               
+--    SET CUST_ADDR    = 'TRIVANDRUM'                                  
+--  WHERE CUST_ACCTNO = 'A0009';                                       
+                                                                       
+---------------------------------------------------------------------- 
+--  SHOW ALL FIELDS DATA OF CUSTOMER_TABLE                             
+---------------------------------------------------------------------- 
+-- SELECT *                                                            
+--   FROM CUSTOMER_TABLE;                                              
+                                                                       
+---------------------------------------------------------------------- 
+--  UPDATE A0001 BALANCE AS 100000                                     
+---------------------------------------------------------------------- 
+-- UPDATE CUSTOMER_TABLE                               
+--    SET CUST_BALANCE   =  100000                     
+--  WHERE CUST_ACCTNO    =  'A0001';                   
+                                                       
+-------------------------------------------------------
+--  DELETE A0008 RECORD FROM TABLE AND VIEW IT         
+-------------------------------------------------------
+-- DELETE FROM CUSTOMER_TABLE                          
+--  WHERE CUST_ACCTNO    =  'A0008';                   
+-- SELECT *                                            
+--   FROM CUSTOMER_TABLE;                              
+                                                       
+-------------------------------------------------------
+-- SELECT ALL THE RECORDS IN ASCENDING ORDER OF NAME   
+-------------------------------------------------------
+-- SELECT *                                            
+--   FROM CUSTOMER_TABLE                               
+--  ORDER BY CUST_NAME ASC;                              
+                                                         
+---------------------------------------------------------
+-- SELECT ALL THE RECORDS IN ASCENDING ORDER OF ACTYPE   
+-- AND DESCENDING ORDER OF BALANCE                       
+---------------------------------------------------------
+-- SELECT *                                              
+--   FROM CUSTOMER_TABLE                                 
+--  ORDER BY CUST_ACTYPE  ASC,                           
+--           CUST_BALANCE DESC;                          
+                                                         
+---------------------------------------------------------
+-- SELECT ALL RECORDS WITH NAME STARTING AS  S           
+---------------------------------------------------------
+-- SELECT *                                              
+--   FROM CUSTOMER_TABLE                                 
+--  WHERE CUST_NAME LIKE 'S%';                           
+------------------------------------------------------
+-- SELECT ALL RECORDS WITH GENDER AS  F               
+------------------------------------------------------
+-- SELECT *                                           
+--   FROM CUSTOMER_TABLE                              
+--  WHERE CUST_GENDER = 'F';                          
+                                                      
+------------------------------------------------------
+-- SELECT ALL MALE RECORDS WHOSE BALANCE IS >= 25000  
+------------------------------------------------------
+-- SELECT *                                           
+--   FROM CUSTOMER_TABLE                              
+--  WHERE CUST_GENDER = 'M'                           
+--    AND CUST_BALANCE >= 25000;                      
+                                                      
+-- SELECT ALL RECORDS WHOSE BALANCE IS BETWEEN 25000 AND 50000 
+-- USING BETWEEN OPERATOR                                      
+---------------------------------------------------------------
+-- SELECT *                                                    
+--   FROM CUSTOMER_TABLE                                       
+--  WHERE CUST_BALANCE BETWEEN 25000                           
+--    AND 50000;                                               
+                                                               
+---------------------------------------------------------------
+-- SELECT ALL RECORDS WHOSE ADDRESS IS IN (COCHIN,TRIVANDRUM)  
+-- USING IN OPERATOR                                           
+---------------------------------------------------------------
+-- SELECT *                                                    
+--   FROM CUSTOMER_TABLE                                       
+--  WHERE CUST_ADDR IN ('COCHIN','TRIVANDRUM');                
+-- SELECT ALL RECORDS WHOSE BALANCE > 5000 OR FEMALE    
+--------------------------------------------------------
+   SELECT *                                             
+     FROM CUSTOMER_TABLE                                
+    WHERE CUST_BALANCE > 5000                           
+       OR CUST_GENDER = 'F';                            
+                                                        
+--------------------------------------------------------
+-- SELECT ALL RECORDS WHOSE NAME ENDS WITH 'A'          
+--------------------------------------------------------
+   SELECT *                                             
+     FROM CUSTOMER_TABLE                                
+    WHERE CUST_NAME LIKE '%A';                          
+                                                        
+--------------------------------------------------------
+-- IDENTIFY THE TOTAL COUNT OF RECORDS IN THE TABLE     
+   SELECT COUNT (*) AS RECORD_COUNT                          
+     FROM CUSTOMER_TABLE;                                    
+                                                             
+-------------------------------------------------------------
+-- IDENTIFY THE TOTAL COUNT OF EACH ACCOUNT TYPE RECORDS     
+-------------------------------------------------------------
+   SELECT COUNT (*) AS RECORD_COUNT,                         
+          CUST_GENDER AS GENDER                              
+     FROM CUSTOMER_TABLE                                     
+    GROUP BY CUST_GENDER;                                    
+                                                             
+-------------------------------------------------------------
+-- IDENTIFY THE TOTAL SUM OF BALANCE IN EACH ACCOUNT TYPE    
+-------------------------------------------------------------
+   SELECT SUM (CUST_BALANCE) AS BALANCE,                     
+          CUST_ACTYPE AS ACCOUNT_TYPE                        
+     FROM CUSTOMER_TABLE                                     
+    GROUP BY CUST_ACTYPE;                                      
+                                                               
+---------------------------------------------------------------
+-- IDENTIFY THE MAXIMUM BALANCE HOLDER IN EACH GENDER          
+---------------------------------------------------------------
+   SELECT MAX(CUST_BALANCE) AS MAX_BALANCE,                    
+          CUST_GENDER AS GENDER                                
+     FROM CUSTOMER_TABLE                                       
+    GROUP BY CUST_GENDER;                                      
+                                                               
+---------------------------------------------------------------
+-- IDENTIFY THE MINIMUM BALANCE HOLDERS IN EACH ACCOUNT TYPE   
+---------------------------------------------------------------
+   SELECT MIN(CUST_BALANCE) AS MIN_BALANCE,                    
+          CUST_ACTYPE AS ACCOUNT_TYPE                          
+     FROM CUSTOMER_TABLE                                       
+    GROUP BY CUST_ACTYPE;                                      
+-----------------------------------------------------
+-- SELECT DISTINCT ADDRESS (CITY) FROM THE TABLE     
+-----------------------------------------------------
+   SELECT DISTINCT (CUST_ADDR) AS CITY               
+     FROM CUSTOMER_TABLE;                            
+                                                     
+-----------------------------------------------------
+-- IDENTIFY AVERAGE BALANCE IN EACH ACCOUNT TYPE     
+-----------------------------------------------------
+   SELECT AVG(CUST_BALANCE) AS AVERAGE_BALANCE       
+     FROM CUSTOMER_TABLE                             
+    GROUP BY CUST_ACTYPE;                            
+                                                     
+-----------------------------------------------------
+-- IDENTIFY THE MAX BALANCE MAINTAINED IN EACH CITY  
+-- AND SORT ON DESCENDING ORDER OF BALANCE           
+---------------------------------------------------
+   SELECT MAX(CUST_BALANCE) AS MAXIMUM_BALANCE,    
+          CUST_ADDR         AS CITY                
+     FROM CUSTOMER_TABLE                           
+    GROUP BY CUST_ADDR                             
+    ORDER BY MAXIMUM_BALANCE DESC;                 
+                                                   
+
+
+
+
+
+
+
+--------------------------------------------------------------------
+--  CREATE THE TABLE WITH NAME EMPLOYEE_TABLE                       
+--  PRIMARY KEY IS EMPLOYEE_NO                                      
+--------------------------------------------------------------------
+-- CREATE TABLE EMPLOYEE_TABLE                                      
+--        (EMPLOYEE_NO         CHAR (06)    NOT NULL,               
+--         EMPLOYEE_NAME       CHAR (25)    NOT NULL,               
+--         EMPLOYEE_DEPT       CHAR (20)    NOT NULL,               
+--         EMPLOYEE_LOCATION   CHAR (15)    NOT NULL,               
+--         EMPLOYEE_SALARY  DECIMAL (12,2)  NOT NULL WITH DEFAULT,  
+--         PRIMARY KEY      (EMPLOYEE_NO))                          
+--         IN DBMATE1.TSMATE26;                                     
+                                                                    
+--------------------------------------------------------------------
+--  CREATE AN INDEX FOR THE EMPLOYEE_TABLE                          
+--------------------------------------------------------------------
+--  CREATE UNIQUE                                                     
+--   INDEX INDEX_EMPLOYEE_NO                                          
+--      ON EMPLOYEE_TABLE   (EMPLOYEE_NO);                            
+                                                                      
+----------------------------------------------------------------------
+--  INSERT THE RECORD IN TABLE EMPLOYEE_TABLES                        
+----------------------------------------------------------------------
+--  INSERT INTO EMPLOYEE_TABLE                                        
+--         (EMPLOYEE_NO,EMPLOYEE_NAME,EMPLOYEE_DEPT,EMPLOYEE_LOCATION,
+--          EMPLOYEE_SALARY)                                          
+--       VALUES                                                       
+--          ('U47906','SURESH','ACCOUNT','TRIVANDRUM',15000);         
+                                                                      
+--  INSERT INTO EMPLOYEE_TABLE                                        
+--         (EMPLOYEE_NO,EMPLOYEE_NAME,EMPLOYEE_DEPT,EMPLOYEE_LOCATION,
+--          EMPLOYEE_SALARY)                                          
+--       VALUES                                                       
+ --         ('U47882','KRISHNA','ANTHEM','CHENNAI',25000);             
+                                                                       
+ --  INSERT INTO EMPLOYEE_TABLE                                        
+ --         (EMPLOYEE_NO,EMPLOYEE_NAME,EMPLOYEE_DEPT,EMPLOYEE_LOCATION,
+ --          EMPLOYEE_SALARY)                                          
+ --       VALUES                                                       
+ --         ('U47852','KISHORE','OPERATION','CHENNAI',120000);         
+                                                                       
+ --  INSERT INTO EMPLOYEE_TABLE                                        
+ --         (EMPLOYEE_NO,EMPLOYEE_NAME,EMPLOYEE_DEPT,EMPLOYEE_LOCATION,
+ --          EMPLOYEE_SALARY)                                          
+ --       VALUES                                                       
+ --         ('U47894','NIRMAL','MANAGEMENT','BANGALORE',45000);        
+                                                                       
+                                                                       
+ --  INSERT INTO EMPLOYEE_TABLE                                        
+ --         (EMPLOYEE_NO,EMPLOYEE_NAME,EMPLOYEE_DEPT,EMPLOYEE_LOCATION,
+--          EMPLOYEE_SALARY)                               
+--       VALUES                                            
+--         ('U47965','LAKSHMI','ASSOCIATE','PUNE',30000);  
+                                                           
+                                                           
+-----------------------------------------------------------
+--  SHOW ALL FIELDS DATA OF EMPLOYEE_TABLE                 
+-----------------------------------------------------------
+    SELECT *                                               
+      FROM EMPLOYEE_TABLE;                                 
+                                                           
+
+
+
+----------------------------------------------------------------------- 
+-- CREATE A NON-INDEXED TABLE ACTYPE_TABLE WITH THE FOLLOWING COLUMNS :-
+-- CUST_ACTYPE CHAR (1)                                                 
+-- CUST_ACDESC CHAR (10)                                                
+------------------------------------------------------------------------
+-- CREATE TABLE ACTYPE_TABLES                                           
+--              (CUST_ACTYPE  CHAR(01) NOT NULL,                        
+--               CUST_ACDESC  CHAR(10) NOT NULL)                        
+--               IN DBMATE1.TSMATE26;                                   
+                                                                        
+----------------------------------------------------------------------  
+--  INSERT THE RECORD IN TABLE CUSTOMER_TABLES                          
+----------------------------------------------------------------------  
+--  INSERT INTO CUSTOMER_TABLE                                          
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,                
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                       
+--  VALUES                                                             
+--         ('A0011','BHAVANI','TRIVANDRUM','F',' ','2015-12-27',10000);
+                                                                       
+--  INSERT INTO CUSTOMER_TABLE                                         
+--         (CUST_ACCTNO,CUST_NAME,CUST_ADDR,CUST_GENDER,               
+--          CUST_ACTYPE,CUST_DTOPEN,CUST_BALANCE)                      
+--  VALUES                                                             
+--         ('A0012','THEJASWINI','TRIVANDRUM','F',' ',DEFAULT,10000);  
+                                                                       
+                                                                       
+---------------------------------------------------------------------- 
+--  SELECT ALL FIELDS FROM SYSTEM TABLES                               
+--  WHERE DATABASE NAME IS DBMATE1                                     
+---------------------------------------------------------------------- 
+-- SELECT *                                                            
+--   FROM SYSIBM.SYSTABLES                                             
+--  WHERE DBNAME='DBMATE1';                                            
+----------------------------------------------
+--  INSERT THE RECORD IN TABLE ACTYPE_TABLE   
+----------------------------------------------
+--  INSERT INTO ACTYPE_TABLES                 
+--              (CUST_ACTYPE,CUST_ACDESC)     
+--  VALUES                                    
+--         ('C','CURRENT');                   
+                                              
+--  INSERT INTO ACTYPE_TABLES                 
+--              (CUST_ACTYPE,CUST_ACDESC)     
+--  VALUES                                    
+--         ('S','SAVINGS');                   
+                                              
+--  INSERT INTO ACTYPE_TABLES                 
+--              (CUST_ACTYPE,CUST_ACDESC)     
+--  VALUES                                    
+--         ('D','FIXED');                             
+                                                      
+--  INSERT INTO ACTYPE_TABLES                         
+--              (CUST_ACTYPE,CUST_ACDESC)             
+--  VALUES                                            
+--         ('R','RECURRING');                         
+                                                      
+--  INSERT INTO ACTYPE_TABLES                         
+--              (CUST_ACTYPE,CUST_ACDESC)             
+--  VALUES                                            
+--         ('O','OVERDRAFT');                         
+                                                      
+------------------------------------------------------
+-- JOIN THE ABOVE CREATED TABLE WITH CUSTOMER_TABLE   
+-- AND DISPLAY THE FOLLOWING COLUMNS :-               
+-- CUST_ACCTNO, CUST_NAME, CUST_ACTYPE, CUST_ACDESC   
+-- USING INNER JOIN                                   
+-----------------------------------------------------
+-- SELECT C.CUST_ACCTNO,                             
+--        C.CUST_NAME,                               
+--        C.CUST_ACTYPE,                             
+--        A.CUST_ACDESC                              
+--   FROM CUSTOMER_TABLE C                           
+--  INNER JOIN                                       
+--        ACTYPE_TABLES A                            
+--     ON C.CUST_ACTYPE = A.CUST_ACTYPE;             
+                                                     
+-----------------------------------------------------
+-- JOIN THE ABOVE CREATED TABLE WITH CUSTOMER_TABLE  
+-- AND DISPLAY THE FOLLOWING COLUMNS :-              
+-- CUST_ACCTNO, CUST_NAME, CUST_ACTYPE, CUST_ACDESC  
+-- USING LEFT OUTER JOIN                             
+-----------------------------------------------------
+-- SELECT C.CUST_ACCTNO,                             
+--        C.CUST_NAME,                                 
+--        C.CUST_ACTYPE,                               
+--        A.CUST_ACDESC                                
+--   FROM CUSTOMER_TABLE C                             
+--   LEFT OUTER JOIN                                   
+--        ACTYPE_TABLES A                              
+--     ON C.CUST_ACTYPE = A.CUST_ACTYPE;               
+                                                       
+-------------------------------------------------------
+-- JOIN THE ABOVE CREATED TABLE WITH CUSTOMER_TABLE    
+-- AND DISPLAY THE FOLLOWING COLUMNS :-                
+-- CUST_ACCTNO, CUST_NAME, CUST_ACTYPE, CUST_ACDESC    
+-- USING RIGHT OUTER JOIN                              
+-------------------------------------------------------
+-- SELECT C.CUST_ACCTNO,                               
+--        C.CUST_NAME,                                 
+--        C.CUST_ACTYPE,                               
+--        A.CUST_ACDESC                              
+--   FROM CUSTOMER_TABLE C                           
+--  RIGHT OUTER JOIN                                 
+--        ACTYPE_TABLES A                            
+--     ON C.CUST_ACTYPE = A.CUST_ACTYPE;             
+                                                     
+-----------------------------------------------------
+-- JOIN THE ABOVE CREATED TABLE WITH CUSTOMER_TABLE  
+-- AND DISPLAY THE FOLLOWING COLUMNS :-              
+-- CUST_ACCTNO, CUST_NAME, CUST_ACTYPE, CUST_ACDESC  
+-- USING FULL OUTER JOIN                             
+-----------------------------------------------------
+-- SELECT C.CUST_ACCTNO,                             
+--        C.CUST_NAME,                               
+--        C.CUST_ACTYPE,                             
+--        A.CUST_ACDESC                              
+--   FROM CUSTOMER_TABLE C                           
+--   FULL OUTER JOIN                                                
+--        ACTYPE_TABLES A                                           
+--     ON C.CUST_ACTYPE = A.CUST_ACTYPE;                            
+                                                                    
+--------------------------------------------------------------------
+-- IDENTIFY THE SECOND MAXIMUM BALANCE IN CUSTOMER TABLE            
+-- USING A SUBQUERY                                                 
+--------------------------------------------------------------------
+-- SELECT MAX(CUST_BALANCE) AS SECOND_MAX_BALANCE                   
+--   FROM CUSTOMER_TABLE                                            
+--  WHERE CUST_BALANCE <                                            
+--        ( SELECT MAX(CUST_BALANCE)                                
+--           FROM  CUSTOMER_TABLE);                                 
+                                                                    
+--------------------------------------------------------------------
+-- CREATE AN UPDATABLE VIEW ON CUSTOMER_TABLE AND DO THE FOLLOWING:-
+--  A. SELECT ALL RECORDS FROM THE ABOVE CREATED VIEW AND DISPLAY   
+--  B. UPDATE ANY CUST_ADDR TO  TRIVANDRUM  THRU THE VIEW   
+--  C. SELECT ALL RECORDS FROM THE ABOVE CREATED VIEW       
+--     AND SEE WHETHER UPDATE IS SUCCESSFUL                 
+--  D. SELECT ALL RECORDS FROM CUSTOMER_TABLE               
+--     AND SEE WHETHER THE UPDATE IS PRESENT                
+------------------------------------------------------------
+                                                            
+-- CREATE VIEW   CUSTOMER_VIEW                              
+--     AS SELECT CUST_ACCTNO,                               
+--               CUST_NAME,                                 
+--               CUST_ADDR,                                 
+--               CUST_GENDER,                               
+--               CUST_ACTYPE,                               
+--               CUST_DTOPEN,                               
+--               CUST_BALANCE                               
+--          FROM CUSTOMER_TABLE;                            
+-- UPDATE CUSTOMER_VIEW                                        
+--    SET CUST_ADDR = 'TRIVANDRUM'                             
+--  WHERE CUST_ACCTNO = 'A0005';                               
+                                                               
+-- SELECT *                                                    
+--   FROM CUSTOMER_VIEW;                                       
+                                                               
+-- SELECT *                                                    
+--   FROM CUSTOMER_TABLE;                                      
+                                                               
+---------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-    
+--  A.     SELECT * FROM SYSIBM.SYSTABLES; (DB2 CATALOG TABLES)
+---------------------------------------------------------------
+                                                               
+   SELECT * FROM SYSIBM.SYSTABLES;                             
+--------------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-         
+--  B.     SELECT * FROM SYSIBM.SYSTABLES WHERE CREATOR='IBMUSER';  
+--------------------------------------------------------------------
+                                                                    
+   SELECT * FROM SYSIBM.SYSTABLES WHERE CREATOR='IBMUSER';          
+                                                                    
+--------------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-         
+--  C.     SELECT DISTINCT DBNAME FROM SYSIBM.SYSTABLES;            
+--------------------------------------------------------------------
+                                                                    
+   SELECT DISTINCT DBNAME FROM SYSIBM.SYSTABLES;                    
+                                                                    
+--------------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-         
+--  D.     SELECT CURRENT DATE FROM SYSIBM.SYSDUMMY1;               
+--------------------------------------------------------------
+                                                              
+   SELECT CURRENT DATE FROM SYSIBM.SYSDUMMY1;                 
+                                                              
+--------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-   
+--  E.     SELECT CURRENT TIME FROM SYSIBM.SYSDUMMY1;         
+--------------------------------------------------------------
+                                                              
+   SELECT CURRENT TIME FROM SYSIBM.SYSDUMMY1;                 
+                                                              
+--------------------------------------------------------------
+-- EXECUTE THE FOLLOWING QUERIES AND EVALUATE THE RESULTS:-   
+--  F.     SELECT CURRENT TIMESTAMP FROM SYSIBM.SYSDUMMY1;    
+--------------------------------------------------------------
+                                                              
+   SELECT CURRENT TIMESTAMP FROM SYSIBM.SYSDUMMY1;            
+
+
+
+
+
+
+----------------------------------------------------------------------
+--  CREATE A TABLE FOR ITEM                                           
+--  HAVING PRIMARY KEY IS ITEM_NO                                     
+----------------------------------------------------------------------
+--  CREATE TABLE ITEM_TABLE                                           
+--         (ITEM_NO               CHAR(05)  NOT NULL,                 
+--          ITEM_BRAND_NAME       CHAR(15)  NOT NULL,                 
+--          ITEM_DESCRIPTION      CHAR(20)  NOT NULL,                 
+--          ITEM_UNIT_PRICE       DECIMAL(07,2) NOT NULL WITH DEFAULT,
+--          ITEM_DISCOUNT         CHAR(01)  NOT NULL,                 
+--          PRIMARY KEY ( ITEM_NO ))                                  
+--      IN DBMATE1.TSMATE26;                                          
+--                                                                    
+----------------------------------------------------------------------
+--  CREATE AN INDEX FOR THE ITEM_TABLE                                
+----------------------------------------------------------------------
+--  CREATE UNIQUE                                           
+--   INDEX INDEX_ITEM_NO                                    
+--      ON ITEM_TABLE   (ITEM_NO);                          
+--                                                          
+------------------------------------------------------------
+--  INSERT VALID RECORDS INTO ITEM_TABLE                    
+------------------------------------------------------------
+--  INSERT INTO ITEM_TABLE                                  
+--         (ITEM_NO,                                        
+--          ITEM_BRAND_NAME,                                
+--          ITEM_DESCRIPTION,                               
+--          ITEM_UNIT_PRICE,                                
+--          ITEM_DISCOUNT)                                  
+--  VALUES                                                  
+--         ('A0001','NOKIA','NOKIA 7" 5520',15000,'N');     
+--                                                          
+--  INSERT INTO ITEM_TABLE                                  
+--         (ITEM_NO,                                         
+--          ITEM_BRAND_NAME,                                 
+--          ITEM_DESCRIPTION,                                
+--          ITEM_UNIT_PRICE,                                 
+--          ITEM_DISCOUNT)                                   
+--  VALUES                                                   
+--         ('A0002','SAMSUNG','SAMSUNG 7" GALAXY',07000,'N');
+--                                                           
+--  INSERT INTO ITEM_TABLE                                   
+--         (ITEM_NO,                                         
+--          ITEM_BRAND_NAME,                                 
+--          ITEM_DESCRIPTION,                                
+--          ITEM_UNIT_PRICE,                                 
+--          ITEM_DISCOUNT)                                   
+--  VALUES                                                   
+--         ('A0003','NOKIA','NOKIA 5" 7720',25000,'Y');      
+--                                                           
+--  INSERT INTO ITEM_TABLE                                 
+--         (ITEM_NO,                                       
+--          ITEM_BRAND_NAME,                               
+--          ITEM_DESCRIPTION,                              
+--          ITEM_UNIT_PRICE,                               
+--          ITEM_DISCOUNT)                                 
+--  VALUES                                                 
+--         ('A0004','SAMSUNG','SAMSUNG S4 MINI',25000,'Y');
+--                                                         
+--  INSERT INTO ITEM_TABLE                                 
+--         (ITEM_NO,                                       
+--          ITEM_BRAND_NAME,                               
+--          ITEM_DESCRIPTION,                              
+--          ITEM_UNIT_PRICE,                               
+--          ITEM_DISCOUNT)                                 
+--  VALUES                                                 
+--         ('A0005','HTC','HTC 6" 9920',15000,'N');        
+--                                                     
+--  INSERT INTO ITEM_TABLE                             
+--         (ITEM_NO,                                   
+--          ITEM_BRAND_NAME,                           
+--          ITEM_DESCRIPTION,                          
+--          ITEM_UNIT_PRICE,                           
+--          ITEM_DISCOUNT)                             
+--  VALUES                                             
+--         ('A0006','IPHONE','IPHONE 4',15000,'Y');    
+--                                                     
+--  INSERT INTO ITEM_TABLE                             
+--         (ITEM_NO,                                   
+--          ITEM_BRAND_NAME,                           
+--          ITEM_DESCRIPTION,                          
+--          ITEM_UNIT_PRICE,                           
+--          ITEM_DISCOUNT)                             
+--  VALUES                                             
+--         ('A0007','IPHONE','IPHONE 5S',25000,'N');    
+--                                                      
+--  INSERT INTO ITEM_TABLE                              
+--         (ITEM_NO,                                    
+--          ITEM_BRAND_NAME,                            
+--          ITEM_DESCRIPTION,                           
+--          ITEM_UNIT_PRICE,                            
+--          ITEM_DISCOUNT)                              
+--  VALUES                                              
+--         ('A0008','IPHONE','IPHONE 6S 6"',55000,'Y'); 
+--                                                      
+--                                                      
+--  INSERT INTO ITEM_TABLE                              
+--         (ITEM_NO,                                    
+--          ITEM_BRAND_NAME,                            
+--          ITEM_DESCRIPTION,                           
+--          ITEM_UNIT_PRICE,                            
+--          ITEM_DISCOUNT)                                      
+--  VALUES                                                      
+--         ('A0009','GOOGLE','GOOGLE NEXUS 5"',25000,'Y');      
+--                                                              
+--  INSERT INTO ITEM_TABLE                                      
+--         (ITEM_NO,                                            
+--          ITEM_BRAND_NAME,                                    
+--          ITEM_DESCRIPTION,                                   
+--          ITEM_UNIT_PRICE,                                    
+--          ITEM_DISCOUNT)                                      
+--  VALUES                                                      
+--         ('A0010','HTC','HTC 6" 7720 WHITE',15000,'Y');       
+--                                                              
+----------------------------------------------------------------
+--  SELECT ALL FIELDS FROM ITEM TABLE                           
+----------------------------------------------------------------
+    SELECT *                                                    
+      FROM ITEM_TABLE; 
+    SELECT *           
+      FROM BONUS_TABLE;
+
+
+
+
+
+---------------------------------------------------------------------
+--  CREATE THE TABLE WITH NAME STUDENT_TABLE                         
+--  PRIMARY KEY IS STUDENT_NO                                        
+---------------------------------------------------------------------
+--  CREATE TABLE STUDENT_TABLE                                       
+--        (STUDENT_NO          CHAR (05)    NOT NULL,                
+--         STUDENT_NAME        CHAR (15)    NOT NULL,                
+--         STUDENT_TOTAL_MARKS INT         NOT NULL WITH DEFAULT,    
+--         STUDENT_ATHLETIC    CHAR (01)    NOT NULL,                
+--         PRIMARY KEY      (STUDENT_NO))                            
+--         IN DBMATE1.TSMATE26;                                      
+--                                                                   
+---------------------------------------------------------------------
+--  CREATE AN INDEX FOR THE STUDENT_TABLE                            
+---------------------------------------------------------------------
+--  CREATE UNIQUE                                                    
+--   INDEX INDEX_STUDENT_NO                                  
+--      ON STUDENT_TABLE    (STUDENT_NO);                    
+--                                                           
+-------------------------------------------------------------
+--  INSERT THE RECORD IN TABLE STUDENT_TABLES                
+-------------------------------------------------------------
+--  INSERT INTO STUDENT_TABLE                                
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,     
+--          STUDENT_ATHLETIC)                                
+--       VALUES                                              
+--          ('U4701','SURESH',150,'N');                      
+--                                                           
+--  INSERT INTO STUDENT_TABLE                                
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,     
+--          STUDENT_ATHLETIC)                                
+--       VALUES                                              
+--         ('U4702','KRISHNA',275,'N');                      
+--                                                        
+--  INSERT INTO STUDENT_TABLE                             
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,  
+--          STUDENT_ATHLETIC)                             
+--       VALUES                                           
+--         ('U4703','KISHORE',320,'Y');                   
+--                                                        
+--  INSERT INTO STUDENT_TABLE                             
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,  
+--          STUDENT_ATHLETIC)                             
+--       VALUES                                           
+--         ('U4704','NIRMAL',450,'N');                    
+--                                                        
+--                                                        
+--  INSERT INTO STUDENT_TABLE                             
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,  
+--          STUDENT_ATHLETIC)                             
+--       VALUES                                            
+--         ('U4705','LAKSHMI',245,'Y');                    
+--                                                         
+--                                                         
+--  INSERT INTO STUDENT_TABLE                              
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,   
+--          STUDENT_ATHLETIC)                              
+--       VALUES                                            
+--          ('U4706','RAMESH',250,'Y');                    
+--                                                         
+--  INSERT INTO STUDENT_TABLE                              
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,   
+--          STUDENT_ATHLETIC)                              
+--       VALUES                                            
+--         ('U4707','KRISHNA',235,'Y');                    
+--                                                         
+--  INSERT INTO STUDENT_TABLE                              
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,
+--          STUDENT_ATHLETIC)                           
+--       VALUES                                         
+--         ('U4708','JHOHN',420,'Y');                   
+--                                                      
+--  INSERT INTO STUDENT_TABLE                           
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,
+--          STUDENT_ATHLETIC)                           
+--       VALUES                                         
+--         ('U4709','GEORGE',295,'Y');                  
+--                                                      
+--                                                      
+--  INSERT INTO STUDENT_TABLE                           
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,
+--          STUDENT_ATHLETIC)                           
+--       VALUES                                         
+--         ('U4710','NIVAS',320,'Y');                   
+--                                                       
+--  INSERT INTO STUDENT_TABLE                            
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS, 
+--          STUDENT_ATHLETIC)                            
+--       VALUES                                          
+--         ('U4711','ABRAHM',295,'N');                   
+--                                                       
+--                                                       
+--  INSERT INTO STUDENT_TABLE                            
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS, 
+--          STUDENT_ATHLETIC)                            
+--       VALUES                                          
+--         ('U4712','KETAN',320,'N');                    
+--                                                       
+--  INSERT INTO STUDENT_TABLE                            
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS, 
+--          STUDENT_ATHLETIC)                            
+--       VALUES                                           
+--         ('U4713','SUVIDHA',301,'Y');                   
+--                                                        
+--  INSERT INTO STUDENT_TABLE                             
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,  
+--          STUDENT_ATHLETIC)                             
+--       VALUES                                           
+--         ('U4714','GOKUL',300,'N');                     
+--                                                        
+--                                                        
+--  INSERT INTO STUDENT_TABLE                             
+--         (STUDENT_NO,STUDENT_NAME,STUDENT_TOTAL_MARKS,  
+--          STUDENT_ATHLETIC)                             
+--       VALUES                                           
+--         ('U4715','CHETAN',273,'Y');                    
+--                                                        
+----------------------------------------------------------
+--  SHOW ALL FIELDS DATA OF STUDENT_TABLE  
+-------------------------------------------
+    SELECT *                               
+      FROM STUDENT_TABLE ;                 
+--   WHERE STUDENT_ATHLETIC = 'Y';         
+
+
+
+
+----------------------------------------------------------------  
+--  CREATE THE TABLE WITH NAME SWIPE_TABLE                        
+----------------------------------------------------------------  
+--  CREATE TABLE SWIPE_TABLE                                      
+--        (SWIPE_ID            CHAR (06)    NOT NULL,             
+--         SWIPE_DATE          DATE         NOT NULL WITH DEFAULT,
+--         SWIPE_INTIME        INT          NOT NULL,             
+--         SWIPE_OUTTIME       INT          NOT NULL)             
+--         IN DBMATE1.TSMATE26;                                   
+                                                                  
+----------------------------------------------------------------  
+--  SELECT ALL FIELDS FROM SWIPE TABLE                            
+----------------------------------------------------------------  
+    SELECT *                                    
+      FROM SWIPE_TABLE;                                           
+------------------------------------------------
+--  SELECT ALL FIELDS FROM EMPLOYEE TABLE       
+------------------------------------------------
+    SELECT *                                    
+      FROM EMPLOYEE_TABLE;                      
+                                                
+------------------------------------------------
+--  JOINS                                       
+------------------------------------------------
+    SELECT E.EMPLOYEE_NO,                       
+           E.EMPLOYEE_NAME,                     
+           E.EMPLOYEE_DEPT,                     
+           S.SWIPE_DATE,                        
+           S.SWIPE_INTIME,                      
+           S.SWIPE_OUTTIME                      
+      FROM EMPLOYEE_TABLE E                     
+           INNER JOIN                                                           
+           SWIPE_TABLE S                    
+        ON E.EMPLOYEE_NO = S.SWIPE_ID       
+     WHERE S.SWIPE_DATE = '2016-12-01';     
+
+
+
+
+

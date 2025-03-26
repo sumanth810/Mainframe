@@ -1,0 +1,145 @@
+43) Create a Table with the following columns Item # (5 Chars), Item brand name (15 Chars), Item
+description (20 Chars), Item Unit Price (9(5)), New year Discount (1 Char) and insert records
+FROM MATE01.ITEMS.FILE using SPUFI. Write a COBOL Program to create a report of all the
+Items from the table. If discount flag is set, apply 50% discount for items with unit price &gt; 50000
+and 20% discount for Items with unit price between 25000 and 50000.
+----|----1----|----2----|----3----|----4----|----5----|----6----|
+
+MEGAMART – MOBILE PRICES FOR NEW YEAR
+-------------------------------------
+
+ITEM NO ITEM DESCRIPTION UNIT PRICE DISCOUNTED PRICE
+------- ---------------- ---------- ----------------
+
+NO. OF ITEMS WITH DISCOUNTED PRICES:
+
+
+ 000100 000100 IDENTIFICATION DIVISION.                                         
+ 000200 000200 PROGRAM-ID. Q47.                                                 
+ 000300 000300 AUTHOR. KUMAR.                                                   
+ 000400 000400*GENERATE DISCOUNT REPORT FOR ITEMS TABLE                         
+ 000500 000500 ENVIRONMENT DIVISION.                                            
+ 000600 000600 INPUT-OUTPUT SECTION.                                            
+ 000700 000700 FILE-CONTROL.                                                    
+ 000800 000800     SELECT PRINT-FILE ASSIGN TO OUTPUT1                          
+ 000900 000900     ORGANIZATION IS SEQUENTIAL.                                  
+ 001000 001000                                                                  
+ 001100 001100 DATA DIVISION.                                                   
+ 001200 001200 FILE SECTION.                                                    
+ 001300 001300 FD  PRINT-FILE                                                   
+ 001400 001400     RECORDING MODE IS F                                          
+ 001500 001500     RECORD CONTAINS 80 CHARACTERS.                               
+ 001600 001600 01  PRINT-RECORD          PIC X(80).                             
+ 001700 001700                                                                  
+ 001800 001800 WORKING-STORAGE SECTION.                                         
+ 001900 001900 01  WS-BLANK-LINE         PIC X(80) VALUE SPACES.                
+ 002000 002000 01  WS-HEADING-1          PIC X(80) VALUE                        
+ 002100 002100     '              MEGAMART - MOBILE PRICES FOR NEW YEAR'.       
+ 002200 002200 01  WS-HEADING-2          PIC X(80) VALUE                        
+ 002300 002300     '              -------------------------------------'.       
+ 002400 002400 01  WS-HEADING-3          PIC X(80) VALUE                        
+ 002500 002500     '  ITEM NO   ITEM DESCRIPTION  UNIT PRICE  DISCOUNTED PRICE'.
+ 002600 002600 01  WS-HEADING-4          PIC X(80) VALUE                        
+ 002700 002700     '  -------   ----------------  ----------  ----------------'.
+ 002800 002800 01  WS-DETAIL-LINE.                                              
+ 002900 002900     05 FILLER              PIC X(2)  VALUE SPACES.               
+ 003000 003000     05 WS-ITEM-NO          PIC X(7).                             
+ 003100 003100     05 FILLER              PIC X(4)  VALUE SPACES.               
+ 003200 003200     05 WS-ITEM-DESC        PIC X(16).                            
+ 003300 003300     05 FILLER              PIC X(3)  VALUE SPACES.               
+ 003400 003400     05 WS-UNIT-PRICE-DISP  PIC ZZZZ9.                            
+ 003500 003500     05 FILLER              PIC X(2)  VALUE SPACES.               
+ 003600 003600     05 WS-DISCOUNT-PRICE-DISP PIC ZZZZ9.                         
+ 003700 003700     05 FILLER              PIC X(31) VALUE SPACES.               
+ 003701 003701 01  WS-SUMMARY-LINE       PIC X(80) VALUE SPACES.                
+ 003750 003750 01  WS-UNIT-PRICE-WORK    PIC 9(5) VALUE 0.                      
+ 003800 003800 01  WS-DISCOUNTED-PRICE   PIC 9(5) VALUE 0.                      
+ 003900 003900 01  WS-COUNTER-DISCOUNT   PIC 9(3) VALUE 0.                      
+ 004000 004000 01  WS-SQLCODE-DISP        PIC ZZZZZZZZ9-.                       
+ 004100 004100                                                                  
+ 004200 004200     EXEC SQL                                                     
+ 004300 004300       INCLUDE SQLCA                                              
+ 004400 004400     END-EXEC.                                                    
+ 004500 004500     EXEC SQL                                                     
+ 004600 004600       INCLUDE ITEMTAB                                            
+ 004700 004700     END-EXEC.                                                    
+ 004800 004800     EXEC SQL                                                     
+ 004900 004900       DECLARE ITEM-CSR CURSOR FOR                                
+ 005000 005000         SELECT ITEM_NO, ITEM_DESCRIPTION, ITEM_UNIT_PRICE,       
+ 005100 005100                NEW_YEAR_DISCOUNT                                 
+ 005200 005200         FROM ITEMS                                               
+ 005300 005300         WITH UR                                                  
+ 005400 005400     END-EXEC.                                                    
+ 005500 005500                                                                  
+ 005600 005600 PROCEDURE DIVISION.                                              
+ 005700 005700 0000-MAIN-PARA.                                                  
+ 005800 005800     PERFORM 1000-INITIALIZE                                      
+ 005900 005900     PERFORM 2000-PROCESS-RECORDS                                 
+ 006000 006000         UNTIL SQLCODE NOT = 0                                    
+ 006100 006100     PERFORM 3000-TERMINATE                                       
+ 006200 006200     STOP RUN.                                                    
+ 006300 006300                                                                  
+ 006400 006400 1000-INITIALIZE.                                                 
+ 006500 006500     OPEN OUTPUT PRINT-FILE                                       
+ 006700 006700     DISPLAY 'OUTPUT FILE OPENED SUCESS'                          
+ 006800 006800     WRITE PRINT-RECORD FROM WS-HEADING-1                         
+ 006900 006900     WRITE PRINT-RECORD FROM WS-HEADING-2                         
+ 007000 007000     WRITE PRINT-RECORD FROM WS-BLANK-LINE                        
+ 007100 007100     WRITE PRINT-RECORD FROM WS-HEADING-3                         
+ 007200 007200     WRITE PRINT-RECORD FROM WS-HEADING-4                         
+ 007300 007300     EXEC SQL                                                     
+ 007400 007400       OPEN ITEM-CSR                                              
+ 007500 007500     END-EXEC.                                                    
+ 007600 007600                                                                  
+ 007700 007700 2000-PROCESS-RECORDS.                                            
+ 007800 007800     EXEC SQL                                                     
+ 007900 007900       FETCH ITEM-CSR                                             
+ 008000 008000       INTO :ITEM-NO, :ITEM-DESCRIPTION, :ITEM-UNIT-PRICE,        
+ 008100 008100            :NEW-YEAR-DISCOUNT                                    
+ 008200 008200     END-EXEC.                                                    
+ 008300 008300     EVALUATE SQLCODE                                             
+ 008400 008400       WHEN 0                                                     
+ 008500 008500          PERFORM 2100-CALCULATE-DISCOUNT                         
+ 008510 008510          MOVE SPACES TO WS-DETAIL-LINE                           
+ 008600 008600          MOVE ITEM-NO TO WS-ITEM-NO                              
+ 008700 008700          MOVE ITEM-DESCRIPTION TO WS-ITEM-DESC                   
+ 008800 008800          MOVE WS-UNIT-PRICE-WORK TO WS-UNIT-PRICE-DISP           
+ 008900 008900          MOVE WS-DISCOUNTED-PRICE TO WS-DISCOUNT-PRICE-DISP      
+ 009000 009000          WRITE PRINT-RECORD FROM WS-DETAIL-LINE                  
+ 009100 009100          DISPLAY 'OUTPUT FILE WRITE SUCCESS: ' ITEM-NO           
+ 009200 009200       WHEN 100                                                   
+ 009300 009300          CONTINUE                                                
+ 009400 009400       WHEN OTHER                                                 
+ 009500 009500          MOVE SQLCODE TO WS-SQLCODE-DISP                         
+ 009600 009600          DISPLAY 'Q43: SQL ERROR DURING FETCH: ' WS-SQLCODE-DISP 
+ 009700 009700     END-EVALUATE.                                                
+ 009800 009800                                                                  
+ 009900 009900 2100-CALCULATE-DISCOUNT.                                         
+ 010000 010000     MOVE ITEM-UNIT-PRICE TO WS-UNIT-PRICE-WORK                   
+ 010010 010010     MOVE WS-UNIT-PRICE-WORK TO WS-DISCOUNTED-PRICE               
+ 010100 010100     IF NEW-YEAR-DISCOUNT = 'Y' AND WS-UNIT-PRICE-WORK > 50000    
+ 010200 010200       COMPUTE WS-DISCOUNTED-PRICE = WS-UNIT-PRICE-WORK * 0.50    
+ 010300 010300       ADD 1 TO WS-COUNTER-DISCOUNT                               
+ 010400 010400     END-IF.                                                      
+ 010500 010500     IF NEW-YEAR-DISCOUNT = 'Y' AND WS-UNIT-PRICE-WORK >= 25000   
+ 010600 010600       AND WS-UNIT-PRICE-WORK <= 50000                            
+ 010700 010700       COMPUTE WS-DISCOUNTED-PRICE = WS-UNIT-PRICE-WORK * 0.80    
+ 010800 010800       ADD 1 TO WS-COUNTER-DISCOUNT                               
+ 010900 010900     END-IF.                                                      
+ 011000 011000                                                                  
+ 011100 011100 3000-TERMINATE.                                                  
+ 011200 011200     EXEC SQL                                                     
+ 011300 011300       CLOSE ITEM-CSR                                             
+ 011400 011400     END-EXEC.                                                    
+ 011410 011410     WRITE PRINT-RECORD FROM WS-BLANK-LINE                        
+ 011420 011420     MOVE SPACES TO WS-SUMMARY-LINE                               
+ 011430 011430     MOVE 'NO. OF ITEMS WITH DISCOUNTED PRICES: ' TO              
+ 011440 011440                        WS-SUMMARY-LINE                           
+ 011450 011450     MOVE WS-COUNTER-DISCOUNT TO WS-SUMMARY-LINE(36:3)            
+ 011460 011460     WRITE PRINT-RECORD FROM WS-SUMMARY-LINE                      
+ 011500 011500     CLOSE PRINT-FILE                                             
+ 011600 011600     DISPLAY 'OUTPUT FILE CLOSED SUCCESSFULLY '                   
+ 012200 012200     DISPLAY 'PROGRAM COMPLETED SUCCESSFULLY '.                   
+ ****** **************************** Bottom of Data ****************************
+                                                                                
+                                                                                

@@ -1,0 +1,1907 @@
+Cobol--> Programming language. Common business oriented language.
+
+PDS-->Members--> Program.
+PDS: 80 bytes FB
+
+Cobol programming Screen:
+
+
+----+----1----+----2---+----3----+----4----+----5----+----6----+----7----+----8
+
+
+column 1-6  --> Leave blank. Blank space will be filled automatically by line number/Sequence number
+column 7 --> * :- to add a comment or to comment out any line.
+AREA A --> 8th byte - 11th byte. --> Name of Divisions (4). Name of Sections. FD (File description) . 01 Level number variable. 
+                                     (in old codes 77 level variable is also defined in AREA A. 77 level is not longer used.). 
+                                     Para (paragraph) names. PROGRAM-ID.
+
+AREA B --> 12th Byte - 72nd byte.  --> Any other variable must be defined in area B. all other statements which is not mentioned in AREA.
+
+
+Column 73-80: Blank.
+
+       <-A><-------------------B-------------------------------------->         
+----+----1----+----2---+----3----+----4----+----5----+----6----+----7----+----8
+
+       IDENTIFICATION DIVISION.
+
+       DATA DIVISION.
+        INPUT-OUTPUT SECTION.
+        FILE SECTION.
+         01      WS-Record  PIC X(10)      --> Level 01 variable, defined in Area A.
+            02      WS-NAme    PIC X(20)   --> Any other variable must be defined in area B.
+
+
+
+Level   Variable  Picture
+number  Name      Clause 
+01      WS-Record  PIC X(10)
+02      WS-NAme    PIC X(20)
+
+
+------------------------------------DIVISIONS & SECTIONS--------------------------------------------------------------------------------
+
+----+----1----+----2---+----3----+----4----+----5----+----6----+----7----+----8
+       IDENTIFICATION DIVISION.                                         --> Used to identify a program. Give name to the program. Mandatory.
+       PROGRAM-ID. COBPGM01.                                            --> COBPGM01:- Program name. Max upto 8 bytes. Start with alphabet.
+                                                                             Can contain numbers and special characters at end. Mandatory.
+       AUTHOR. <Name of person who wrote the program.>                  --> for reference purpose only. Doesnot impact logic of program.Optional             
+       DATE-WRITTEN.<date when you wrote the program.>  		--> for reference purpose only. Doesnot impact logic of program.Optional
+       DATE-COMPILED.<date when you compiled the program.>		--> for reference purpose only. Doesnot impact logic of program.Optional
+    
+
+       ENVIRONMENT DIVISION.
+
+       CONFIGURATION SECTION. 						--> not used now-a-days. Used to give computer name.
+       SOURCE-COMPUTER. <Name of computer>.
+       OBJECT-COMPUTER. <Name of computer>.
+
+       INPUT-OUTPUT SECTION.                                            --> Used to define the properties of files. Mandatory when files are 										    accessed
+
+
+       DATA DIVISION.                                                   --> used to handle data.
+
+       WORKING-STORAGE SECTION.                                         --> Used to define variables. Variables are used to store values/data. 
+       FILE SECTION.                                                    --> USed to define the properties of records present in the file.
+									    Mandatory when files are accessed
+ 
+       PROCEDURE DIVISION.                                              --> logic of program.
+
+
+
+e.g. move string Pranchan to variable.
+
+----+----1----+----2---+----3----+----4----+----5----+----6----+----7----+----8
+       DATA DIVISION.                                                   
+
+       WORKING-STORAGE SECTION.
+
+       01      WS-Record  PIC X(10) .
+
+       PROCEDURE DIVISION.
+
+            MOVE 'PRANCHAN' TO WS-Record.
+
+-----------------------------------------------------Working storage Variables (data item)----------------------------------------------------
+
+Defined in Working storage section under Data Division. Used to store values
+
+Level   Variable  Picture  Value <Data>
+number  Name      Clause 
+
+
+Level numbers:
+01       --> Elementary variable. Area A
+77       --> Independent Variable. AREA A. Cannot be subdivided.
+02-49    --> Group variables or sub variables. Group variables cannot be defined independently. Defined under 01 Level.
+
+Special purpose variables.
+66  --> Rename or regroup a variable.
+88  --> Set Condition/Flags.
+
+
+01      WS-Record  PIC X(10)     --> Elementary variable. SIZE: 10 bytes
+
+
+
+01      WS-Record.
+    02    WS-CITY    PIC X(04)   
+    02    WS-STATE   PIC X(04) 
+    02    WS-COUNTRY PIC X(02) 
+
+01      WS-Record.
+    05    WS-CITY       --> Group variable.
+          10  WS-AREA  PIC X(02) 
+          10  WS-STREET PIC X(02) 
+    05    WS-STATE   PIC X(04) 
+    05    WS_COUNTRY PIC X(02) 
+
+
+Variable name:
+
+Any name. Max Length: ??. One word cannot be more than 8. Start with alphabet. Words are separated by - . Can contain numebers & special characters at the end.
+
+Picture clause:
+
+PIC datatype (Size of data).
+
+PIC: Has to be written as it is. It is abbreviation of Picture.
+Data type: 
+
+Alphabet/String/character: A
+Numeric                 : 9
+Aphanumeric (Combination of nimbers and alphabets) : X
+Decimal                  : 9 and V
+Signed  (+/-)            : S and 9 ( signed decimal  S,9,v)
+Packed Decmimal          : S,9 and COMP-3.
+
+
+e.g.1  01      WS-Record  PIC X(10)    --> Alphanumeric data item of size 10 bytes
+e.g.2  01      WS-Record  PIC 9(10)    --> Numeric data item of size 10 bytes
+e.g.3  01      WS-Record  PIC A(10)    --> String data item of size 10 bytes
+e.g.4  01      WS-Record  PIC X(10)    --> Alphanumeric data item of size 10 bytes
+e.g.5  01      WS-Record  PIC 9(10)V99  --> numeric data item with 2 bytes of decimal after 10 bytes of numeric data
+e.g.6  01      WS-Record  PIC S9(10)    --> Signed data item of size 10 bytes. S occupied half byte and used to store +/- value.
+e.g.7  01      WS-Record  PIC S9(10) COMP-3    --> Signed data item of size 10 bytes. S occupied half byte and used to store +/- value.
+ 						   COMP3 --> Packed decimal. Odd number: (n+1)/2.  Even number: n/2
+
+
+1000123
+ 
+01 WS-Account-number  PIC 9(07) --> Numeric
+
+
+1000.123
+
+01 WS-Account-number  PIC 9(4)V9(03)
+                     
+
+
+v1=5
+V2=6
+
+
+v1-v2 = -1
+
+
+
+S-Record  PIC S9(10) --> -1
+
++1245678901
+WS-Record  PIC S9(10)     --> 0.5,10: 10.5 bytes
+
+
+WS-Record  PIC S9(10) COMP-3          --> 0.5S and 10 bytes for numeric field. 10/2 = 5 bytes.  5.5 bytes
+
+
++12456789012
+
+WS-Record  PIC S9(11) --> 0.5 and 11; 11.5 bytes
+WS-Record  PIC S9(11) COMP-3  --> 0.5 11+1/2 = 12/2 =6; 6.5 bytes
+
+
+Note: Keywords or Cobol reserved words are those words which has to be written exactly as it is. 
+
+Storing values in a variable: Variable can store only one value at a time. If you move multiple value to same variable then it will store the latest value.
+
+1. Value keyword. Store value in the variable during declaration of the variable itself in Working storage section.
+                  when value is stored in the variable using value keyword, then the value is called as Constant.
+
+e.g. +12456789012
+
+ Working-storage section.
+
+ 01  WS-Record  PIC S9(11) VALUE +12456789012.
+
+e.g. PRANCHAN
+
+ Working-storage section.
+
+ 01  WS-Record  PIC X(11) VALUE 'PRANCHAN'.
+
+
+2. Move statement.
+
+a. Declare a variable in WS Section.
+b. store/move value to the variable in procedure division using MOVE statement.
+
+	DATA DIVISION.
+	Working-storage section.
+ 	01  WS-Record  PIC X(11).
+
+
+	PROCEDURE DIVISION.
+	    MOVE 'PRANCHAN' TO WS-Record.
+            MOVE 'BISWAS' TO WS-Record.
+ 
+3. ACCEPT: Input statement. Accept is use to accept the value passed from a JCL to a cobol program.
+                         This value is passed from JCL with the help of SYSIN DD * statement.
+
+	DATA DIVISION.
+	Working-storage section.
+ 	01  WS-Record  PIC X(11).
+            
+	PROCEDURE DIVISION.
+	    ACCEPT WS-Record.
+
+
+JCL:
+
+//SYSIN DD *
+  PRANCHAN
+/*
+            
+
+--------------------------------------------------STATEMENTS----------------------------------------------------------------------------------
+
+DISPLAY 'STRING/MESSAGE/INFORMATION/NUMERIC VALE'   --> Used to display message or value stored in variable.
+DISPLAY <Variable name>
+
+e.g.1
+	PROCEDURE DIVISION.
+		DISPLAY 'HELLO WORLD'           --> Displaying String HELLO WORLD without storing it in any variable.        
+
+e.g.2   -> Displaying String HELLO WORLD by storing it in variable using value Keyword.
+	DATA DIVISION.
+	Working-storage section.
+ 	01  WS-message  PIC X(11) VALUE 'HELLO WORLD'. 
+
+
+        PROCEDURE DIVISION.
+           DISPLAY WS-message.
+
+e.g.3	-> Displaying String HELLO WORLD by storing it in variable using MOVE Statement.
+	DATA DIVISION.
+	Working-storage section.
+ 	01  WS-message  PIC X(11).
+
+
+        PROCEDURE DIVISION.
+           MOVE 'HELLO WORLD' TO WS-message.
+	   DISPLAY WS-message.
+
+       
+STOP RUN.   --> It is used to stop the Execution of Cool program. It marks the logical end of Cobol program. It should be the last statement in 			your Cobol program.
+
+EXIT.       --> Same function as STOP RUN.
+
+
+MOVE.    --> It is used to - 
+              Store a value inside a variable.
+
+              e.g. MOVE 'ROHIT' TO WS_NAME.
+ 
+	      Copy value from one variable to another variable.
+                    MOVE 'ROHIT' TO WS_NAME.      --> WS_NAME = ROHIT
+	      e.g.  MOVE WS-NAME TO WS_NAME01.    --> WS_NAME = ROHIT; WS_NAME01=ROHIT
+
+	      Copy partial value from one variable to another variable.	This process is called Reference modification.
+		    MOVE 'ROHIT' TO WS_NAME.           --> WS_NAME = ROHIT
+	      e.g.  MOVE WS-NAME(1:3) TO WS_NAME01.    --> WS_NAME = ROHIT; WS_NAME01=ROH
+
+		
+
+Arithmetic statements: For Arithematic operation, variable's data type must be Numeric/Signed or PD. Signed variables are used to store numeric 		       result
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05) VALUE 100.
+                01      WS-NUM02  PIC 9(05) VALUE 200.
+		01	WS-RESULT PIC 9(05).
+		01      WS-REMAINDER PIC 9(05).
+		
+ 		PROCEDURE DIVISION.
+		ADD: Add the value of 2 variables.
+	   	ADD WS-NUM01 TO WS-NUM02
+                    100         200            --> 100+200=300--> WS-NUM02
+
+                 DISPLAY   WS-NUM01            --> WS-NUM01 = 100
+		 DISPLAY   WS-NUM02            --> WS-NUM02 = 300
+ 
+		ADD WS-NUM01 TO WS-NUM02 GIVING WS-RESULT.
+		     100         200            --> 100+200=300--> WS-RESULT
+                 DISPLAY   WS-NUM01            --> WS-NUM01  = 100
+		 DISPLAY   WS-NUM02            --> WS-NUM02  = 200
+                 DISPLAY   WS-RESULT           --> WS-RESULT = 300
+		
+		SUBTRACT: Subtract value of one variable from another variable
+		SUBTRACT WS-NUM01 FROM WS-NUM02.
+     			    100         200            --> 200-100=100--> WS-NUM02
+
+		SUBTRACT WS-NUM01 FROM WS-NUM02 GIVING WS-RESULT.
+     			  100         200            --> 200-100=100--> WS-RESULT
+
+                SUBTRACT WS-NUM02 FROM WS-NUM01 GIVING WS-RESULT.
+     			  200           100            --> 100-200=-100--> WS-RESULT
+
+
+	     MULTIPLY: Subtract value of one variable by value of another variable
+		MULTIPLY WS-NUM01 BY WS-NUM02.
+		          100         200            --> 100*200=20000--> WS-NUM02
+		MULTIPLY WS-NUM01 BY WS-NUM02 GIVING WS-RESULT.
+			  100         200            --> 100*200=20000--> WS-RESULT
+
+		MULTIPLY WS-NUM01 BY WS-NUM02 GIVING WS-RESULT ON SIZE ERROR DISPLAY 'OVERFLOW'.
+                           99999      88888          -->   8888711112
+		
+	      DIVIDE:
+                DIVIDE WS-NUM01 INTO WS-NUM02.
+                         100           200       100/200-> Decimal. 
+                         
+		DIVIDE WS-NUM01 INTO WS-NUM02 GIVING WS-RESULT REMAINDER WS-REMAINDER.
+
+                         20            3             --> 20/3: WS-RESULT=6,  WS-REMAINDER=2
+
+
+	     COMPUTE: Combination of one r more Arithmetic expression.
+           
+                ADD 2 variables:   Compute WS-RESULT = WS-NUM01 +  WS-NUM02
+ 
+                ADD 2 variables and Subtract 3 variable: Compute WS-RESULT = WS-NUM01 +  WS-NUM02 - WS-NUM03
+
+                ADD 2 variables and Multiply 3 variable: Compute WS-RESULT = (WS-NUM01 +  WS-NUM02) * WS-NUM03
+
+
+
+INITIALIZE:  Reset the value of a variable.
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05).
+                01      WS-NUM02  PIC 9(05).
+                01      WS-NAME   PIC X(10).
+
+		PROCEDURE DIVISION.
+
+		  MOVE 'ROHIT' TO WS_NAME.  
+                  MOVE  100 TO WS-NUM01. 
+                  MOVE  200 TO WS-NUM02.
+		  ADD WS-NUM01 TO WS-NUM02.      --> WS-NAME  = ROHIT, WS-NUM01 = 100, WS-NUM02 = 300
+                  INITIALIZE WS-NAME.            --> WS-NAME  = SPACES
+		  INITIALIZE WS-NUM01.           --> WS-NUM01 = Zeros
+		  INITIALIZE WS-NUM02.           --> WS-NUM02 = Zeros
+
+
+
+
+NEXT/CONTINUE:   Self Study.
+
+
+COMPILATION AND EXECUTION:
+
+Cobol program: - English.  --> COB001
+Compiler-MF: English--> Machine language instructions --> MF
+
+COMPILATION (Compile JCL): Cobol pgm (PDS--> Members) --> Machine language instructions --> Load library (load modules)
+                            COB001 (OZA@@@.**.COBOL (COB001)) -->                            OZA@@@.**.LOADLIB(COB001) 
+
+
+Execution (Run JCL): Run the Program with the help of load module.
+
+
+STEPLIB/JOBLIB: used to pass Load module to JCL through Load library.
+
+
+//name DD DSN-<FILE name>, Parameters
+
+//STEPLIB DD DSN=OZA@@@.LOADLIB,DISP=SHR   --> If we are passing load module and load lib after Exec statement. Most preferrable way.
+
+
+
+//JOBLIB DD DSN=OZA@@@.LOADLIB,DISP=SHR   --> If we are passing load module and load lib after JOB statement. 
+
+
+------------------------------------------------------Loop and conditional statements 31/01-----------------------------------------------
+
+
+PARA. (Paragraph)--> Group/Block/Set of statements (Lines of code). AREA A
+
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05).
+                01      WS-NUM02  PIC 9(05).
+                01      WS-NAME   PIC X(10).
+
+		PROCEDURE DIVISION.
+
+                  PERFORM A001-MOVE-PARA.
+		  PERFORM A002-ADD-PARA 5 times.
+		  PERFORM A003-INIT-PARA.
+                  STOP RUN.
+                                
+                
+                A001-MOVE-PARA. 
+		  MOVE 'ROHIT' TO WS_NAME.      WS_NAME = ROHIT
+                  MOVE  100 TO WS-NUM01. 	WS-NUM01 = 100
+                  MOVE  200 TO WS-NUM02.	WS-NUM01 = 200
+
+               A002-ADD-PARA. 
+		  ADD WS-NUM01 TO WS-NUM02.      100+200=300--> WS-NUM02;  WS-NUM02 = 300  --> Iteration1      
+                                                 100+300=400--> WS-NUM02;  WS-NUM02 = 400  --> Iteration2 
+                                                 100+400=500--> WS-NUM02;  WS-NUM02 = 500  --> Iteration3 
+						 100+500=600--> WS-NUM02;  WS-NUM02 = 600  --> Iteration4 
+						 100+600=700--> WS-NUM02;  WS-NUM02 = 700  --> Iteration5 
+               A003-INIT-PARA.      
+                  INITIALIZE WS-NAME.            WS-NAME= SPACES          
+		  INITIALIZE WS-NUM01.           WS-NUM01=0
+		  INITIALIZE WS-NUM02.           WS-NUM02=0
+
+		
+
+LOOP/PERFORM statement:  
+
+Used to execute a paragraph one or more number of times. If a para s executed more than once--> Loop.
+
+1. Simple perform
+   Perform <Para name> --> Execute a para one time.
+   e.g. PERFORM A001-MOVE-PARA.
+
+2. Perform <Para> n times; N--> any number.  --> Perform para n number of times
+	PERFORM A002-ADD-PARA 5 times.
+
+3. Perform <Para> Until <condition>        --> Perform a paragraph until condition becomes true.
+
+e.g.
+DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05).
+                01      WS-NUM02  PIC 9(05).
+                01      WS-NAME   PIC X(10).
+                01      WS-COUNT  PIC 9(02).
+
+		PROCEDURE DIVISION.
+
+                  PERFORM A001-MOVE-PARA.
+                  PERFORM A002-ADD-PARA UNTIL WS-COUNT>03.
+		  PERFORM A003-INIT-PARA.
+                  STOP RUN.
+                                
+                
+                A001-MOVE-PARA. 
+		  MOVE 'ROHIT' TO WS_NAME.      WS_NAME = ROHIT
+                  MOVE  100 TO WS-NUM01. 	WS-NUM01 = 100
+                  MOVE  200 TO WS-NUM02.	WS-NUM01 = 200
+                  MOVE  01  TO WS-COUNT.        WS-COUNT = 01
+
+               A002-ADD-PARA.                   WS-COUNT = 01;02             
+		  ADD WS-NUM01 TO WS-NUM02.      100+200=300--> WS-NUM02;  WS-NUM02 = 300  --> Iteration1 
+                  ADD 01 to WS-COUNT.           01+01=02 ;  WS-COUNT = 02                  --> Iteration1
+
+                                                100+300=400--> WS-NUM02;  WS-NUM02 = 400  --> Iteration2 
+						01+02=03 ;  WS-COUNT = 03                  --> Iteration2
+
+                                                100+400=500--> WS-NUM02;  WS-NUM02 = 500  --> Iteration3 
+						01+03=04 ;  WS-COUNT = 04                  --> Iteration3
+
+               A003-INIT-PARA.      
+                  INITIALIZE WS-NAME.            WS-NAME= SPACES          
+		  INITIALIZE WS-NUM01.           WS-NUM01=0
+		  INITIALIZE WS-NUM02.           WS-NUM02=0
+
+4. Perform <Para> VARYING <Counter variable> FROM x By y Until <condition>;  x,y--> Numbers
+
+5. Perform <Para> VARYING <Counter variable1> FROM x By y Until <condition>;  x,y--> Numbers  --> 2 dimensional perform
+                  AFTER   <Counter variable2> FROM x By y Until <condition>;  x,y--> Numbers 
+
+e.g.
+DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05).
+                01      WS-NUM02  PIC 9(05).
+                01      WS-NAME   PIC X(10).
+                01      WS-COUNT  PIC 9(02).
+
+		PROCEDURE DIVISION.
+
+                  PERFORM A001-MOVE-PARA.
+                  PERFORM A002-ADD-PARA VARYING WS-COUNT FROM 1 BY 1 UNTIL WS-COUNT>03.
+		  PERFORM A003-INIT-PARA.
+                  STOP RUN.
+                                
+                
+                A001-MOVE-PARA. 
+		  MOVE 'ROHIT' TO WS_NAME.      WS_NAME = ROHIT
+                  MOVE  100 TO WS-NUM01. 	WS-NUM01 = 100
+                  MOVE  200 TO WS-NUM02.	WS-NUM01 = 200
+                 
+               A002-ADD-PARA.                   WS-COUNT = 01 ;02          
+		  ADD WS-NUM01 TO WS-NUM02.      100+200=300--> WS-NUM02;  WS-NUM02 = 300  --> Iteration1 
+                                                                           WS-COUNT = 2   --> Iteration1
+						 100+300=400--> WS-NUM02;  WS-NUM02 = 400  --> Iteration2 
+                                                                           WS-COUNT = 3   --> Iteration2
+						 100+400=500--> WS-NUM02;  WS-NUM02 = 500  --> Iteration3 
+                                                                           WS-COUNT = 4   --> Iteration3
+
+               A003-INIT-PARA.      
+                  INITIALIZE WS-NAME.            WS-NAME= SPACES          
+		  INITIALIZE WS-NUM01.           WS-NUM01=0
+		  INITIALIZE WS-NUM02.           WS-NUM02=0
+
+6. Perform <Para> Thru <Para>.            --> Used to execute a range of paragraphs.
+
+e.g.
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-NUM01  PIC 9(05).
+                01      WS-NUM02  PIC 9(05).
+                01      WS-NAME   PIC X(10).
+
+		PROCEDURE DIVISION.
+
+                  PERFORM A001-MOVE-PARA THRU A003-INIT-PARA.          --> executes all para in sequence. 
+                  STOP RUN.
+                                
+                
+                A001-MOVE-PARA. 
+		  MOVE 'ROHIT' TO WS_NAME.      WS_NAME = ROHIT
+                  MOVE  100 TO WS-NUM01. 	WS-NUM01 = 100
+                  MOVE  200 TO WS-NUM02.	WS-NUM01 = 200
+
+               A002-ADD-PARA. 
+		  ADD WS-NUM01 TO WS-NUM02.      100+200=300--> WS-NUM02;  WS-NUM02 = 300      
+                                              
+               A003-INIT-PARA.      
+                  INITIALIZE WS-NAME.            WS-NAME= SPACES          
+		  INITIALIZE WS-NUM01.           WS-NUM01=0
+		  INITIALIZE WS-NUM02.           WS-NUM02=0
+
+
+CONDITIONAL statements:
+
+Conditions are used to set some criteria for execution of statements. Statements will be executed if conditions are satisfied.
+
+IF/END-IF              --> Simple
+IF/ELSE/END-IF         --> IF-Else
+
+We can have multiple condition in IF, separated by OR or AND.
+IF we have multiple conditions separated by OR, then the statements under IF will be executed if either of Conditions are satisfied.
+IF we have multiple conditions separated by AND, then the statements under IF will be executed if All of the Conditions are satisfied.
+
+Nested-IF:-    IF inside an IF.
+
+e.g.1
+                   IF WS-AGE > 18 OR WS-AGE <= 60
+                      MOVE 'Adult' to WS-AGE-CRITERIA
+                   ELSE
+                      IF WS-AGE > 60
+                         MOVE 'OLD' to WS-AGE-CRITERIA
+                      END-IF
+                   END-IF.
+
+e.g.2
+                   IF WS-AGE > 18 
+                      IF WS-AGE <= 60
+                      MOVE 'Adult' to WS-AGE-CRITERIA
+                   ELSE
+                      IF WS-AGE > 60
+                         MOVE 'OLD' to WS-AGE-CRITERIA
+                      END-IF
+                   END-IF.
+
+
+
+
+e.g.  Display Age criterias.  Age: 0-3--> Infant, >3-<14--> Kid, 14-18--> Teen, >18-60--> Adult, >60--> OLD
+
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-AGE  PIC 9(03).
+                01      WS-AGE-CRITERIA  PIC X(08).
+                01      WS-NAME   PIC X(10).
+
+		PROCEDURE DIVISION.
+
+                   MOVE 14 TO WS-AGE.
+
+                   IF WS-AGE <= 03
+                      MOVE 'infant' to WS-AGE-CRITERIA                --> not executed
+                   END-IF.
+
+                   IF WS-AGE > 03 OR WS-AGE < 14
+                      MOVE 'KID' to WS-AGE-CRITERIA                  --> not executed
+                   END-IF.
+                   IF WS-AGE >= 14 OR WS-AGE <= 18
+                      MOVE 'Teen' to WS-AGE-CRITERIA                 --> Yes  WS-AGE-CRITERIA = Teen
+                   END-IF.
+                   IF WS-AGE > 18 OR WS-AGE <= 60
+                      MOVE 'Adult' to WS-AGE-CRITERIA
+                   ELSE
+                      IF WS-AGE > 60
+                         MOVE 'OLD' to WS-AGE-CRITERIA
+                      END-IF
+                   END-IF.
+                   DISPLAY WS-AGE-CRITERIA.                        --> TEEN
+
+
+EVALUATE. Used to remove multiple IF.
+
+MONTH        num of days
+JAN            31
+FEb -->        28
+MAR -->        31
+APR-->         30
+MAY-->         31
+JUN  -->       30
+JUL-->         31
+AUG-->         31
+SEP-->         30
+OCT-->         31
+NOV-->         30
+DEC-->         31 
+
+
+IF:
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-MONTH  PIC X(10).
+                01      WS-NUM-OF-DAYS  PIC 9(02).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'SEP' TO WS-MONTH.
+                  IF WS-MONTH  = 'JAN' OR 'MAR' OR 'MAY' OR 'JUL' OR 'AUG' OR OCT' OR 'DEC'
+                     MOVE 31 TO WS-NUM-OF-DAYS
+
+                     ELSE
+                        IF WS-MONTH  = 'APR' OR 'JUN' OR 'SEP' OR 'NOV'
+				MOVE 30 TO WS-NUM-OF-DAYS
+                        ELSE
+                                MOVE 28 TO WS-NUM-OF-DAYS
+                        END-IF
+                  END-IF. 
+
+EVALUATE:
+ e.g.1              
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-MONTH  PIC X(10).
+                01      WS-NUM-OF-DAYS  PIC 9(02).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'SEP' TO WS-MONTH.
+                  
+                  EVALUATE WS-MONTH
+                    WHEN 'JAN'
+                          MOVE 31 TO WS-NUM-OF-DAYS
+                    WHEN 'FEB'
+			  MOVE 28 TO WS-NUM-OF-DAYS
+                    WHEN 'MAR'
+                          MOVE 31 TO WS-NUM-OF-DAYS
+                    WHEN  'APR'
+                          MOVE 30 TO WS-NUM-OF-DAYS
+                          :
+                          :
+                    WHEN 'DEC' 
+			  MOVE 31 TO WS-NUM-OF-DAYS
+                   END-EVALUATE.
+
+e.g.2
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-MONTH  PIC X(10).
+                01      WS-NUM-OF-DAYS  PIC 9(02).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'SEP' TO WS-MONTH.
+                  
+                  EVALUATE WS-MONTH
+                    WHEN 'JAN'
+                    WHEN 'MAR'
+                    WHEN 'MAY'
+                    WHEN 'JUL'
+                    WHEN 'AUG'
+                    WHEN 'OCT'
+                    WHEN 'DEC'
+                          MOVE 31 TO WS-NUM-OF-DAYS
+                    WHEN 'FEB'
+			  MOVE 28 TO WS-NUM-OF-DAYS
+                    WHEN 'APR'
+                    WHEN 'JUN'
+                    WHEN 'SEP'
+                    WHEN 'NOV'
+                          MOVE 30 TO WS-NUM-OF-DAYS
+             
+                   END-EVALUATE.
+
+
+EVALUATE TRUE.
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-MONTH  PIC X(10).
+                01      WS-NUM-OF-DAYS  PIC 9(02).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'SEP' TO WS-MONTH.
+                  
+                  EVALUATE TRUE
+                    WHEN WS-MONTH = 'JAN'
+                          MOVE 31 TO WS-NUM-OF-DAYS
+                    WHEN WS-MONTH = 'FEB'
+			  MOVE 28 TO WS-NUM-OF-DAYS
+                    WHEN WS-MONTH = 'MAR'
+                          MOVE 31 TO WS-NUM-OF-DAYS
+                    WHEN WS-MONTH =  'APR'
+                          MOVE 30 TO WS-NUM-OF-DAYS
+                          :
+                          :
+                    WHEN WS-MONTH = 'DEC' 
+			  MOVE 30 TO WS-NUM-OF-DAYS
+                   END-EVALUATE.
+
+EVALUATE ALSO.  --> Used to check2 conditions under Single WHEN. Both the conditions must be satisfied.
+
+VOTING Eligibility for INDIA:
+
+STATE   AgE
+Mah     >18     
+Del
+pun
+tel
+AP
+Raj
+
+e.g.1
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-STATE  PIC X(10).
+                01      WS-AGE  PIC 9(03).
+                01      WS-ELI-STATUS PIC A(01).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'Tel' TO WS-STATE.
+                  MOVE  20  TO WS-AGE
+                  
+                  EVALUATE WS-STATE ALSO WS-AGE
+                    WHEN 'Mah' ALSO >18
+                    WHEN 'DEL' ALSO >18
+                    WHEN 'Pun' ALSO >18
+                    WHEN 'Tel' ALSO >18
+                    WHEN 'AP'  ALSO >18
+                    WHEN 'Raj' ALSO >18
+                    WHEN 'DEC'
+                          MOVE 'Y' TO  WS-ELI-STATUS
+                    WHEN 'OTHER'
+		          MOVE 'N' TO WS-ELI-STATUS                    
+                   END-EVALUATE.
+
+                   DISPLAY WS-ELI-STATUS
+
+
+EVALUATE - TRUE- ALSO.    --> Used to check Multiple conditions. Both the conditions should be satisfied.
+
+e.g.2
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-STATE  PIC X(10).
+                01      WS-AGE  PIC 9(03).
+                01      WS-ELI-STATUS PIC A(01).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 'Tel' TO WS-STATE.
+                  MOVE  20  TO WS-AGE
+                  
+                  EVALUATE TRUE ALSO TRUE
+                    WHEN WS-STATE='Mah' ALSO WS-AGE>18
+                    WHEN WS-STATE='Tel' ALSO WS-AGE>18
+                    WHEN WS-STATE='Pun' ALSO WS-AGE>18
+                    WHEN WS-STATE='AP' ALSO WS-AGE>18
+                    WHEN WS-STATE='Raj' ALSO WS-AGE>18
+                    WHEN WS-STATE='Del' ALSO WS-AGE>18
+                          MOVE 'Y' TO  WS-ELI-STATUS
+                    WHEN 'OTHER'
+		          MOVE 'N' TO WS-ELI-STATUS                    
+                   END-EVALUATE.
+
+                   DISPLAY WS-ELI-STATUS
+
+EVALUATE-THRU
+
+AGE: 0-3: Infant
+     4-13: KID
+     14-17: Teen
+     18-59: Adult
+     >60: OLD
+ 
+e.g.1              
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01	WS-AGE  PIC 9(03).
+                01      WS-AGE-CRITERIA  PIC X(08).
+           
+                PROCEDURE DIVISION
+                
+                  MOVE 40 TO WS-AGE.
+                  
+                  EVALUATE WS-AGE
+                    WHEN 00 THRU 03
+                          MOVE 'Infant' TO WS-AGE-CRITERIA
+                    WHEN 04 THRU 13
+                          MOVE 'KID' TO WS-AGE-CRITERIA
+                    WHEN 14 THRU 17
+                          MOVE 'Teen' TO WS-AGE-CRITERIA
+                    WHEN 18 THRU 59
+                          MOVE 'Adult' TO WS-AGE-CRITERIA
+		    WHEN OTHER
+                          MOVE 'OLD' TO WS-AGE-CRITERIA                          
+                   END-EVALUATE.
+
+
+FLAGS / Condition names:
+88 level variables are condition names (Flags). 88 level variables do not have PIC clause. Always defined under 01 level.
+
+         ----+----1----+----2---+----3----+----4----+----5----+----6----+----7----+----8
+		DATA DIVISION.
+		WORKING-STORAGE SECTION.
+
+		01 WS-GENDER PIC X(01).
+  		    88 MALE VALUE 'M'.
+   		    88 FEMALE VALUE 'F'.
+  
+                PROCEDURE DIVISION
+                
+                    MOVE 'M' TO WS-GENDER.            --> MALE condition is Active
+                  
+		    MOVE 'F' TO WS-GENDER.            --> FEMALE condition is Active
+
+                    SET MALE TO TRUE                  --> MALE condition is Active
+
+
+                    IF MALE
+                       DISPLAY ' I AM A BOY'
+                    ELSE
+                       DISPLAY ' I AM A GIRL'
+                    END-IF.
+                      
+
+         
+-------------------------------------------------------FILES.-----------------------------------------------------------------------------------
+
+1. Define the properties of file.
+     File Declaration.  ENVIRONMENT DIVISION --> INPUT-OUTPUT SECTION --> FILE-CONTROL.
+          Logical and Physical file name.
+                   Select <Logical file name> ASSIGN TO <DD Name/Physical file name>.         *DD name should match with DD name inside Run Jcl.
+                                                                                              * Logical file name will be used inside the pgm 													for open/read/write/close operation.
+               
+          Type/Organisation of file.
+                   ORGANISATION IS SEQUENTIAL.                                            Other organizations are: INDEXED and RELATIVE--> VSAM
+                                                                                          For PS file: SEQUENTIAL.
+                 
+          Mode of access.
+                  ACCESS MODE IS SEQUENTIAL.                                              ACCESS MODE: RANDOM --> VSAM
+ 
+
+          File status.                                                                    Very important. 2 byte working storage variable used 			
+          FILE STATUS IS <Working storage variable>       			  to store Status code of each operation performed in the file.
+                 
+
+          RECORD KEY                                                                      Only for VSAM.
+   
+
+e.g.
+PGM: COBPGM02
+Compilation  ->load module.--> COBPGM02
+Execution
+
+
+INPUT-OUTPUT SECTION.                                File Declaration.
+FILE-CONTROL.
+  Select INPUT ASSIGN TO INP001                        INP001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL                           ESDS:SEQUENTIAL, KSDS: INDEXED, RRDS: RELATIVE                         
+  ACCESS MODE IS SEQUENTIAL                            ESDS:SEQUENTIAL, KSDS: RANDOM / SEQUENTIAL, RRDS: RANDOM 
+  RECORD KEY IS WS-RECORD-KEY                          only for KSDS VSAM,  Define WS-RECORD-KEY in WS section
+  ALTERNATE KEY IS WS-ALT-RECORD-KEY                   only if you want to access KSDS VSAM with alternate key (AIX),Define WS-ALT-RECORD-KEY in WS section
+  RELATIVE KEY IS WS-RELATIVE-KEY                      only for RRDS. Define WS-RELATIVE-KEY in WS Section.
+  FILE STATUS IS WS-FILE-STATUS-IN.
+
+  Select OUTPUT ASSIGN TO OUT001                       OUT001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL 
+  ACCESS MODE IS SEQUENTIAL
+  FILE STATUS IS WS-FILE-STATUS-OUT.
+
+
+//STEP001 EXEC PGM=COBPGM02                        --> EXEC statement  
+//STEPLIB DD DSN= XXX.Loadlib              
+//INP001 DD DSN=OZA120.AGENT.FILE,                 --> DD statement. Input operation/Input file
+//            DISP=SHR                             --> SHR/OLD
+//OUT001 DD DSN=OZA120.AGENT.FILE.OP,               --> DD statement. Output operation/Output file
+//		DISP=(NEW,CATLG,DELETE),
+//		SPACE=(CYL,(10,5),RLSE),
+//		UNIT=SYSDA,
+//		VOLUME=<Serial number>,
+//		DCB=(DSORG=PS,RECFM=FB,LRECL=80,BLKSIZE=400)
+
+
+2. Define the properties of records present in the file. DATA DIVISION--> FILE SECTION-->FD.
+
+File definition.--> 
+
+DATA DIVISION.
+FILE SECTION.
+
+FD <File Name>                                     --> Logical file name. AREA A.
+  Record Length:
+  RECORD CONTAINS nn CHARACTERS.                 --> nn: Length of record. It should match with the actual record length of the file. AREA B. 							                           if file is FIXED BYTE.
+
+  RECORD CONTAINS xx to yy CHARACTERS.           --> xx: minimum length. yy: maximum length. If the file is Variable byte.
+
+
+  Record format (type):
+  RECORDING MODE IS   F/FB/V/VB                 --> F/FB: Fixed byte. V/VB: Variable byte. AREA B. 
+
+  BLKSIZE:                                      --> AREA B.  Multiple of record length 
+
+  DATA Record.                                  --> Working storage variable to store the records/data which is read from or Written into file
+  Data records is <Variable name>                   PIC clause of the working storage variable should match with the rec length.
+                                                    This variable will be defined in FD statement under file section and not in working storage   01 Variable PIC()	            		    section, It is a 01 Level variable.
+
+
+
+e.g.
+PGM: COBPGM02
+Compilation  ->load module.--> COBPGM02
+Execution
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.                                File Declaration.
+FILE-CONTROL.                                        AREA A.
+  Select INPUT ASSIGN TO INP001                        INP001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL
+  ACCESS MODE IS SEQUENTIAL
+  FILE STATUS IS WS-FILE-STATUS-IN.
+
+  Select OUTPUT ASSIGN TO OUT001                       OUT001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL 
+  ACCESS MODE IS SEQUENTIAL
+  FILE STATUS IS WS-FILE-STATUS-OUT.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+
+01 WS-FILE-STATUS.
+   05 WS-FILE-STATUS-IN   PIC 9(02).
+   05 WS-FILE-STATUS-OUT  PIC 9(02).
+
+FILE SECTION.
+FD INPUT
+   RECORD CONTAINS 80 CHARACTERS.                     Record length should match with records length of file
+   RECORDING MODE IS F                                Record format should match with records format of file
+   BLOCK CONTAINS 400 CHARACTERS.                     Block length should match with Block length of file, Should be multiple of Record length.
+   DATA RECORD IS WS_INP01.
+01 WS_INP01 PIC X(80).
+
+
+FD OUTPUT
+  RECORD CONTAINS 80 CHARACTERS.                      Record length should match with records length of file
+  RECORDING MODE IS  F				      Record format should match with records format of file
+  BLOCK CONTAINS 400 CHARACTERS.                      Block length should match with Block length of file, Should be multiple of Record length.
+  DATA RECORD IS WS_OUT01.
+01 WS_OUT01 PIC X(80).
+
+
+//STEP001 EXEC PGM=COBPGM02                         --> EXEC statement  
+//STEPLIB DD DSN= XXX.Loadlib              
+//INP001 DD DSN=OZA120.AGENT.FILE,                  --> DD statement. Input operation/Input file
+//            DISP=SHR                              --> SHR/OLD
+//OUT001 DD DSN=OZA120.AGENT.FILE.OP,               --> DD statement. Output operation/Output file
+//		DISP=(NEW,CATLG,DELETE),
+//		SPACE=(CYL,(10,5),RLSE),
+//		UNIT=SYSDA,
+//		VOLUME=<Serial number>,
+//		DCB=(DSORG=PS,RECFM=FB,LRECL=80,BLKSIZE=400)
+
+
+3. Perform operations.  
+   Procedure division.
+   AREA B.
+
+    A. Open file. First operation of a file.
+       OPEN <MODE> <LOGICAL FILE NAME>
+
+       MODES:  INPUT            --> If you want to only read the records (Read operation) from the file.
+               OPEN INPUT <LOGICAL FILE NAME>
+
+               OUTPUT            --> If you want to only Write/modify the records (WRITE operation) into the file.
+               OPEN OUTPUT <LOGICAL FILE NAME>
+
+               I/O            --> If you want to perform both READ or Write into the file then open the file in I-O mode.    I-O --> INPUT+OUTPUT             	
+		OPEN I-O  <LOGICAL FILE NAME>
+		
+               EXTEND         --> If you want to append records at end of the file then open the file in EXTEND mode.
+
+
+    B. READ/Write/read+Write.
+       
+       READ PS FILE
+
+       READ <LOGICAL FILE NAME>
+            AT END <Statement>                         --> AT END tells the MF OS that it is the last record of the file.
+                                                           Statement written inside AT END will be executed when last record of the file is read
+            NOT AT END <Statement>                     --> NOT AT END tells the OS that it is not the last record of the file.
+							   Statement written inside  NOT AT END will be executed if the record read is not the 								   last record.
+
+       READ <LOGICAL FILE NAME> INTO <WS-Storage variable>.
+            AT END <Statement>
+            NOT AT END <Statement>
+       END READ  
+
+
+      READ VSAM FILE:
+
+      ESDS:
+        
+      READ <LOGICAL FILE NAME> 
+            AT END <Statement>
+            NOT AT END <Statement>
+      END READ  
+
+      KSDS:
+      
+      Random:
+
+      READ <LOGICAL FILE NAME> 
+            Key is WS-RECORD-KEY                                   --> If you want ro read the file using AIX, then use Alternate key variable: WS-ALT-RECORD-KEY                           
+            INVALID KEY <Statement>                                --> If the key value doesnot match, then O/S executes this statement.
+            NOT INVALID KEY <Statement>                            --> If the key value matches, then O/S executes this statement.
+      END-READ  
+
+      Sequential:
+         
+        
+      START <LOGICAL FILE NAME>                                    --> Set a pointer to the record that matches the KEY.
+         KEY IS EQUAL TO WS-RECORD-KEY
+         INVALID KEY <Statement> 
+         NOT INVALID KEY  <Perform READ operation>
+      END-START
+
+      READ <logical file name>                                     --> Reads next records from the file where the pointer is set.
+       NEXT RECORD
+         AT END  <Statement>
+         NOT AT END <Statement>
+         
+     RRDS:
+
+     READ <LOGICAL FILE NAME> 
+            Key is WS-RELATIVE-KEY                                 --> If you want ro read the file using AIX, then use Alternate key variable: WS-ALT-RECORD-KEY                           
+            INVALID KEY <Statement>                                --> If the key value doesnot match, then O/S executes this statement.
+            NOT INVALID KEY <Statement>                            --> If the key value matches, then O/S executes this statement.
+      END-READ
+
+
+       WRITE:
+
+       WRITE <DATA RECORD>
+       WRITE <DATA RECORD> FROM <WS-Storage variable>.
+            INVALID KEY <Statement>                                --> If the key value doesnot match, then O/S executes this statement.
+            NOT INVALID KEY <Statement>                            --> If the key value matches, then O/S executes this statement.
+       END-WRITE.
+
+       KSDS:
+       WRITE <DATA RECORD> FROM <WS-Storage variable>.
+         
+
+    C. Close File. Last operation of a file.
+         CLOSE <LOGICAL FILE NAME>.
+
+
+
+
+e.g.
+PGM: COBPGM02
+Compilation  ->load module.--> COBPGM02
+Execution
+
+ENVIRONMENT DIVISION.
+INPUT-OUTPUT SECTION.                                File Declaration.
+FILE-CONTROL.                                        AREA A.
+  Select INPUT01 ASSIGN TO INP001                        INP001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL
+  ACCESS MODE IS SEQUENTIAL
+  FILE STATUS IS WS-FILE-STATUS-IN.
+
+  Select OUTPUT01 ASSIGN TO OUT001                       OUT001 should be the DD name in your Run JCL. Select statement should be in AREA B
+  ORGANISATION IS SEQUENTIAL 
+  ACCESS MODE IS SEQUENTIAL
+  FILE STATUS IS WS-FILE-STATUS-OUT.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+
+01 WS-FILE-STATUS.
+   05 WS-FILE-STATUS-IN   PIC 9(02).
+   05 WS-FILE-STATUS-OUT  PIC 9(02).
+
+01 WS-EOF-FILE-STATUS PIC X(01).                       Set a flag for End of file. Required for Read operation.
+   88  EOF   Value 'Y'.
+   88  NOT-EOF Value 'N'.
+
+WS-OUT-RECORD PIX X(80).
+
+
+FILE SECTION.
+FD INPUT01
+   RECORD CONTAINS 80 CHARACTERS.                     Record length should match with records length of file
+   RECORDING MODE IS F                                Record format should match with records format of file
+   BLOCK CONTAINS 400 CHARACTERS.                     Block length should match with Block length of file, Should be multiple of Record length.
+   DATA RECORD IS WS_INP01.
+01 WS_INP01.
+   05 WS-AGENT-ID       PIC X(10).
+   05 WS-Business-UNIT  PIC X(02).
+   05 WS-INSURANCE TYPE PIC X(15).
+   05 WS-STATUS         PIC X(08).
+   05 FILLER            PIC X(45).
+ 
+FD OUTPUT01
+  RECORD CONTAINS 80 CHARACTERS.                      Record length should match with records length of file
+  RECORDING MODE IS  F				      Record format should match with records format of file
+  BLOCK CONTAINS 400 CHARACTERS.                      Block length should match with Block length of file, Should be multiple of Record length.
+  DATA RECORD IS WS_OUT01.
+01 WS_OUT01 PIC X(80).
+
+PROCEURE DIVISION.
+
+  PERFORM A001-OPEN PARA.
+  
+  SET  NOT-EOF to TRUE.                              NOT-EOF is SET.
+  PERFORM A002-READ PARA UNTIL EOF.                  Execute  A002-READ until flag EOF is Set.  EOF will be Set to true/Active, when last record
+						     is read.               
+  PERFORM A003-WRITE PARA.
+  PERFORM A004-CLOSE PARA.
+
+A001-OPEN PARA.
+  OPEN INPUT INPUT01.                        22 --> WS-FILE-STATUS-IN
+   IF WS-FILE-STATUS-IN = 00
+      DISPLAY 'INPUT01 FILE OPEN SUCCESSFULL', WS-FILE-STATUS-IN
+   ELSE
+      DISPLAY 'INPUT01 FILE OPEN FAIL', WS-FILE-STATUS-IN               -- 'INPUT01 FILE OPEN FAIL' 23
+   END-IF.
+
+  OPEN OUTPUT OUTPUT01.  --> 00    --> WS-FILE-STATUS-IN
+   IF WS-FILE-STATUS-IN = 00
+      DISPLAY 'OUTPUT01 FILE OPEN SUCCESSFULL', WS-FILE-STATUS-IN       --> OUTPUT01 FILE OPEN SUCCESSFULL 00
+   ELSE
+      DISPLAY 'OUTPUT01 FILE OPEN FAIL', WS-FILE-STATUS-IN
+   END-IF.  
+
+PERFORM A004-CLOSE PARA.
+
+  CLOSE INPUT01.
+   IF WS-FILE-STATUS-IN = 00
+      DISPLAY 'INPUT01 FILE CLOSE SUCCESSFULL'
+   ELSE
+      DISPLAY 'INPUT01 FILE CLOSE FAIL'
+   END-IF.
+
+  CLOSE OUTPUT01.
+   IF WS-FILE-STATUS-OUT = 00
+      DISPLAY 'OUTPUT01 FILE CLOSE SUCCESSFULL'
+   ELSE
+      DISPLAY 'OUTPUT01 FILE CLOSE FAIL'
+   END-IF.  
+
+A002-READ PARA.
+
+   READ INPUT01                                           --> Read only one record.
+     AT END
+        DISPLAY ' LAST RECORD OF FILE'
+        SET EOF to TRUE          
+     NOT AT END DISPLAY WS_INP01
+   END READ.
+
+PERFORM A003-WRITE PARA.
+   MOVE ROHIT TO WS_OUT01.                               WS_OUT01= ROHIT
+   WRITE OUTPUT01.
+
+   MOVE MOUNIKA TO WS-OUT-RECORD.                       WS-OUT-RECORD = MOUNIKA
+                                                        WS_OUT01 = ROHIT
+   WRITE OUTPUT01 FROM WS-OUT-RECORD.
+
+NOT EOF--> Active
+OZA120.AGENT.FILE
+
+ROHIT            Record1    --> WS_INP01  --> ROHIT         FLAG: NOT EOF    
+MOUNIKA          Record2    --> WS_INP01  --> MOUNIKA       FLAG: NOT EOF 
+PRANCHAN         Record3    --> WS_INP01  --> PRANCHAN      FLAG: NOT EOF
+MOHAN            Record4    --> WS_INP01  --> MOHAN         FLAG: NOT EOF
+POOJA            Record5    --> WS_INP01  --> POOJA         FLAG: NOT EOF
+                                                            FLAG: EOF. LOOP Terminates.
+ 
+
+
+
+
+
+
+
+
+
+
+//STEP001 EXEC PGM=COBPGM02                         --> EXEC statement  
+//STEPLIB DD DSN= XXX.Loadlib              
+//INP001 DD DSN=OZA120.AGENT.FILE,                  --> DD statement. Input operation/Input file
+//            DISP=SHR                              --> SHR/OLD
+//OUT001 DD DSN=OZA120.AGENT.FILE.OP,               --> DD statement. Output operation/Output file
+//		DISP=(NEW,CATLG,DELETE),
+//		SPACE=(CYL,(10,5),RLSE),
+//		UNIT=SYSDA,
+//		VOLUME=<Serial number>,
+//		DCB=(DSORG=PS,RECFM=FB,LRECL=80,BLKSIZE=400)
+
+
+----------------------------------------------------------Arrays 03/02---------------------------------------------------------------
+
+
+Arrays--> Internal table. Collection of Variable (Data item) of same data type (Length and type).
+          Arrays are defined using OCCURS Clause. OCCURS defines the number of occurrences of the Array variable.
+          Array Cannot be defined at 01/08/66 level. Defined at 02-49 level.
+
+Variables can store only one value at a time.
+
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS TWO TIMES.                   --> Array.
+
+
+MOVE 'SUNDAY' TO WS-DAY (01)    --> WS-DAY (01) = SUNDAY
+
+MOVE 'MONDAY' TO WS-DAY (02)   --> WS-DAY (02) = MONDAY
+
+
+
+Arrays are accessed using Index or Subscript.
+
+Subscript is a WS variable used to access Array.
+Subscript is modified with MOVE & ADD statement.
+ARRAY that are accessed using Subscript are called as non indexed Array.
+
+Working-storage section.
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS TWO TIMES.
+
+01 WS-COUNT PIC 9(02).
+
+MOVE 01 TO WS-COUNT.           -->  WS-COUNT = 01
+
+MOVE 'SUNDAY' TO WS-DAY (WS-COUNT).       -->    SUNDAY --> First occurrence of variable WS-DAY.  WS DAY: ARRAY, WS-COUNT: SUBSCRIPT.
+
+ADD 01 TO WS-COUNT.            -->  WS-COUNT = 02
+
+ MOVE 'MONDAY' TO WS-DAY (WS-COUNT).      -->   MONDAY --> Second occurrence of variable WS-DAY.
+
+ 
+
+Index:
+
+Index is declared inside the array itself using INDEXED Keyword. It is a single letter alphabet. (I,J)
+When Indexed is defined inside an Array, the array is referred as Indexed Array.
+Indexed are modified using SET and SET UP.
+
+
+
+
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS 7 TIMES INDEXED BY I.
+
+SET I to 0                         --> I=0
+
+
+PERFORM A001-ARRAY 7 TIMES.
+PERFORM A001-ARRAY UNTIL I > 7.
+
+
+A001-ARRAY.
+
+ SET I UP by 1.            -->  I=01
+
+ IF I=1
+  MOVE 'SUNDAY' TO WS-DAY (I).       -->    SUNDAY --> First occurrence of variable WS-DAY.  WS DAY: ARRAY, I: index.
+ IF I=2
+  MOVE 'MONDAY' TO WS-DAY (I).      -->   MONDAY --> Second occurrence of variable WS-DAY.
+ IF I=3
+  MOVE 'TUESDAY' TO WS-DAY (I).      -->   MONDAY --> Second occurrence of variable WS-DAY.
+   :
+   :
+  IF I=7
+   MOVE 'SATURDAY' TO WS-DAY (I).      -->   MONDAY --> Second occurrence of variable WS-DAY.
+  END-IF.
+ 
+
+One dimensional Array/Linear Array:
+ SUNDAY  MONDAY TUESDAY............... SATURDAY
+
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS TWO TIMES.                   --> Linear Array.
+
+
+TWO Dimensional Array:
+
+
+BUISNESS HOUSE         BUSINESSES.
+ TATA                  AGRO
+                       IT
+                       MOTORS
+              
+            
+ RELIANCE              JIO
+                       PETROLEUM
+                       CAPITAL
+                       
+ ADITYA BIRLA          REAL ESTATE
+                       APPARELS
+                       MANUFACTURING
+
+
+BH                   B1    	B2 		 B3
+
+TATA                 AGRO 	 IT 		 MOTORS
+RELIANCE	     JIO  	 PETROLEUM	 CAPITAL
+ADITYA BIRLA         REAL ESTATE APPARELS	 MANUFACTURING
+
+
+WS-BUSINESS-HOUSE  -->    OCCUR 3 TIMES  
+  WS-BUSINESS      -->    OCCUR 3 TIMES  
+
+ARRAY 01                         ARRAY 02
+ WS-BUSINESS-HOUSE -->           WS-BUSINESS SHOULD OCCUR3 times
+
+         
+2 dimension Array (non indexed)
+01 WS-BUSINESS-DATA                                 --> 2 dimensional Array.
+   05 WS-BUSINESS-HOUSE PIC X (05) OCCURS 3 TIMES.            15
+      10 WS-BUSINESS  PIC X(03) OCCURS 3 TIMES.               9
+
+2 dimension Array (indexed)
+01 WS-BUSINESS-DATA                                 --> 2 dimensional Array.
+   05 WS-BUSINESS-HOUSE PIC X (05) OCCURS 3 TIMES INDEXED BY I.            
+      10 WS-BUSINESS  PIC X(03) OCCURS 3 TIMES INDEXED BY J .     
+
+
+
+
+--------------------------------------------------SEARCH/SEARCH ALL-------------------------------------------------------------------------------------------------------
+
+
+
+SEARCH/SEARCH ALL are used to find/search a particular value inside an array.
+
+SEARCH: Linear or sequential Search.
+
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS TWO TIMES.                   --> Linear Array.
+
+WS-DAY : SUN MON TUE WED THU FRI SAT
+
+SEARCH=THU
+
+1st SEARCH: 1st element: SUN  != THU
+2nd SEARCH: 2nd element: MON  != THU
+3rd SEARCH: 3rd element: TUE  != THU
+4th SEARCH: 4th element: WED  != THU
+5th SEARCH: 5th element: THU = THU --> DISPLAY: Value THU found.
+
+
+SEARCH ALL: Binary search. Tries to find the middle element of the array. Sorted array.
+
+01 WS-DAY-OF-WEEK.
+   05 WS-DAY   PIC X(10) OCCURS TWO TIMES INDEXED BY I.                   --> Linear Array.
+
+WS-DAY : SUN MON TUE WED THU FRI THU
+
+SEARCH ALL=THU
+
+1st SEARCH: middle element: WED  != THU
+
+SUN MON TUE  :A1
+THU FRI SAT  :A2
+
+
+2nd SEARCH: middle element of 1st half (A1): MON != THU
+
+SUN MON TUE  :A1
+SUN          :A11
+TUE          :A12
+
+3rd SEARCH: middle element of 1st half (A11): SUN != THU
+4th SEARCH: middle element of 1st half (A12): TUE != THU
+
+THU FRI SAT  :A2
+5th SEARCH: middle element of 2nd half (A2): FRI != THU
+
+
+THU FRI SAT  :A2
+THU          :A21
+SAT          :A22
+
+5th SEARCH: middle element of 2nd half (A21): THU != THU      --> Value 'THU' FOUND.
+
+SEARCH <ARRAY> INDEXED BY <Index>
+   AT END  Display 'Value not found'
+WHEN < SEARCH CONDITION>
+END-SEARCH.
+
+SEARCH WS-DAY INDEXED BY I                         --> Linear/SEQ search
+   AT END  Display 'Value not found'
+WHEN WS-DAY (I) = 'THU'
+   DISPLAY 'Value find in the array'
+END-SEARCH.
+
+
+SEARCH ALL WS-DAY INDEXED BY I                     --> Binary Search.
+   AT END  Display 'Value not found'
+WHEN WS-DAY (I) = 'THU'
+   DISPLAY 'Value find in the array'
+END-SEARCH.
+
+
+----------------------------------------------------------- CALL 22/02--------------------------------------------------------------------------------------------
+
+Inter-program communication. Cobol programs can communicate with each other through STATIC/DYNAMIC CALL.
+
+Main program/Calling program --> Main/Calling program calls Subprogram/called program/Sub routine with the help of CALL statement.
+
+Subprogram/called program/Sub routine: Set of cobol statements written in a program which is called by other (Calling/Main) programs.
+
+
+PGM1: A <-- B   : Calling/Main program
+
+PGM2: B          : Sub pgm/subroutine/called pgm         
+
+PGM3: C  <-- B   : Calling program/Main program
+
+
+
+Main
+PGM001
+
+
+Data Division
+Working storage section.
+
+WS-NUM01  PIC 9(03)   VALUE 100
+
+WS-NUM02  PIC 9(03)   VALUE 200
+
+WS-ADD    PIC 9(03).
+
+
+Procedure division.
+
+CALL <PGM NAME> USING WS-NUM01, WS-NUM02, WS-ADD.              :- Variables which are passed in Call statements are referred as parameters/arguments.
+                                                               :- STATIC Call
+STOP RUN.
+
+
+Sub
+
+SUBPGM01
+
+
+Data Division
+Linkage Section                            --> Used to 1. Link your sub pgm to the calling/main pgm and
+                                                       2. declare variables that will contain values passed by main/calling pgm and
+                                                       3  declare variables that will contain values passed to the main/calling pgm.
+LS-NUM01  PIC 9(03)
+LS-NUM02  PIC 9(03)
+
+LS-ADD    PIC 9(03)
+
+
+
+
+Working storage section
+
+WS-RESULT    PIC 9(03)
+
+
+Procedure division USING LS-NUM01, LS-NUM02, LS-ADD.    --> imp: in sub program, write PROCEDURE DIVISION USING Linkage variables.
+
+ADD LS-NUM01 TO LS-NUM02 GIVING WS-RESULT           -->  WS-RESULT = 300 --> this value cannot be passed to main pgm
+ADD LS-NUM01 TO LS-NUM02 GIVING LS-ADD              -->  LS-ADD = 300 --> this value will be passed to main pgm through LS-ADD --> WS-ADD
+
+
+ Call types:
+
+ STATIC CALL.
+
+  CALL <PGM NAME> USING arguments.
+
+ DYNAMIC CALL.
+  Pass the program name in a variable under WS storage section (WS-PGM).
+
+  CALL WS-PGM Using arguments.
+
+
+  Data Division
+  Working storage section.
+
+  WS-NUM01  PIC 9(03)   VALUE 100
+
+  WS-NUM02  PIC 9(03)   VALUE 200
+
+  WS-ADD    PIC 9(03).
+
+  WS-PGM    PIC X(08)  VALUE 'SUBPGM01'.
+
+
+  Procedure division.
+
+  CALL WS-PGM USING WS-NUM01, WS-NUM02, WS-ADD.                            --> Dynamic call.
+
+  GO BACK.                                                                  --> Returs the control/flow back to the main program
+
+
+
+
+A-->B
+    STOP RUN
+    GO BACK
+
+CALL   :-   Passes the control from Main pgm to sub pgm
+GO BACK: -  Passes the control back from sub pgm to main pgm
+STOP RUN/EXIT :- Control end at sub program.  control will not be returned back from sub pgm to main pgm.
+
+
+
+STATIC/DYNAMIC
+
+Call by value/content --> The values of arguments modified in the sub program will not be passed back to the main program. Only the returning result will be passed.
+
+Main pgm
+A
+V1  = 10
+V2  = 20 
+
+Call B using BY VALUE V1,v2
+Call B using BY CONTENT V1,v2
+
+V1 = 10
+V2 = 20
+
+Sub pgm
+B
+LS-V1    = 10
+LS-v2    = 20
+
+Add 20 to LS-V1       LS-V1  =  30   
+ADD 40 TO LS-v2       LS-v2  =  60
+
+GO BACK.
+
+Call by reference (default) --> The values of arguments modified in the sub program will be passed back to the main program along with the returning result.
+
+
+CALL WS-PGM Using arguments.
+CALL WS-PGM Using by reference arguments.
+
+
+Main pgm
+A
+V1  = 10
+V2  = 20 
+
+Call B using V1,v2
+Call B using BY REFERENCE V1,v2
+
+V1 = 30
+V2 = 60
+
+Sub pgm
+B
+LS-V1    = 10
+LS-v2    = 20
+
+Add 20 to LS-V1       LS-V1  =  30   
+ADD 40 TO LS-v2       LS-v2  =  60
+
+GO BACK.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+load module
+Main pgm  load module
+sub pgm   load module
+
+Static call: sub pgm   load module is a part of / linked with Main pgm  load module --> When a sub pgm is changed, compile both subpgm and main pgm.
+Dynamic call: sub pgm   load module and is not a part of Main pgm  load module. --> When a sub pgm is changed, compile only subpgm.
+                                                                                    When a main pgm is changed, compile only main pgm.
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

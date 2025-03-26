@@ -1,0 +1,107 @@
+//KSDS(RANDOM) TO PS FILE
+
+000100 IDENTIFICATION DIVISION.                 
+000200 PROGRAM-ID. COB001.                      
+000300 AUTHOR. SUMANTH.                         
+000310                                          
+000400 ENVIRONMENT DIVISION.                    
+000500 INPUT-OUTPUT SECTION.                    
+000600 FILE-CONTROL.                            
+000700     SELECT INP01 ASSIGN TO INPUT01       
+000800     ORGANIZATION IS INDEXED              
+000900     ACCESS MODE IS RANDOM                
+001000     RECORD KEY IS AGENT-ID               
+001100     FILE STATUS IS WS-STATUS.            
+001200                                          
+001210     SELECT OUT01 ASSIGN TO VALID01       
+001220     ORGANIZATION IS SEQUENTIAL           
+001230     ACCESS MODE IS SEQUENTIAL            
+001250     FILE STATUS IS WS-STATUS.            
+001260                                          
+001300 DATA DIVISION.                           
+001400 FILE SECTION.                            
+001500 FD INP01                                 
+001600     RECORD CONTAINS 80 CHARACTERS        
+001700     BLOCK CONTAINS 800 CHARACTERS 
+001800*    RECORDING MODE IS F           
+001900     DATA RECORD IS INP-RECORD.    
+002000 01 INP-RECORD.                    
+002100     05 AGENT-ID PIC 9(03).        
+002200     05 AGENT-NAME PIC X(15).      
+002300     05 AGENT-TEAM PIC X(06).      
+002400     05 AGENT-DIVISION PIC X(10).  
+002500     05 AGENT-SCORE PIC 9(04).     
+002600     05 FILLER PIC X(42).          
+002700                                   
+002800 FD OUT01                          
+002810     RECORD CONTAINS 80 CHARACTERS 
+002820     BLOCK CONTAINS 800 CHARACTERS 
+002830     RECORDING MODE IS F           
+002840     DATA RECORD IS VAL-RECORD.    
+002900 01 VAL-RECORD PIC X(80).          
+003000                                   
+003100 WORKING-STORAGE SECTION.          
+003200 01 WS-STATUS PIC X(02).           
+003300 01 WS-KEY.                        
+003400     05 WS-KEYS-VALUE PIC 9(03).   
+003500 01 WS-EOF-STATUS PIC X(01).       
+003600     88 EOF VALUE 'Y'.             
+003700     88 NOT-EOF VALUE 'N'.         
+003800                                   
+003900 PROCEDURE DIVISION.                                      
+004000     ACCEPT WS-KEYS-VALUE.                                
+004100     DISPLAY 'KEY VALUE PASSED FROM JCL IS ' WS-KEYS-VALUE
+004200     PERFORM A01-OPEN.                                    
+004300     SET NOT-EOF TO TRUE.                                 
+004400     MOVE WS-KEYS-VALUE TO AGENT-ID.                      
+004500     PERFORM A02-READ UNTIL EOF.                          
+004600     PERFORM A06-CLOSE.                                   
+004610     STOP RUN.                                            
+004700                                                          
+004800 A01-OPEN.                                                
+004900     OPEN INPUT INP01.                                    
+005000     IF WS-STATUS = '00'                                  
+005100        DISPLAY 'INP01 FILE OPEN SUCCESSFUL'              
+005200     ELSE                                                 
+005300        DISPLAY 'INP01 FILE OPEN FAILED'                  
+005400     END-IF.                                              
+005500     OPEN OUTPUT OUT01.                                   
+005600     IF WS-STATUS = '00'                                  
+005700        DISPLAY 'OUT01 FILE OPEN SUCCESSFUL'              
+005800     ELSE                                                 
+005900        DISPLAY 'OUT01 FILE OPEN FAILED'                  
+006000     END-IF.                                              
+006010                                                          
+006100 A02-READ.                                     
+006200     READ INP01                                
+006300     KEY IS AGENT-ID                           
+006400     INVALID KEY DISPLAY 'KEY NOT FOIUND'      
+006500      SET EOF TO TRUE                          
+006600     NOT INVALID KEY                           
+006700      SET EOF TO TRUE                          
+006800      DISPLAY AGENT-ID                         
+006900      PERFORM A04-WRITE-OUTPUT                 
+007000     END-READ.                                 
+007100     IF WS-STATUS = '00'                       
+007200        DISPLAY 'INP01 FILE READ SUCCESSFUL'   
+007300     ELSE                                      
+007400        DISPLAY 'INP01 FILE READ FAILED'       
+007500     END-IF.                                   
+007600                                               
+007700 A04-WRITE-OUTPUT.                             
+007800     MOVE INP-RECORD TO VAL-RECORD.            
+007900     WRITE VAL-RECORD.                         
+007910     IF WS-STATUS = '00'                       
+007920        DISPLAY 'OUTPUT FILE WRITE SUCCESSFUL' 
+007930     ELSE                                      
+007940        DISPLAY 'OUTPUT FILE WRITE FAILED'     
+007950     END-IF.                                   
+008000                                               
+008100 A06-CLOSE.                                   
+008200     CLOSE INP01.                             
+008300     IF WS-STATUS = '00'                      
+008400        DISPLAY 'INP01 FILE CLOSESUCCESSFUL'  
+008500     ELSE                                     
+008600        DISPLAY 'INP01 FILE CLOSEFAILED'      
+008700     END-IF.                                  
+**************************** Bottom of Data ********       

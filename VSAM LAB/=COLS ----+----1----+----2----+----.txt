@@ -1,0 +1,128 @@
+ =COLS> ----+----1----+----2----+----3----+----4----+----5----+----6----+----7--
+ ****** ***************************** Top of Data ******************************
+ 000100 000100 IDENTIFICATION DIVISION.                                         
+ 000200 000200 PROGRAM-ID. COB003.                                              
+ 000300 000300 AUTHOR. KUMAR.                                                   
+ 000400 000400*COBOL PGM TO READ AGENT FILE , VALIDATE DATA AND WRITE OUT FILE. 
+ 000500 000500 ENVIRONMENT DIVISION.                                            
+ 000600 000600 INPUT-OUTPUT SECTION.                                            
+ 000700 000700 FILE-CONTROL.                                                    
+ 000800 000800     SELECT PSFILE1 ASSIGN TO AGENTPS                             
+ 000900 000900     ORGANIZATION IS SEQUENTIAL                                   
+ 001000 001000     ACCESS MODE IS SEQUENTIAL                                    
+ 001100 001100     FILE STATUS IS WS-STATUS.                                    
+ 001200 001200     SELECT PSFILE2 ASSIGN TO AGENTOUT                            
+ 001300 001300     ORGANIZATION IS SEQUENTIAL                                   
+ 001400 001400     ACCESS MODE IS SEQUENTIAL                                    
+ 001500 001500     FILE STATUS IS WS-STATUS.                                    
+ 001600 001600                                                                  
+ 001700 001700 DATA DIVISION.                                                   
+ 001800 001800 FILE SECTION.                                                    
+ 001900 001900 FD PSFILE1                                                       
+ 001910 001910     RECORDING MODE IS F                                          
+ 002000 002000     RECORD CONTAINS 80 CHARACTERS                                
+002100 002100     BLOCK CONTAINS 0 CHARACTERS                                  
+002300 002300     DATA RECORD IS INP-RECORD.                                   
+002400 002400 01 INP-RECORD.                                                   
+002500 002500     05 AGT-NUMBER PIC X(06).                                     
+002600 002600     05 AGT-REG-CD PIC X(02).                                     
+002700 002700     05 AGT-BU PIC X(15).                                         
+002800 002800     05 AGT-DIVISION PIC X(05).                                   
+002900 002900     05 AGT-SCORE PIC 9(03).                                      
+003000 003000     05 FILLER PIC X(49).                                         
+003100 003100 FD PSFILE2                                                       
+003110 003110     RECORDING MODE IS F                                          
+003200 003200     RECORD CONTAINS 80 CHARACTERS                                
+003300 003300     BLOCK CONTAINS 800 CHARACTERS                                
+003500 003500     DATA RECORD IS OUT-RECORD.                                   
+003600 003600 01 OUT-RECORD.                                                   
+003700 003700     05 OUT-AGT-NUMBER PIC X(06).                                 
+003800 003800     05 OUT-AGT-REG-CD PIC X(02).                                 
+003900 003900     05 OUT-AGT-BU PIC X(15).                                     
+004000 004000     05 OUT-AGT-DIVISION PIC X(05).                               
+004100 004100     05 OUT-AGT-SCORE PIC 9(03).                                  
+004200 004200     05 OUT-AGT-STATUS PIC X(08).                                 
+004300 004300     05 FILLER PIC X(41).                                         
+004400 004400                                                                  
+004500 004500 WORKING-STORAGE SECTION.                                         
+004600 004600 01 WS-STATUS PIC X(02).                                          
+004700 004700 01 WS-FILE-EOF-STATUS PIC X(01).                                 
+004800 004800     88 EOF VALUE 'Y'.                                            
+004900 004900     88 NOT-EOF VALUE 'N'.                                        
+005000 005000 PROCEDURE DIVISION.                                              
+005100 005100     PERFORM A100-OPEN-FILES.                                     
+005200 005200     SET NOT-EOF TO TRUE.                                         
+005300 005300     PERFORM A200-PROCESS-RECORDS UNTIL EOF.                      
+005400 005400     PERFORM A300-CLOSE-FILES.                                    
+005500 005500     STOP RUN.                                                    
+005600 005600 A100-OPEN-FILES.                                                 
+005700 005700     OPEN INPUT PSFILE1.                                          
+005800 005800     IF WS-STATUS = '00'                                          
+005900 005900        DISPLAY 'INPUT FILEE OPEN SUCCESSFUL'                     
+006000 006000     ELSE                                                         
+006100 006100        DISPLAY 'INPUT FILEE OPEN FAILED'                         
+006200 006200     END-IF.                                                      
+006300 006300                                                                  
+006400 006400     OPEN OUTPUT PSFILE2.                                         
+006500 006500     IF WS-STATUS = '00'                                          
+006600 006600        DISPLAY 'OUTPUT FILE OPEN SUCCESSFUL'                     
+006700 006700     ELSE                                                         
+006800 006800        DISPLAY 'OUTPUT FILE OPEN FAILED'                         
+006900 006900     END-IF.                                                      
+007000 007000                                                                  
+007100 007100 A200-PROCESS-RECORDS.                                            
+007200 007200     READ PSFILE1                                                 
+007300 007300     AT END                                                       
+007400 007400         SET EOF TO TRUE                                          
+007500 007500     NOT AT END                                                   
+007700 007700         PERFORM A210-VALIDATE-AND-WRITE                          
+007800 007800     END-READ                                                     
+007900 007900                                                                  
+008000 008000     IF WS-STATUS = '00'                                          
+008100 008100        DISPLAY 'RECORD READ SUCCESSFUL'                          
+008200 008200     ELSE                                                         
+008300 008300        DISPLAY 'RECORD READ FAILED'                              
+008400 008400     END-IF.                                                      
+008500 008500                                                                  
+008600 008600 A210-VALIDATE-AND-WRITE.                                         
+008700 008700     IF AGT-NUMBER > SPACES AND                                   
+008800 008800        AGT-BU > SPACES AND                                       
+008900 008900        AGT-DIVISION IS NUMERIC AND AGT-DIVISION > ZEROS          
+009000 009000        PERFORM A220-SET-STATUS                                   
+009100 009100        PERFORM A230-WRITE-OUTPUT                                 
+009300 009300     END-IF.                                                      
+009400 009400                                                                  
+009500 009500 A220-SET-STATUS.                                                 
+009510 009510     IF AGT-SCORE < 500                                           
+009520 009520        MOVE 'DORMANT' TO OUT-AGT-STATUS                          
+009530 009530     ELSE                                                         
+009540 009540        MOVE 'ACTIVE' TO OUT-AGT-STATUS                           
+009550 009550     END-IF.                                                      
+009560 009560                                                                  
+009570 009570 A230-WRITE-OUTPUT.                                               
+009600 009600     MOVE AGT-NUMBER TO OUT-AGT-NUMBER                            
+009700 009700     MOVE AGT-REG-CD TO OUT-AGT-REG-CD                            
+009800 009800     MOVE AGT-BU TO OUT-AGT-BU                                    
+009900 009900     MOVE AGT-DIVISION TO OUT-AGT-DIVISION                        
+010000 010000     MOVE AGT-SCORE TO OUT-AGT-SCORE                              
+010100 010100     WRITE OUT-RECORD                                             
+010200 010200     IF WS-STATUS = '00'                                          
+010300 010300        DISPLAY 'RECORD WRITTEN SUCCESS'                          
+010400 010400     ELSE                                                         
+010500 010500        DISPLAY 'RECORD WRITE FAILED'                             
+010600 010600     END-IF.                                                      
+011500 011500                                                                  
+011510 011510 A300-CLOSE-FILES.                                                
+011600 011600     CLOSE PSFILE1                                                
+011700 011700     IF WS-STATUS = '00'                                          
+011800 011800        DISPLAY 'INPUT FILE CLOSED SUCCESSFULLY'                  
+011900 011900     ELSE                                                         
+012000 012000        DISPLAY 'INPUT FILE CLOSE FAILED'                         
+012100 012100     END-IF.                                                      
+012200 012200     CLOSE PSFILE2                                                
+012300 012300     IF WS-STATUS = '00'                                          
+012400 012400        DISPLAY 'OUTPUT FILE CLOSED SUCCESS'                      
+012500 012500     ELSE                                                         
+012600 012600        DISPLAY 'OUTPUT FILE CLOSE FAIL'                          
+012700 012700     END-IF.                                                      
+****** **************************** Bottom of Data ****************************

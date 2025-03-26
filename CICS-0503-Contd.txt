@@ -1,0 +1,411 @@
+--------------------------------------------------------------CICS  05/03-------------------------------------------------------------------------------------------------
+
+CICS --> Online screen for Mainframe.
+
+FRONT END - SCREEN
+
+INTERFACE(API)
+
+BACKEND - COBOL program / (PL1/PLI)
+
+
+Transaction:- User request to perform an operation. Task/Unit of work executed by CICS for a USER.
+Task:- Unit of Work performed by CICS to complete the transaction.
+
+
+SCREEN (CICS) --> Pranchan --> BALANCE QUERY      --> Pranchan has initiated a transaction.
+                    --> information --> Prachan will input required information-->OK.
+
+CICS -->  API  --> COBOL program --> DB2/IMS/VSAM 
+    <--       <--    CIC001           <--
+
+
+Conversational programming: Program waits for user input. Until user input is received, program will be in executing phase. Once input Is received from the user, the program will complete the operation and stop execution. Expensive.
+
+Pseudo-Conversational programming: Program doesnot remain in executing status waiting for user input. CICS will halt the execution of the program until user input is received. Once User inputs the required information, then CICS will again start the program.   
+
+CIC001: Balance Enquiry
+CIC002: Amount withdrawl.
+
+Pranchan: BALANCE Enquiry  --> CIC001   WORKING STORAGE  ACCOUNT ID, ACCOUNT INFORMATION
+Abshishek: Money withdrawl --> CIC002
+Sriti: BALANCE Enquiry     --> CIC001   WORKING STORAGE  ACCOUNT ID, ACCOUNT INFORMATION
+
+
+Multitasking:- Ability to execute multiple talk simultaneously invoking same or different CICS application programs. Allows CICS to handle multiple user requests parallelly.
+
+
+Multithreading:- Subset of multitasking.Ability to execute multiple talk simultaneously invoking same CICS application programs.
+                 For multithreading, programs must be re-entrant or quasi reentrant.
+
+Non Reentrant: batch programs. Does not support multitasking.
+Re-entrant: Same copy of the program is accessed by multiple task. Program does not modify. Each task uses its own set of data.
+Quasi-Reentrant: CICS stores a copy of working storage for application programs for different tasks. Used to share copy of same program during task interruptions.
+                 For pseudo conversation, programs must be quasi re-entrant. Supports Pseudo conversation/Task interruptions.
+
+
+
+SCREEN (CICS) --> Is designed with the help of MAP (Assembler language). Set/Collection of MAP is called MAPSET.
+
+
+Control table and Control program. Predefined tables and programs provided by IBM for specific CICS operation.
+
+Control tables: 
+
+PCT (Program control table): Store Transaction ID and name of the program that will execute to perform the transaction. Transaction ID must be unique
+PPT (Program processing table):Stores name of MAP/MAPSET/ CICS PROGRAMS. All entities must be unique.
+FCT (File control table): Stores the name of VSAM (KSDS) cluster / AIX.
+TST (Temporary storage QUEUE Table): Store the Temporary storage QUEUE names.
+DCT (Destination control Table): Store the Transient Data QUEUE names
+RCT (Resource control table): Store the Plan name for DB2. (CICS+DB2 pgm)
+SNT (Sign on table): Mainframe User ID and password.
+PLT (Program list table): All the programs that need to be automatically restarted during CICS start up and Shut down should be listed in Program List Table.
+TCT (Terminal control table): Name of terminal/Machine where you are executing CICS programs/Accessing CICS MAPS.
+JCT (Journal control table): Contains Logs.
+
+
+Control programs:
+
+PCP (Program Control program): reads PCT (Transaction ID + Name of program [CIC001] that should be executed) and finds it in the PPT. If the program is found then it loads the program in CICS(OS) for execution.
+FCP (The File Control Program): offers file manipulation services to application programs. These services include reading, updating, adding, and deleting records in files.
+TCP (Terminal control program): It is a bridge between terminal screen and application program. TCP is used to receive input/messages from the terminal and request CICS to initiate a task.
+KCP (Task control program):KCP is used to simultaneously control the execution of tasks (Initiate, Schedule and terminate task) and its related properties.It handles multi-tasking.
+SCP (Storage control program): Used to allocate temporary storage during task execution.
+
+
+QUEUE: Storage area to store data.
+
+       write		read
+CIC001------> QUEUE <-------- CIC002
+
+Terminal--> Transaction (Data) --> Program
+                               <--
+
+Temporary storage Queue (TSQ): Pass data between transactions/Programs within same CICS region.
+                         Data remains in temporary storage queues until the queue is deleted by the task which created the queue or by any other external task.
+                         Data in the Queue can be read sequentially or random with the help of item number. Item number is associated with every records in the queue.
+                         Used to store/pass huge volume of data. Expensive.
+                         individual data items cannot be deleted from the queue. The complete queue must be deleted by a task.
+                         registered in TST
+                         TSQ written in main/auxiliary memory.
+                         All operations of TS Queue are performed in CICS program
+
+
+1. Define and write items/records in a queue from a datarecord/WS variable.
+
+EXEC CICS WRITEQ TS                                       --> WRITEQ TS: Define and write data in Temporary storage queue.
+         QUEUE(WS-QUEUE-NAME)                             --> Queue name. Unique. Tranid.
+         FROM(WS-CUST-RECORD)                             --> Data record/WS variable from where you want to copy the data into the queue.
+         LENGTH(WS-LENGTH)                                --> Length of each records to be copied. Optional
+         [NUMITEMS(number of items)]                      --> Number of items/records in the queue.Optional
+         [ITEM(item-number)  REWRITE]                     --> Itam number of each record. REWRITE: updates the record that matches the item number. Optional
+	 MAIN/AUXILARY                                    --> Main: Primary storage (CPU/RAM/ROM). Auxillary: Secondary storage. (TAPE/DISK). Optional
+         RESP(WS-RESP)                                    --> Response code to check if the operation is successfull. Optional
+END-EXEC.                         
+
+2. Read data from a queue to a WS variable/Data record of a file.
+
+EXEC CICS READQ TS                                      --> READQ TS: Read data from a Temporary storage queue to a data record or WS variable.
+         QUEUE(WS-QUEUE-NAME)                            --> Queue name. Unique. Tranid.
+         INTO(WS-CUST-RECORD)                             --> Data record/WS variable where you want to copy the data from the queue.
+         LENGTH(WS-LENGTH)                               --> Length of each records to be copied. Optional
+         ITEM(WS-ITEM-NO)                                --> This optional parameter is included if we want to copy only specific item from queue to ws variable.
+         NEXT                                            --> This optional parameter is included if we want to copy records sequentially from specific item of the queue to 							     ws variable.
+         RESP(WS-RESP)                                   --> Response code to check if the operation is successfull. Optional
+         END-EXEC.
+
+3. Delete Queue.  We cannot delete specific records from a queue. We have to delete the entire queue.
+
+    EXEC CICS DELETEQ TS                                    --> DELETEQ TS: Delete  Temporary storage queue.
+         QUEUE(WS-QUEUE-NAME)
+         RESP(WS-RESP)
+    END-EXEC.
+
+
+Transient Data queue: Pass data between transactions from one region to another CICS region to from one CICS region to batch/External device/printer.
+                      Read destructive. Data from the queue is read/Transfered, the data is automatically deleted.
+                      TDQ written in Dataset (VSAM).
+		      Data in the Queue can be read sequentially
+                      TQDs are registered in DCT.
+		      2 types: INtrapartition: Accessed by CICS region locally.
+                               Extra partition: Transient data queues are extra partitions when data is transferred to an external destination from the CICS region. The 				external destination could be another CICS region, a batch system, a printer, or other options.
+                      FIFO format.
+
+WRITE: WRITEQ TD
+READ:  READQ TD
+DELETE:DELETEQ TD
+
+---------------------------------------------------------------------0603-MAP/MAPSET/FIELDS------------------------------------------------------------------------------
+MAP: Screen of any application which is defined by CICS.
+MAPSET: Collection of MAP
+FIELD: Area in a screen that contains information.
+      Display: contains message to be displayed on the screen which is passed from the CICS program.
+      Data fields: used to store the value entered in the screen and passed to CICS program
+      AID: information about the operation performed with KEY.
+
+
+
+-----------------------------------------
+| 					|
+| Enter pin number       		|                      Field  (2,20)
+|					|                             (16)
+|					|                             ATTRIB=(BRT,AKSIP,INITIAL = 'Enter pin number')
+|	Do you want to continue         |	
+|   		YES NO                  |
+-----------------------------------------
+
+MACROS (BMS) --> Predefined assembly language programs.
+
+DFHMSD:-  Defines MAPSET
+
+mapset-name DFHMSD TYPE={MAP|DSECT|FINAL},                           --> mapset-name is name given to the mapset. upto 7 char. Unique. 
+		   MODE={IN|OUT|INOUT},                              --> IN: Allows to receive input from terminal. OUT: Allows to send message to terminal INOUT:- Both
+		   LANG={COBOL|PL/I|ASSEMBLER},                      --> LANG: language of the CICS program to process the MAP.
+		   CTRL={FREEKB|PRINT|FRSET|ALARM},                  --> FREEKB: unlocks the terminal keyboard. ALARM: Allows to send audio after each output operation.
+                                                                         PRINT: Send all MAP within the Mapset to Printer. FRSET: Resets the MDT (modified data tag) flag
+		   HILIGHT={OFF|BLINK|REVERSE|UNDERLINE},            --> OFF: no highlight. Blink: Field must blink. REVERSE: field displayed in reverse.
+                                                                         UNDERLINE: used to underline the field
+		   STORAGE=AUTO,                                     --> Storage required for the mapset will be automatically allocated.
+		   TIOAPFX=YES,                                      --> Terminal INPUT OUTPUT AREA PREFIX. Generated 12 byte filler for Symbolic map used to store control 									 information about the MAPS
+		   TERM=type,                                        --> Determines what is the type of CICS terminal.
+		   COLOR=color-name                                  --> Determines background color of a screen.
+
+TYPE: PHYSICAL MAP --> Actual Screen: MAP
+      SYMBOLIC MAP --> Collection of variables that is similar to Physical map. Used to store the values sent to/received from Screen (MAP)
+                       Defined inside CICS program. DSECT
+      FINAL        --> Denotes END of a MAPSET.
+
+
+  
+DFHMDI:- Defines MAP
+
+map01 DFHMDI  SIZE=(rows,columns),                                  --> It defines the size of the screen (Row & Column). Common value: (24,80)
+			LINE=row-position,                          --> Specifies the starting row position of the map on the screen
+			COLUMN=column-position,                     --> Specifies the starting column position of the map on the screen
+			CTRL={FREEKB|PRINT|FRSET|ALARM},            --> Optional. Taken frm MAPSET if not coded for MAP
+			COLOR=color-name,                           --> Optional. Taken frm MAPSET if not coded for MAP
+			HILIGHT={OFF|BLINK|REVERSE|UNDERLINE}       --> Optional. Taken frm MAPSET if not coded for MAP
+
+
+map02 DFHMDI  SIZE=(rows,columns),
+			LINE=row-position,
+			COLUMN=column-position,
+                                                                   --> CTRL, COLOR and HILIGHT id taken from MAPSET
+
+DFHMDF:- Defines FIELDs in the map.
+
+field-name DFHMDF   POS=(row,column),                               --> position of each field in a screen.
+			LENGTH=field-length,                        --> Length of the field.
+			ATTRB=(attribute-list),
+			INITIAL='default-text',
+			HILIGHT=OFF|BLANK|REVERSE|UNDERLINE,
+			COLOR=color-option,
+			PICIN=input-picture-value,
+			PICOUT=picture-clause,
+			JUSTIFY=LEFT|RIGHT|BLANK|ZERO
+
+
+
+ATTRB=  (Value1,Value 2, Value3....)                             --> Attributes (Characteristics/Behaviour)
+
+Value1 = BRT/DRK/NORM                                            --> BRT: Bright:- The filed will be displayed more prominently.
+								     NORM: NOrmal:- The filed will be displayed normally like any other fields
+								     DRK: Dark:- The filed will not be displayed ot diaplyed with a very low intensity.
+
+
+Value 2 = PROT/ASKIP/UNPROT                                     --> PROT: Protected field:- User cannot change the field or enter any value in the field.
+                                                                    AKSIP:Protected field:- When user enters tab from previous field, control will skip the field because 									  of ASKIP attribute and places control to next field.
+                                                                    UNPROT: Data can be entered or changed in the field.
+
+Other values:
+NUM: specifies user can enter numeric value only.
+IC: Cursor should be located at start of a field.
+COLOR: COLOR of the field.
+HIGHLIGHT: highlights the field. (optional)
+PICIN: picture clause of the field
+PICOUT: picture clause of the field
+INITIAL: The initial or default value that is to be displayed on the screen.
+FSET: Used to MDT Flag.
+JUSTIFY=LEFT|RIGHT|BLANK|ZERO
+
+
+SCREEN:
+
+1 Mapset
+  1.1MAP01
+     1.1.1  Field01
+     1.1.2  Field02
+
+   1.2 MAP02
+     1.2.1 FIELD 03
+     1.2.2 FIELD 04
+     1.2.3 FIELD 05
+
+   1.3MAP03
+     1.3.1 FIELD 01
+
+
+
+Step 1.  Code instructions for 3 macros - DFHMSD (MAPSET) DFHMDI (MAP) and DFHMDF (FIELD) in a PDS inside a member.
+Step 2.  Execute the macros with the help of JCL  --> it will create Mapset, MAP, Fields and symbolic map
+Step 3.  Write and execute CICS program (cobol) to send or receive values from program to the screen(map) or from Screen (Map) to the program.
+
+DFHCOMMAREA <--Linkage section of the CICS program. It is the link between your program and the screen.
+
+SEND: Sends the MAP/MAPSET/FIELDS/VALUE from CICS program to the screen(Terminal)
+
+PROCEDURE DIVISION.
+
+    EXEC CICS SEND
+         MAP('CUSMAP')
+         MAPSET('CUSTINQ')
+         ERASE
+         END-EXEC.
+
+
+RECEIVE: Receives value from MAP(Screen<--Terminal) to the CICS program.
+
+         EXEC CICS RECEIVE
+		MAP('CUSMAP')
+		MAPSET('CUSTINQ')
+		INTO (CUSMAPO)                              CUSMAPO: WS variable. Symbolic MAP variable.
+         END-EXEC.
+
+-----------------------------------------------------------------AID-------------------------------------------------------------------------------------------------------
+
+Attention Identifiers. operation to be performed by keyboard keys.
+
+KEYS: AID KEY--> Trigger events that perform some operation (e.g. clear screen, go to next screen, exit from the screen)
+                 DFHAID.
+     
+      NON AID Key--> Which are just used to enter the values. 
+
+
+AID Keys and values are already mapped inside a copybook DFHAID.
+
+When an AID key is pressed in the screen, The value is checked in the respective variable of copybook DFHAID with the help of another variable EIBAID
+of EIB (EXEC Interface Block)
+
+e.g  
+
+COPY DFHAID                                     --> Add this predefined copybook in the CICS program in WS section.
+
+ 01 DFHAID.
+   02  DFHNULL   PIC  X  VALUE IS ' '.
+   02  DFHENTER  PIC  X  VALUE IS ''''.
+   02  DFHCLEAR  PIC  X  VALUE IS '_'.
+   02  DFHCLRP   PIC  X  VALUE IS '¦'.
+   02  DFHPEN    PIC  X  VALUE IS '='.
+   02  DFHOPID   PIC  X  VALUE IS 'W'.
+   02  DFHMSRE   PIC  X  VALUE IS 'X'.
+   02  DFHSTRF   PIC  X  VALUE IS 'h'.
+   02  DFHTRIG   PIC  X  VALUE IS '"'.
+   02  DFHPA1    PIC  X  VALUE IS '%'.
+   02  DFHPA2    PIC  X  VALUE IS '>'.
+   02  DFHPA3    PIC  X  VALUE IS ','.
+   02  DFHPF1    PIC  X  VALUE IS '1'.
+   02  DFHPF2    PIC  X  VALUE IS '2'.
+   ... 
+   02  DFHPF23   PIC  X  VALUE IS '.'.
+   02  DFHPF24   PIC  X  VALUE IS '<'.
+
+
+PEOCEDURE DIVIDION>
+
+e.g.
+
+EVALUATE TRUE
+        WHEN EIBAID = DFHENTER                          --> When Enter is pressed on the screen, the value of enter is checked with DFHENTER variable of COPYBOOK DFHAID 								against EIBAID of EIB.
+             PERFORM PROCESS-ENTER-LOGIC
+        WHEN EIBAID = DFHPF3 
+             PERFORM PROCESS-EXIT-LOGIC
+        WHEN EIBAID = DFHPF7  
+             PERFORM PROCESS-SCROLL-UP-LOGIC
+    END-EVALUATE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

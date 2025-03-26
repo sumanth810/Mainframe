@@ -1,0 +1,52 @@
+System IP Address : 206.72.204.242   Port (Telnet): 6443 or 23
+
+Type TSO
+	-Type Username and click enter
+	-Type password
+
+F3 - To come out of the screen
+
+(1)VIEW - To view or display the record/data
+(2)EDIT - To change the record/data
+(3)UTILITIES - To create a File go to the Utilities
+	-Click (2)Data Set Utility
+	-Click Name and give a name
+	- File name should not exceed 44 char. ,one word shouldn't be more than 8 char. 
+	- Eg: 'JGFBHUYH.DJFHE.FILE1' (Separate with . if name exceeds 8)
+	- Type A
+
+For PDS when Allocate New Data Set
+Directory blocks should be any natural no.
+Record Length should be 80.
+Data set name type - PDS
+
+Name of the member shouldn't be >8 char
+
+character/alphanumeric: CH
+numeric: ZD/PD
+numeric: BI
+Ascending: A, Descending: D
+
+EQ--> Equal
+NE--> Not Equal
+GT--> Greater than
+LT--> Less Than
+GE--> Gretaer than Equal to
+LE--> Less than Equal to
+
+//OZA142A JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M
+//* SORT JCL TO SORT RECORDS IN ASCENDING ORDER      
+//STEP001 EXEC PGM=SORT                              
+//*                                                  
+//SORTIN DD DSN=OZA142.AGENT.FILE,DISP=SHR           
+//SORTOUT DD DSN=OZA142.AGENT.SORTED.FILE,           
+//           DISP=(NEW,CATLG,DELETE),                
+//           SPACE=(CYL,(5,5),RLSE),                 
+//           DCB=(RECFM=FB,LRECL=40,BLKSIZE=0)       
+//SYSIN DD*                                          
+  SORT FIELDS=(1,10,CH,A)                            
+/*                                                   
+//SYSOUT DD SYSOUT=*                                 
+
+-- To execute the job SUB is the command
+

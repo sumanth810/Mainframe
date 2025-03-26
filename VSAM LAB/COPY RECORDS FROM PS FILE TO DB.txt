@@ -1,0 +1,235 @@
+//COPY RECORDS FROM PS FILE TO DB
+
+000100 IDENTIFICATION DIVISION.              
+
+000200 PROGRAM-ID. INSPS01.                  
+
+000300 AUTHOR. SUMANTH.                      
+
+000400                                       
+
+000500 ENVIRONMENT DIVISION.                 
+
+000600 INPUT-OUTPUT SECTION.                 
+
+000700 FILE-CONTROL.                         
+
+000800     SELECT CUS-FILE ASSIGN TO CUSFILE.
+
+000900 DATA DIVISION.                        
+
+001000 FILE SECTION.                         
+
+001100                                       
+
+001200 FD CUS-FILE                           
+
+001300     LABEL RECORDS ARE STANDARD        
+
+001400     RECORDING MODE IS F               
+
+001500     RECORD CONTAINS 80 CHARACTERS.    
+
+001600                                       
+
+001700 01 CUS-REC PIC X(80).                 
+
+001800                                       
+
+001900 WORKING-STORAGE SECTION.              
+
+002000     EXEC SQL                          
+
+002100       INCLUDE SQLCA                   
+
+002200     END-EXEC.                         
+
+002300                                       
+
+002400     EXEC SQL                          
+
+002500       INCLUDE CUSTABLE             
+
+002600     END-EXEC.                      
+
+002700 01 WS-CUS-REC.                     
+
+002800    05 WS-ACCTNO PIC X(5).          
+
+002900    05 WS-NAME PIC X(25).           
+
+003000    05 WS-ADDR PIC X(20).           
+
+003100    05 WS-GENDER PIC X(1).          
+
+003200    05 WS-ACTYPE PIC X(1).          
+
+003300    05 WS-DTOPEN PIC X(10).         
+
+003400    05 WS-BALANCE PIC 9(7)V9(2).    
+
+003500    05 FILLER PIC X(11).            
+
+003600                                    
+
+003700 01 WS-COND-EOF PIC X(1).           
+
+003800    88 WS-COND-EOF-TRUE VALUE 'Y'.  
+
+003900    88 WS-COND-EOF-FALSE VALUE 'N'. 
+
+004000                                    
+
+004100 01 WS-COUNTER.                     
+
+004200    05 WS-COUNTER-REC PIC 9(2).     
+
+004300    05 WS-COUNTER-CHANGE PIC 9(10). 
+
+004400    05 WS-SQLCODE PIC ZZZZZZZZ9-.   
+
+004500                                    
+
+004600 PROCEDURE DIVISION.                
+
+004700 00000-MAIN-PARA.                   
+
+004800     PERFORM 01000-INIT-PARA.       
+
+004900     PERFORM 01100-OPEN-FILE-PARA.  
+
+005000     PERFORM 20000-READ-CUS-FILE-PARA              
+
+005100       UNTIL WS-COND-EOF-TRUE.                     
+
+005200     PERFORM 90000-END-JOB-PARA.                   
+
+005300     GOBACK.                                       
+
+005400 01000-INIT-PARA.                                  
+
+005500     MOVE 'N' TO WS-COND-EOF.                      
+
+005600                                                   
+
+005700 01100-OPEN-FILE-PARA.                             
+
+005800     OPEN INPUT CUS-FILE.                          
+
+005900                                                   
+
+006000 20000-READ-CUS-FILE-PARA.                         
+
+006100     DISPLAY 'READ CUS FILE'.                      
+
+006200     READ CUS-FILE INTO WS-CUS-REC                 
+
+006300          AT END                                   
+
+006400          MOVE 'Y' TO WS-COND-EOF                  
+
+006500          NOT AT END                               
+
+006600             PERFORM 21000-INSERT-RECORD-TABLE-PARA
+
+006700     END-READ.                                     
+
+006800                                                   
+
+006900 21000-INSERT-RECORD-TABLE-PARA.                   
+
+007000     DISPLAY 'INSERT RECORD'.                      
+
+007100     MOVE WS-ACCTNO TO CUST-ACCTNO.                
+
+007200     MOVE WS-NAME TO CUST-NAME.                    
+
+007300     MOVE WS-ADDR TO CUST-ADDR.                    
+
+007400     MOVE WS-GENDER TO CUST-GENDER.                
+
+007500     MOVE WS-ACTYPE TO CUST-ACTYPE.  
+
+007600     MOVE WS-DTOPEN TO CUST-DTOPEN.  
+
+007700     MOVE WS-BALANCE TO CUST-BALANCE.
+
+007800     ADD 1 TO WS-COUNTER-REC.        
+
+007900                                     
+
+008000     EXEC SQL                        
+
+008100       INSERT INTO CUSTOMER_TABLE    
+
+008200              (CUST_ACCTNO,          
+
+008300               CUST_NAME,            
+
+008400               CUST_ADDR,            
+
+008500               CUST_GENDER,          
+
+008600               CUST_ACTYPE,          
+
+008700               CUST_DTOPEN,          
+
+008800               CUST_BALANCE)         
+
+008900       VALUES                        
+
+009000              (:CUST-ACCTNO,         
+
+009100               :CUST-NAME,           
+
+009200               :CUST-ADDR,           
+
+009300               :CUST-GENDER,         
+
+009400               :CUST-ACTYPE,         
+
+009500               :CUST-DTOPEN,         
+
+009600               :CUST-BALANCE)        
+
+009700     END-EXEC.                       
+
+009800                                     
+
+009900     EVALUATE SQLCODE                
+
+010000         WHEN 0                                         
+
+010100              DISPLAY 'RECORD ADDED SUCCESSFULLY'       
+
+010200              ADD 1 TO WS-COUNTER-CHANGE                
+
+010300         WHEN -803                                      
+
+010400              DISPLAY 'DUPLICATE RECORD FOUND'          
+
+010500         WHEN OTHER                                     
+
+010600              DISPLAY 'SQL CODE ERROR WHILE INSERT'     
+
+010700              MOVE SQLCODE TO WS-SQLCODE                
+
+010800              DISPLAY 'SQLCODE IS: ' WS-SQLCODE         
+
+010900     END-EVALUATE.                                      
+
+011000                                                        
+
+011100 90000-END-JOB-PARA.                                    
+
+011200     CLOSE CUS-FILE.                                    
+
+011300     DISPLAY 'NUMBER OF RECORDS INSERTED: '             
+
+011400             WS-COUNTER-CHANGE.                         
+
+011500     DISPLAY 'NO OF RECORDS READ FROM INPUT FILE IS : ' 
+
+011600             WS-COUNTER-REC.                            
+
+011700     DISPLAY 'END'.                                     

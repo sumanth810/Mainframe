@@ -1,0 +1,105 @@
+000100 000100 IDENTIFICATION DIVISION.                       
+000200 000200 PROGRAM-ID. ITEM.                              
+000300 000300 AUTHOR. ANKIT.                                 
+000400 000400                                                
+000500 000500 ENVIRONMENT DIVISION.                          
+000510 000510 INPUT-OUTPUT SECTION.                          
+000520 000520 FILE-CONTROL.                                  
+000530 000530      SELECT PRINT-FILE ASSIGN TO OUTFILE.      
+000540 000540                                                
+000600 000600 DATA DIVISION.                                 
+000610 000610 FILE SECTION.                                  
+000620 000620 FD PRINT-FILE                                  
+000630 000630      LABEL RECORDS ARE STANDARD                
+000640 000640      RECORDING MODE IS F                       
+000650 000650      RECORD CONTAINS 80 CHARACTERS.            
+000660 000660 01 PRINT-REC PIC X(80).                        
+000670 000670                                                
+000700 000700 WORKING-STORAGE SECTION.                       
+000800 000800      EXEC SQL                                  
+000900 000900       INCLUDE SQLCA                            
+001000 001000      END-EXEC.                                 
+001100 001100      EXEC SQL                                  
+001200 001200       INCLUDE ITEMDCL  
+001300 001300      END-EXEC.                                           
+001400 001400 01 WS-EOF PIC X(1) VALUE 'N'.                            
+001500 001500      88 END-OF-FILE VALUE 'Y'.                           
+001600 001600 01 WS-DISCOUNTED-PRICE PIC S9(5)V9(2) COMP-3.            
+001610 001610 01 WS-ITEM-UNIT-PRICE-DISPLAY PIC Z(5).99.               
+001620 001620 01 WS-DISCOUNTED-PRICE-DISPLAY PIC Z(5).99.              
+001700 001700                                                          
+001800 001800      EXEC SQL                                            
+001900 001900       DECLARE ITEM_CUR CURSOR FOR                        
+002000 002000        SELECT ITEM_NO, ITEM_BRAND_NAME,                  
+002100 002100               ITEM_DESC, ITEM_UNIT_PRICE,                
+002200 002200               NEW_YEAR_DISCOUNT                          
+002300 002300          FROM ITEM_TABLE                                 
+002400 002400      END-EXEC.                                           
+002500 002500 01 WS-DCLITEM-REC.                                       
+002600 002600      10 WS-ITEM-NO PIC X(5).                             
+002700 002700      10 WS-ITEM-BRAND-NAME PIC X(15).                    
+002800 002800      10 WS-ITEM-DESC PIC X(20).                          
+002900 002900      10 WS-ITEM-UNIT-PRICE PIC S9(5)V9(2) COMP-3.        
+003000 003000      10 WS-NEW-YEAR-DISCOUNT PIC X(1).                   
+003100 003100                                                          
+003200 003200 PROCEDURE DIVISION.                                      
+003300 003300                                                          
+003400 003400 MAIN-PROCESS.                                            
+003500 003500      OPEN OUTPUT PRINT-FILE.                             
+003600 003600        EXEC SQL    
+003700 003700         OPEN ITEM_CUR                                           
+003800 003800        END-EXEC.                                                
+003900 003900      DISPLAY 'REPORT GENERATION STARTED...'.                    
+004000 004000                                                                 
+004100 004100      MOVE 'MEGAMART - MOBILE PRICES FOR NEW YEAR' TO PRINT-REC. 
+004200 004200       WRITE PRINT-REC.                                          
+004300 004300      MOVE '--------------------------------------' TO PRINT-REC.
+004400 004400       WRITE PRINT-REC.                                          
+004500 004500      MOVE 'ITEM NO  ITEM DESC  UNIT PRICE  DISCOUNTED PRICE'    
+004600 004600           TO PRINT-REC.                                         
+004700 004700       WRITE PRINT-REC.                                          
+004800 004800      MOVE '-------  ---------  ----------  ----------------'    
+004900 004900           TO PRINT-REC.                                         
+005000 005000       WRITE PRINT-REC.                                          
+005100 005100                                                                 
+005200 005200 FETCH-ITEMS.                                                    
+005300 005300       EXEC SQL                                                  
+005400 005400         FETCH ITEM_CUR INTO :WS-DCLITEM-REC                     
+005500 005500       END-EXEC.                                                 
+005600 005600                                                                 
+005700 005700       IF SQLCODE = 100                                          
+005800 005800         SET END-OF-FILE TO TRUE                                 
+005900 005900       GO TO END-REPORT.                                         
+006000 006000                                                                 
+006100 006100       IF WS-NEW-YEAR-DISCOUNT = 'Y'                             
+006200 006200          IF WS-ITEM-UNIT-PRICE > 50000                          
+006300 006300           COMPUTE WS-DISCOUNTED-PRICE = WS-ITEM-UNIT-PRICE * 0.5 
+006400 006400          ELSE IF WS-ITEM-UNIT-PRICE >= 25000 AND                 
+006500 006500                         WS-ITEM-UNIT-PRICE <= 50000              
+006600 006600           COMPUTE WS-DISCOUNTED-PRICE = WS-ITEM-UNIT-PRICE * 0.8 
+006700 006700          ELSE                                                    
+006800 006800           MOVE WS-ITEM-UNIT-PRICE TO WS-DISCOUNTED-PRICE         
+006900 006900          END-IF                                                  
+007000 007000       ELSE                                                       
+007100 007100         MOVE WS-ITEM-UNIT-PRICE TO WS-DISCOUNTED-PRICE           
+007200 007200       END-IF.                                                    
+007300 007300                                                                  
+007310 007310       MOVE WS-ITEM-UNIT-PRICE TO WS-ITEM-UNIT-PRICE-DISPLAY      
+007320 007320       MOVE WS-DISCOUNTED-PRICE TO WS-DISCOUNTED-PRICE-DISPLAY    
+007330 007330                                                                  
+007400 007400       STRING WS-ITEM-NO SPACE WS-ITEM-DESC SPACE                 
+007500 007500       WS-ITEM-UNIT-PRICE-DISPLAY SPACE                           
+007501 007501       WS-DISCOUNTED-PRICE-DISPLAY                                
+007510 007510              DELIMITED BY SIZE                                   
+007600 007600                INTO PRINT-REC.                                   
+007700 007700          WRITE PRINT-REC.                                        
+007800 007800       GO TO FETCH-ITEMS.                                         
+007900 007900                                                                  
+008000 008000 END-REPORT.                                                      
+008100 008100         EXEC SQL                                                 
+008200 008200          CLOSE ITEM_CUR                                          
+008300 008300         END-EXEC. 
+008400 008400                                                           
+008500 008500         CLOSE PRINT-FILE.                                 
+008600 008600         DISPLAY 'REPORT GENERATED SUCCESSFULLY...'.       
+008700 008700         STOP RUN.                                                                                                                                                      

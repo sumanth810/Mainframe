@@ -1,0 +1,100 @@
+//RRDS TO PS
+
+000100 IDENTIFICATION DIVISION.              
+000200 PROGRAM-ID. RRDS1.                    
+000300 AUTHOR. SUMANTH.                      
+000400                                       
+000500 ENVIRONMENT DIVISION.                 
+000600 INPUT-OUTPUT SECTION.                 
+000700 FILE-CONTROL.                         
+000800     SELECT INP01 ASSIGN TO INPUT01    
+000900     ORGANIZATION IS RELATIVE          
+001000     ACCESS MODE IS RANDOM             
+001100     RELATIVE KEY IS R-KEY             
+001200     FILE STATUS IS WS-STATUS.         
+001300                                       
+001400     SELECT OUT01 ASSIGN TO VALID01    
+001500     ORGANIZATION IS SEQUENTIAL        
+001600     ACCESS MODE IS SEQUENTIAL         
+001700     FILE STATUS IS WS-STATUS.         
+001800                                       
+001900 DATA DIVISION.                        
+002000 FILE SECTION.                         
+002100 FD INP01                              
+002200     RECORD CONTAINS 80 CHARACTERS     
+002300     BLOCK CONTAINS 800 CHARACTERS 
+002500     DATA RECORD IS INP-RECORD.    
+002600 01 INP-RECORD.                    
+002700     05 AGENT-ID PIC 9(03).        
+002800     05 AGENT-NAME PIC X(15).      
+002900     05 AGENT-TEAM PIC X(06).      
+003000     05 AGENT-DIVISION PIC X(10).  
+003100     05 AGENT-SCORE PIC 9(04).     
+003200     05 FILLER PIC X(42).          
+003300                                   
+003400 FD OUT01                          
+003500     RECORD CONTAINS 80 CHARACTERS 
+003600     BLOCK CONTAINS 800 CHARACTERS 
+003700     RECORDING MODE IS F           
+003800     DATA RECORD IS VAL-RECORD.    
+003900 01 VAL-RECORD PIC X(80).          
+004000                                   
+004100 WORKING-STORAGE SECTION.          
+004200 01 WS-STATUS PIC X(02).           
+004300 01 R-KEY PIC 9(5).                
+004500 01 WS-EOF-STATUS PIC X(01).       
+004600     88 EOF VALUE 'Y'.             
+004700     88 NOT-EOF VALUE 'N'.         
+004800                                   
+004900 PROCEDURE DIVISION.               
+005200     PERFORM A01-OPEN.                        
+005300     SET NOT-EOF TO TRUE.                     
+005400     MOVE 1 TO R-KEY                          
+005500     PERFORM A02-READ UNTIL EOF.              
+005600     PERFORM A04-CLOSE.                       
+005700     STOP RUN.                                
+005800                                              
+005900 A01-OPEN.                                    
+006000     OPEN INPUT INP01.                        
+006100     IF WS-STATUS = '00'                      
+006200        DISPLAY 'INP01 FILE OPEN SUCCESSFUL'  
+006300     ELSE                                     
+006400        DISPLAY 'INP01 FILE OPEN FAILED'      
+006500     END-IF.                                  
+006600     OPEN OUTPUT OUT01.                       
+006700     IF WS-STATUS = '00'                      
+006800        DISPLAY 'OUT01 FILE OPEN SUCCESSFUL'  
+006900     ELSE                                     
+007000        DISPLAY 'OUT01 FILE OPEN FAILED'      
+007100     END-IF.                                  
+007200                                              
+007300 A02-READ.                                    
+007400     READ INP01                               
+007600     INVALID KEY DISPLAY 'KEY NOT FOIUND'     
+007700      SET EOF TO TRUE                         
+007800     NOT INVALID KEY                            
+007900      SET EOF TO TRUE DISPLAY R-KEY             
+008100      PERFORM A03-WRITE-OUTPUT                  
+008200     END-READ.                                  
+008300     IF WS-STATUS = '00'                        
+008400        DISPLAY 'INP01 FILE READ SUCCESSFUL'    
+008500     ELSE                                       
+008600        DISPLAY 'INP01 FILE READ FAILED'        
+008700     END-IF.                                    
+008800                                                
+008900 A03-WRITE-OUTPUT.                              
+009000     MOVE INP-RECORD TO VAL-RECORD.             
+009100     WRITE VAL-RECORD.                          
+009200     IF WS-STATUS = '00'                        
+009300        DISPLAY 'OUTPUT FILE WRITE SUCCESSFUL'  
+009400     ELSE                                       
+009500        DISPLAY 'OUTPUT FILE WRITE FAILED'      
+009600     END-IF.                                    
+009700                                                
+009800 A04-CLOSE.                                     
+009900     CLOSE INP01.                               
+010000     IF WS-STATUS = '00'                        
+010100        DISPLAY 'INP01 FILE CLOSESUCCESSFUL'    
+010200     ELSE                                       
+010300        DISPLAY 'INP01 FILE CLOSEFAILED'        
+010400     END-IF. 

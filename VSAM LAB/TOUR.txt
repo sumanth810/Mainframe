@@ -1,0 +1,264 @@
+****** ***************************** Top of Data ******************************
+000100 000100 IDENTIFICATION DIVISION.                                         
+000200 000200 PROGRAM-ID. TOUR.                                                
+000300 000300 AUTHOR. KUMAR.                                                   
+000400 000400* PROGRAM TO PROCESS TOUR DETAILS AND CALCULATE DISCOUNTS         
+000500 000500 ENVIRONMENT DIVISION.                                            
+000600 000600 INPUT-OUTPUT SECTION.                                            
+000700 000700 FILE-CONTROL.                                                    
+000800 000800     SELECT OUTTOUR-FILE ASSIGN TO OUTTOUR                        
+000900 000900     ORGANIZATION IS SEQUENTIAL                                   
+001000 001000     ACCESS MODE IS SEQUENTIAL.                                   
+001100 001100     SELECT OUTODEL-FILE ASSIGN TO OUTODEL                        
+001200 001200     ORGANIZATION IS SEQUENTIAL                                   
+001300 001300     ACCESS MODE IS SEQUENTIAL.                                   
+001400 001400 DATA DIVISION.                                                   
+001500 001500 FILE SECTION.                                                    
+001600 001600 FD  OUTTOUR-FILE                                                 
+001700 001700     RECORDING MODE IS F                                          
+001800 001800     RECORD CONTAINS 80 CHARACTERS                                
+001900 001900     BLOCK CONTAINS 0 RECORDS.                                    
+002000 002000 01  OUTTOUR-RECORD         PIC X(80).                            
+002100 002100 FD  OUTODEL-FILE                                                 
+002200 002200     RECORDING MODE IS F                                          
+002300 002300     RECORD CONTAINS 80 CHARACTERS                                
+002400 002400     BLOCK CONTAINS 0 RECORDS.                                    
+002500 002500 01  OUTODEL-RECORD         PIC X(80).                          
+002600 002600 WORKING-STORAGE SECTION.                                       
+002700 002700 01  WS-SWITCHES.                                               
+002800 002800     05 WS-END-OF-CURSOR       PIC X VALUE 'N'.                 
+002900 002900        88 END-OF-CURSOR      VALUE 'Y'.                        
+003000 003000 01  WS-WORK-AREAS.                                             
+003100 003100     05 WS-TOUR-PLACE         PIC X(15)       VALUE SPACES.     
+003200 003200     05 WS-TOUR-GUIDE         PIC X(10)       VALUE SPACES.     
+003300 003300     05 WS-LANGUAGE           PIC X(3)        VALUE SPACES.     
+003400 003400     05 WS-TOUR-DATE          PIC X(10)       VALUE SPACES.     
+003500 003500     05 WS-GROUP-SIZE         PIC S9(9)       VALUE 0 COMP.     
+003600 003600     05 WS-PRICE-PER-HEAD     PIC S9(9)       VALUE 0 COMP.     
+003700 003700     05 WS-DISCOUNT           PIC S9(5)V9(4)  VALUE 0 COMP-3.   
+003800 003800     05 WS-DISCOUNT-DISPLAY   PIC 9(9).                         
+003900 003900     05 WS-FINAL-PRICE        PIC S9(9)       VALUE 0 COMP.     
+004000 004000     05 WS-GROUP-DISCOUNT     PIC S9(9)       VALUE 0 COMP.     
+004100 004100 01  HV-TOUR-DETAILS.                                           
+004200 004200     05 HV-TOUR-PLACE         PIC X(15).                        
+004300 004300     05 HV-TOUR-GUIDE         PIC X(10).                        
+004310 004310     05 HV-TOUR-GUIDE-IND     PIC S9(4) COMP VALUE 0.           
+004400 004400     05 HV-LANGUAGE           PIC X(3).                         
+004500 004500     05 HV-TOUR-DATE          PIC X(10).                        
+004600 004600     05 HV-GROUP-SIZE         PIC S9(9) USAGE COMP.             
+004700 004700     05 HV-PRICE-PER-HEAD     PIC S9(9) USAGE COMP.             
+004800 004800 01  HV-SEASON-DISCOUNT.                                        
+ 004900 004900     05 HV-SD-TOUR-PLACE      PIC X(15).                          
+ 005000 005000     05 HV-SD-FINAL-PRICE     PIC S9(9) USAGE COMP.               
+ 005100 005100     05 HV-SD-GUIDE           PIC X(10).                          
+ 005110 005110     05 HV-SD-GUIDE-IND       PIC S9(4) COMP VALUE 0.             
+ 005200 005200     05 HV-SD-TOUR-DATE       PIC X(10).                          
+ 005300 005300     05 HV-SD-DISCOUNT        PIC S9(9) USAGE COMP.               
+ 005400 005400     05 HV-SD-GROUP-DISCOUNT  PIC S9(9) USAGE COMP.               
+ 005500 005500 01  WS-OUTTOUR-RECORD.                                           
+ 005600 005600     05 OUTT-TOUR-PLACE       PIC X(15).                          
+ 005700 005700     05 FILLER                PIC X(1) VALUE SPACE.               
+ 005800 005800     05 OUTT-FINAL-PRICE      PIC 9(7).                           
+ 005900 005900     05 FILLER                PIC X(1) VALUE SPACE.               
+ 006000 006000     05 OUTT-TOUR-GUIDE       PIC X(10).                          
+ 006100 006100     05 FILLER                PIC X(1) VALUE SPACE.               
+ 006200 006200     05 OUTT-DISCOUNT         PIC 9(9).                           
+ 006300 006300     05 FILLER                PIC X(1) VALUE SPACE.               
+ 006400 006400     05 OUTT-TOUR-DATE        PIC X(10).                          
+ 006500 006500     05 FILLER                PIC X(1) VALUE SPACE.               
+ 006600 006600     05 OUTT-GROUP-DISCOUNT   PIC 9(9).                           
+ 006700 006700     05 FILLER                PIC X(1) VALUE SPACE.               
+ 006800 006800     05 OUTT-GROUP-SIZE       PIC 9(2).                           
+ 006900 006900 01  WS-OUTODEL-RECORD.                                           
+ 007000 007000     05 OUTD-TOUR-PLACE       PIC X(15).                          
+ 007100 007100     05 FILLER                PIC X(1) VALUE SPACE.               
+ 007200 007200     05 OUTD-TOUR-GUIDE       PIC X(10).                          
+007300 007300     05 FILLER                PIC X(1) VALUE SPACE.               
+007400 007400     05 OUTD-LANGUAGE         PIC X(3).                           
+007500 007500     05 FILLER                PIC X(1) VALUE SPACE.               
+007600 007600     05 OUTD-TOUR-DATE        PIC X(10).                          
+007700 007700     05 FILLER                PIC X(1) VALUE SPACE.               
+007800 007800     05 OUTD-GROUP-SIZE       PIC 9(2).                           
+007900 007900     05 FILLER                PIC X(1) VALUE SPACE.               
+008000 008000     05 OUTD-PRICE-PER-HEAD   PIC 9(5).                           
+008100 008100     05 FILLER                PIC X(30) VALUE SPACES.             
+008200 008200     EXEC SQL                                                     
+008300 008300       INCLUDE SQLCA                                              
+008400 008400     END-EXEC.                                                    
+008500 008500     EXEC SQL                                                     
+008600 008600       INCLUDE TOURDET                                            
+008700 008700     END-EXEC.                                                    
+008800 008800     EXEC SQL                                                     
+008900 008900       INCLUDE SEASONDI                                           
+009000 009000     END-EXEC.                                                    
+009100 009100     EXEC SQL                                                     
+009200 009200       DECLARE TOUR-CURSOR CURSOR FOR                             
+009300 009300       SELECT TOUR_PLACE, TOUR_GUIDE, LANGUAGE, TOUR_DATE,        
+009400 009400              GROUP_SIZE, PRICE_PER_HEAD                          
+009500 009500       FROM TOUR_DETAILS                                          
+009600 009600       WHERE GROUP_SIZE > 1 AND PRICE_PER_HEAD > 1000             
+009700 009700       WITH UR                                                    
+009800 009800     END-EXEC.                                                    
+009900 009900 PROCEDURE DIVISION.                                              
+010000 010000 0000-MAIN-PARA.                                                  
+010100 010100     PERFORM 1000-INITIALIZATION                                  
+010200 010200     PERFORM 2000-PROCESS-RECORDS                                 
+010300 010300       UNTIL END-OF-CURSOR                                        
+010400 010400     PERFORM 3000-TERMINATION                                     
+010500 010500     STOP RUN.                                                    
+010600 010600 1000-INITIALIZATION.                                             
+010700 010700     OPEN OUTPUT OUTTOUR-FILE                                     
+010800 010800     OPEN OUTPUT OUTODEL-FILE                                     
+010900 010900     DISPLAY 'OUTPUT FILES OPENED SUCCESSFULLY'                   
+011000 011000     EXEC SQL                                                     
+011100 011100       OPEN TOUR-CURSOR                                           
+011200 011200     END-EXEC                                                     
+011300 011300     IF SQLCODE NOT = 0                                           
+011400 011400        DISPLAY 'CURSOR OPEN ERROR: ' SQLCODE                     
+011500 011500        MOVE 'Y' TO WS-END-OF-CURSOR                              
+011600 011600     END-IF.                                                      
+011700 011700                                                                  
+011800 011800 2000-PROCESS-RECORDS.                                            
+011900 011900     EXEC SQL                                                     
+012000 012000       FETCH TOUR-CURSOR                                          
+012100 012100       INTO :HV-TOUR-PLACE, :HV-TOUR-GUIDE:HV-TOUR-GUIDE-IND,     
+012110 012110            :HV-LANGUAGE,                                         
+ 012200 012200            :HV-TOUR-DATE, :HV-GROUP-SIZE, :HV-PRICE-PER-HEAD     
+ 012300 012300     END-EXEC                                                     
+ 012400 012400     IF SQLCODE = 0                                               
+ 012500 012500        PERFORM 2100-PROCESS-CURRENT-RECORD                       
+ 012600 012600     END-IF.                                                      
+ 012610 012610     IF SQLCODE = 100                                             
+ 012620 012620        MOVE 'Y' TO WS-END-OF-CURSOR                              
+ 012630 012630     END-IF.                                                      
+ 012700 012700     IF SQLCODE NOT = 0 AND SQLCODE NOT = 100                     
+ 012800 012800        DISPLAY 'FETCH ERROR: ' SQLCODE ' - CONTINUING...'        
+ 013000 013000     END-IF.                                                      
+ 013100 013100                                                                  
+ 013200 013200 2100-PROCESS-CURRENT-RECORD.                                     
+ 013300 013300     MOVE HV-TOUR-PLACE TO WS-TOUR-PLACE.                         
+ 013400 013400     MOVE HV-TOUR-GUIDE TO WS-TOUR-GUIDE.                         
+ 013500 013500     MOVE HV-LANGUAGE TO WS-LANGUAGE.                             
+ 013600 013600     MOVE HV-TOUR-DATE TO WS-TOUR-DATE.                           
+ 013700 013700     MOVE HV-GROUP-SIZE TO WS-GROUP-SIZE.                         
+ 013800 013800     MOVE HV-PRICE-PER-HEAD TO WS-PRICE-PER-HEAD.                 
+ 013900 013900     PERFORM 2200-CHECK-NULL-TOUR-GUIDE.                          
+ 014000 014000                                                                  
+ 014100 014100 2200-CHECK-NULL-TOUR-GUIDE.                                      
+ 014200 014200     IF HV-TOUR-GUIDE-IND < 0 OR WS-TOUR-GUIDE =                  
+ 014210 014210           SPACES OR LENGTH OF WS-TOUR-GUIDE = 0                  
+ 014300 014300        MOVE 'YTD' TO WS-TOUR-GUIDE                               
+ 014400 014400        MOVE WS-TOUR-PLACE TO OUTD-TOUR-PLACE                     
+ 014500 014500        MOVE WS-TOUR-GUIDE TO OUTD-TOUR-GUIDE                     
+ 014600 014600        MOVE WS-LANGUAGE TO OUTD-LANGUAGE                         
+ 014700 014700        MOVE WS-TOUR-DATE TO OUTD-TOUR-DATE                       
+ 014800 014800        MOVE WS-GROUP-SIZE TO OUTD-GROUP-SIZE                     
+ 014900 014900        MOVE WS-PRICE-PER-HEAD TO OUTD-PRICE-PER-HEAD             
+ 015000 015000        WRITE OUTODEL-RECORD FROM WS-OUTODEL-RECORD               
+ 015100 015100        DISPLAY 'NULL GUIDE RECORD WRITTEN TO OUTODEL: '          
+ 015200 015200                                    WS-TOUR-PLACE                 
+ 015300 015300        EXEC SQL                                                  
+ 015400 015400          DELETE FROM TOUR_DETAILS                                
+ 015500 015500          WHERE TOUR_PLACE = :HV-TOUR-PLACE                       
+ 015600 015600        END-EXEC                                                  
+ 015610 015610     END-IF.                                                      
+ 015700 015700     IF SQLCODE NOT = 0                                           
+ 015800 015800        DISPLAY 'DELETE ERROR: ' SQLCODE                          
+ 015900 015900     END-IF.                                                      
+ 016000 016000     IF HV-TOUR-GUIDE-IND >= 0 AND WS-TOUR-GUIDE NOT = SPACES     
+ 016010 016010         AND LENGTH OF WS-TOUR-GUIDE > 0                          
+ 016100 016100        PERFORM 2300-CALCULATE-DISCOUNT                           
+ 016200 016200     END-IF.                                                      
+ 016300 016300                                                                  
+ 016400 016400 2300-CALCULATE-DISCOUNT.                                         
+ 016500 016500     MOVE 0 TO WS-DISCOUNT                                        
+ 016600 016600     IF WS-GROUP-SIZE = 5                                         016800 016800         COMPUTE WS-DISCOUNT = WS-PRICE-PER-HEAD * 0.01           
+016810 016810     END-IF.                                                      
+016900 016900     IF WS-GROUP-SIZE > 5 AND WS-GROUP-SIZE <= 10                 
+017000 017000               AND WS-LANGUAGE = 'ENG'                            
+017100 017100         COMPUTE WS-DISCOUNT = WS-PRICE-PER-HEAD * 0.02           
+017110 017110     END-IF.                                                      
+017200 017200     IF WS-GROUP-SIZE > 10 AND WS-GROUP-SIZE <= 20                
+017300 017300         COMPUTE WS-DISCOUNT = WS-PRICE-PER-HEAD * 0.03           
+017310 017310     END-IF.                                                      
+017400 017400     IF WS-GROUP-SIZE > 20 AND WS-GROUP-SIZE <= 30                
+017500 017500               AND WS-LANGUAGE = 'ENG'                            
+017600 017600         COMPUTE WS-DISCOUNT = WS-PRICE-PER-HEAD * 0.018          
+017610 017610     END-IF.                                                      
+017700 017700     IF WS-GROUP-SIZE > 20 AND WS-GROUP-SIZE <= 30                
+017800 017800               AND WS-LANGUAGE = 'TAM'                            
+017900 017900         COMPUTE WS-DISCOUNT = WS-PRICE-PER-HEAD * 0.015          
+018000 018000     END-IF.                                                      
+018100 018100     PERFORM 2400-CALCULATE-FINAL-PRICE.                          
+018200 018200                                                                  
+018300 018300 2400-CALCULATE-FINAL-PRICE.                                      
+018400 018400     COMPUTE WS-GROUP-DISCOUNT = WS-GROUP-SIZE * WS-DISCOUNT.     
+018500 018500     MOVE WS-DISCOUNT TO WS-DISCOUNT-DISPLAY.                     
+018600 018600     IF WS-DISCOUNT >= 10 AND WS-DISCOUNT <= 20                   
+018800 018800         COMPUTE WS-FINAL-PRICE =                                 
+018900 018900                 WS-PRICE-PER-HEAD - WS-GROUP-DISCOUNT - 10       
+ 018910 018910     END-IF.                                                      
+ 019000 019000     IF WS-DISCOUNT > 20 AND WS-DISCOUNT <= 40                    
+ 019100 019100         COMPUTE WS-FINAL-PRICE =                                 
+ 019200 019200                 WS-PRICE-PER-HEAD - WS-GROUP-DISCOUNT - 12       
+ 019210 019210     END-IF.                                                      
+ 019300 019300     IF WS-DISCOUNT > 40 AND WS-DISCOUNT <= 50                    
+ 019400 019400         COMPUTE WS-FINAL-PRICE =                                 
+ 019500 019500                 WS-PRICE-PER-HEAD - WS-GROUP-DISCOUNT - 13       
+ 019510 019510     END-IF.                                                      
+ 019600 019600     IF WS-DISCOUNT > 50 AND WS-DISCOUNT < 100                    
+ 019700 019700         COMPUTE WS-FINAL-PRICE =                                 
+ 019800 019800                 WS-PRICE-PER-HEAD - WS-GROUP-DISCOUNT - 9        
+ 019810 019810     END-IF.                                                      
+ 019900 019900     IF WS-DISCOUNT < 10 OR WS-DISCOUNT >= 100                    
+ 020000 020000         MOVE WS-PRICE-PER-HEAD TO WS-FINAL-PRICE                 
+ 020100 020100     END-IF.                                                      
+ 020200 020200     PERFORM 2500-INSERT-SEASON-DISCOUNT.                         
+ 020300 020300                                                                  
+ 020400 020400 2500-INSERT-SEASON-DISCOUNT.                                     
+ 020500 020500     MOVE WS-TOUR-PLACE TO HV-SD-TOUR-PLACE.                      
+ 020600 020600     MOVE WS-FINAL-PRICE TO HV-SD-FINAL-PRICE.                    
+ 020700 020700     MOVE WS-TOUR-GUIDE TO HV-SD-GUIDE.                           
+ 020800 020800     MOVE WS-TOUR-DATE TO HV-SD-TOUR-DATE                         
+ 020900 020900     COMPUTE HV-SD-DISCOUNT = FUNCTION INTEGER(WS-DISCOUNT)       
+ 021000 021000     MOVE WS-GROUP-DISCOUNT TO HV-SD-GROUP-DISCOUNT.              
+021010 021010     EXEC SQL                                                     
+021020 021020       INSERT INTO SEASON_DISCOUNT                                
+021021 021021       (TOUR_PLACE, FINAL_PRICE, GUIDE, DISCOUNT, DATE,           
+021022 021022        GROUP_DISCOUNT)                                           
+021030 021030       VALUES (:HV-SD-TOUR-PLACE, :HV-SD-FINAL-PRICE,             
+021040 021040               :HV-SD-GUIDE:HV-SD-GUIDE-IND, :HV-SD-DISCOUNT,     
+021041 021041               :HV-SD-TOUR-DATE,                                  
+021050 021050               :HV-SD-GROUP-DISCOUNT)                             
+021600 021600     END-EXEC.                                                    
+021700 021700     IF SQLCODE = 0                                               
+021800 021800        PERFORM 2600-WRITE-OUTTOUR-RECORD                         
+021900 021900     ELSE                                                         
+022000 022000        DISPLAY 'INSERT ERROR: ' SQLCODE ' FOR TOUR: '            
+022010 022010                                     WS-TOUR-PLACE                
+022020 022020        DISPLAY 'SKIPPING RECORD DUE TO INSERT FAILURE'           
+022030 022030     END-IF.                                                      
+022100 022100                                                                  
+022200 022200 2600-WRITE-OUTTOUR-RECORD.                                       
+022300 022300     MOVE WS-TOUR-PLACE TO OUTT-TOUR-PLACE.                       
+022400 022400     MOVE WS-FINAL-PRICE TO OUTT-FINAL-PRICE.                     
+022500 022500     MOVE WS-TOUR-GUIDE TO OUTT-TOUR-GUIDE.                       
+022600 022600     MOVE WS-DISCOUNT-DISPLAY TO OUTT-DISCOUNT.                   
+022700 022700     MOVE WS-TOUR-DATE TO OUTT-TOUR-DATE                          
+022800 022800     MOVE WS-GROUP-DISCOUNT TO OUTT-GROUP-DISCOUNT.               
+022900 022900     MOVE WS-GROUP-SIZE TO OUTT-GROUP-SIZE.                       
+ 023000 023000     WRITE OUTTOUR-RECORD FROM WS-OUTTOUR-RECORD.                 
+ 023100 023100     DISPLAY 'RECORD WRITTEN TO OUTTOUR: ' WS-TOUR-PLACE.         
+ 023200 023200                                                                  
+ 023300 023300 3000-TERMINATION.                                                
+ 023400 023400     EXEC SQL                                                     
+ 023500 023500       CLOSE TOUR-CURSOR                                          
+ 023600 023600     END-EXEC.                                                    
+ 023700 023700     CLOSE OUTTOUR-FILE                                           
+ 023800 023800     CLOSE OUTODEL-FILE                                           
+ 023900 023900     DISPLAY 'OUTPUT FILES CLOSED SUCCESSFULLY'                   
+ 024000 024000     DISPLAY 'PROGRAM COMPLETED SUCCESSFULLY'.                    
+ ****** **************************** Bottom of Data ****************************
+                                                                                
+                                                                                
+                                                                                

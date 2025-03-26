@@ -1,0 +1,543 @@
+----------------------------------------------------DB2 25/02--------------------------------------------------------------------------------------------------------
+DBA: Database administrator
+
+
+IMS --> Hierarchical Database for Mainframe. There are several levels of hierarchy. Root is at the top level.
+        Data is stored in Segments in the form of parent and child relationship and represents inverted tree structure.
+        Parent segment are those segments that are connected to child segments below.
+        Child segments are those segments that are connected to parent segments above.
+        Each segments can have one or more fields. Fields contain the data.
+        
+
+DB2 --> Relational Database for Mainframe.
+        Data is stored in tables in the form of rows and columns.
+        
+       Columns--> Fields
+       Row --> Data
+      
+       Fields--> we can make a particular field as a KEY. --> PRIMARY KEY --> It will contain Unique values.
+
+
+DB2 consists of:
+
+DB2 OBJECTS.
+       Tables --> Records/Data are stored
+
+       Tablespace --> DB2 tables are stored.
+
+          Simple tablespace:- A Region where one or more tables are stored. 
+          Partitioned table space: - A table space is divided into 64 partitions. And one table can be stored in one or more partitions.
+                                     in one partition, you cannot store more than one table.
+                                     For huge tables.
+          Segmented table space: - A table space is divided into segments and one segment can hold one table of data.
+         
+
+       INDEX --> Table with primary key. It acts as a pointer to tables.
+
+       Index Spaces --> Indexes are stored.
+       
+       Views --> Derived from one or more tables to give an alternate representation of data.
+
+	CUSTOMER TABLE                               MERCHANT TABLE
+
+	customer  customer  Goods                    merchant  shop       goods in 
+	name      address   purchased                name      address    stock
+
+
+	Alternate view  --> STOCK <= derived from CUSTOMER TABLE & MERCHANT TABLE
+
+	customer  Goods           goods in
+	name      purchased       stock
+
+        Storage groups:- are DASD Volumes that hold the data in which tables and indexes are actually stored.
+
+        System catalog (DB2 catalog):- Consists of tables of data about every object defined in the DB2 system. SYSIBM.SYSTABLES contains all the tables defined in 					System catalog.
+
+
+------------------------------------------------------SQL-----------------------------------------------------------------------------------------------------------
+SQL:   Query language to process data in DB2 tables. Every query should end with a ;
+
+DATATYPES: what type of data a field/column of a DB2 table can store.
+
+NUMERIC
+   INT/INTEGER(n)    --> 9 bytes
+   SMALLINT          --> 4 bytes 
+   DECIMAL(x,y)      --> Decimal number.  
+   DECIMAL(10,2)     --> Number of 10 digits out of which decimal is 2 digits and remaining is whole number.
+   DATE              --> 10 bytes, stores Date
+   TIME              --> 08 bytes, stores time in HH:MM:SS
+   TIMESTAMP         --> 26, stores time in HH:MM:SS:....... 
+
+
+CHARACTER/String
+  CHAR(n)
+  VARCHAR(n)
+
+
+NULL        --> Empty or no data. Default
+NOTNULL     --> Prevents a field to accept empty value. Usually use this constraint for Field defined as Primary key.
+
+
+DDL Data Definition Language.
+    CREATE,ALTER,DELETE (DROP):- table/tablespace/View/Index/Index space.
+
+CREATE OBJECT <name of the object> <Parameters>
+
+e.g.1 create a table.
+
+CREATE TABLE CUSTOMER                                              --> Creating an OBJECT: TABLE and name of the table is :- CUSTOMER
+ ( ID 		INT 			NOT NULL,                  --> ID,NAME,AGE,ADRESS & SALARY --> Fields/Columns of the table  CUSTOMER
+   NAME 	VARCHAR (20)		NOT NULL,                  --> Each of this fields will hold data.
+   AGE 		INT 			NOT NULL,                  --> A field marked as NOT NULL will not accept empty/blank/Null value. 
+   ADDRESS 	CHAR (25), 
+   SALARY 	DECIMAL (18, 2), 
+  );
+
+e.g.2 create a table with primary key.--> PRIMARY KEY (Column name) 
+ 
+
+CREATE TABLE CUSTOMERS
+( 
+CID 		INT 			NOT NULL, 
+NAME 		VARCHAR (20)	        NOT NULL, 
+AGE 		INT 			NOT NULL, 
+ADDRESS 	CHAR (25), 
+SALARY 	DECIMAL (18, 2), 
+PRIMARY KEY (CID)                                                     --> PRIMARY KEY (ID): - Field ID is made as Primary Key.
+);
+
+
+
+SQL Constraints: additional/optional parameters applied to a field of a DB2 table
+
+NOT NULL  --> A field marked as NOT NULL will not accept empty/blank/Null value.
+PRIMARY KEY (Field name) --> Field ID is made as Primary Key. Field marked as Primary key cannot accept duplicate values.
+FOREIGN KEY (Field name) --> is a field is a table which is primary key in any other table. --> Referential Integrity.
+UNIQUE KEY  (Field name) --> is an additional key in a field other than primary key in a table.
+CHECK Constraint:        --> Add a condition to a column. it will allow to add data in the field only if condition is satisfied
+
+e.g.3.1 create a table with Foreign key.--> FOREIGN KEY (Column name) REFERENCES TABLE NAME (Column name)
+
+CREATE TABLE ORDER
+( 
+ORDERID 	INT 			NOT NULL, 
+ORDERSUMMARY	VARCHAR (20)	        NOT NULL, 
+CID 		INT 			NOT NULL, 
+PRIMARY KEY (OrderID)                                                     --> PRIMARY KEY (ID): - Field ID is made as Primary Key.
+FOREIGN KEY (CID)  REFERENCES CUSTOMERS (CID)                             --> CID marked as foreign key in ORDER table is a primary key in CUSTOMERS table
+);
+
+e.g.3.2 create a table with Foreign key.--> FIELD NAME DATATYPE REFERENCES TABLE NAME (Column name)
+
+
+CREATE TABLE ORDERS 
+( 
+ID 		INT  NOT NULL, 
+DATE 		DATE, 
+CUSTOMER_ID 	INT references CUSTOMERS(ID),                            --> CID marked as foreign key in ORDER table is a primary key in CUSTOMERS table
+AMOUNT 		INT,          
+PRIMARY KEY (ID) 
+);
+
+
+Customer table:                              Order table                 
+
+CID NAME AGE ADDRESS SALARY                  OrderID ORDERSUMMARY CID
+
+
+e.g.4 create a table with condition-->  CHECK (condition)
+CREATE TABLE CUSTOMERS(
+ID 		INT 		NOT NULL, 
+NAME 		VARCHAR (20) 	NOT NULL, 
+AGE 		INT 		NOT NULL 	CHECK (AGE >= 18),     --> Allows field AGE to accept data with value Greater than equal to 18.
+ADDRESS 	CHAR (25), 
+SALARY 	DECIMAL (9, 2), 
+PRIMARY KEY (ID) 
+);
+
+
+DELETE OBJECT: Delete DB2 objects: table/tablespace/view/index/indexspace
+
+ DROP OBJECT <object name>;
+
+ DROP TABLE CUSTOMERS                                 --> Delete Object: TABLE, Name: CUSTOMERS.
+   
+
+ALTER OBJECT: Major use: Add column/Delete column/rename column/Change datatype of column in a table.
+
+  ALTER TABLE <Table name>
+  ADD COLUMN (Column name datatype)                            
+  DROP COLUMN <Column name>
+  RENAME Column (existing column name) TO <New column name>
+  ALTER COLUMN <column name> Set DATATYPE <new data type>
+
+e.g.
+
+ALTER TABLE CUSTOMERS
+ADD COLUMN (GOODS VARCHAR (20))                                  --> Add a new column  GOODS with Datatype  VARCHAR (20)                     
+DROP COLUMN ADDRESS                                              --> Remove column ADDRESS from table CUSTOMERS      
+RENAME COLUMN ID TO CUST-ID                                      --> Rename ID to CUST-ID
+ALTER COLUMN SALARY Set DATATYPE INTEGER                         --> Datatype of SALARY will be changed from Decimal to INTEGER
+
+
+
+
+DQL Data Query Language. Use to access/Retrieve rows/records from DB2 tables.
+    SELECT
+
+DML Data Query Language. Use to process data inside DB2 tables
+    INSERT/UPDATE/DELETE:- Rows/records/data from/into DB2 Tables
+
+INSERT  --> Insert Row of data in a table. One INSERT statement can add only one row at a time.
+
+CREATE TABLE CUSTOMERS
+( 
+CID 		INT 			NOT NULL, 
+NAME 		VARCHAR (20)	        NOT NULL, 
+AGE 		INT 			NOT NULL, 
+ADDRESS 	CHAR (25), 
+SALARY 	DECIMAL (18, 2), 
+PRIMARY KEY (CID)                                                     --> PRIMARY KEY (ID): - Field ID is made as Primary Key.
+);
+
+
+INSERT INTO <Table name> VALUES <value1, Value2.....>                  --> Values to be added should be in the same sequence/order of columns in the table.
+
+e.g.1
+INSERT INTO CUSTOMER_TABLE                
+       VALUES                             
+      (0002,'SWATHI',35,'PUNE',900.00);                                  
+
+CUSTOMERS
+CID	NAME		AGE	ADDRESS		SALARY
+0002	SWATHI		35	PUNE		900.00   
+
+e.g.2
+INSERT INTO CUSTOMER_TABLE                                    
+     (CID,NAME,AGE,ADDRESS,SALARY)
+      VALUES                                                  
+     (0001,'AJAY',25,'MUMBAI',500.00);    
+
+
+UPDATE                                                             --> Modify value of one or more fields.
+
+UPDATE <Table name> SET <Column name> = Value
+       WHERE <Column name> = <Value/Condition>;                    --> Column name is usually the primary key. 
+
+e.g.
+UPDATE CUSTOMERS SET SALARY = 1500
+       WHERE CUST_ACCTNO = 0001;  
+
+
+DELETE:                                                              --> Delete the rows from the Table
+
+DELETE FROM <table name> WHERE <condition>                                  
+DELETE FROM CUSTOMERS WHERE CID = 0002;                                  
+
+=-------------------------------------------------------------------------26/02------------------------------------------------------------------------
+DQL:
+
+ SELECT
+
+
+-----------------------------------------------------------------------UNION/JOIN/VIEW :27/02--------------------------------------------------------
+
+UNION / UNION ALL: Combination of 2 Select statements. It gives the result of 2 select statement on same or different table in single Query.
+UNION: Duplicate rows will be eliminated.
+UNION ALL: Duplicate rows will be retained.
+
+
+CUSTOMER_TABLE
+CUSTOMERS
+
+Select * from CUSTOMER_TABLE UNION/ UNION ALL Select * from CUSTOMERS
+Select CUST_ID,CUST_NAME FROM CUSTOMER_TABLE UNION select CUST_ADDR from CUSTOMERS
+
+
+JOIN: Checks if the values are matching / not matching in two tables based on condition. It forms a logical relationship between the tables and retrieves the data from the tables.
+
+INNER JOIN  -> fetch only the matching rows from 2 tables.
+Select * from CUSTOMER_TABLE A INNER JOIN Select * from CUSTOMERS B ON A.CUST_ADDR = B.CUST_ADDR
+                              
+
+LEFT OUTER JOIN -> fetches  the matching rows from 2 tables and all the remaining rows from the table which is mentioned on the left side of = / JOIN.
+LEFT JOIN
+
+Select * from CUSTOMER_TABLE A LEFT JOIN Select * from CUSTOMERS B ON A.CUST_ADDR = B.CUST_ADDR
+
+RIGHT OUTER JOIN
+fetches  the matching rows from 2 tables and all the remaining rows from the table which is mentioned on the right side of = / JOIN.
+LEFT JOIN
+
+Select * from CUSTOMER_TABLE A RIGHT JOIN Select * from CUSTOMERS B ON A.CUST_ADDR = B.CUST_ADDR
+
+
+FULL OUTER JOIN
+
+Fetches the matching and non matching rows from both tables.
+
+
+VIEW:
+
+
+CUSTOMER
+
+CUST_ID  CUST_NAME CUST_ADDR CUST_GENDER CUST_AGE CUST-SALARY
+
+001      AJAY       PUNE        M          25        1000
+002      MOUNIKA    MUM         F          30        10000
+003      ABHISHEK   CHENNAI     F          28        5000
+004      SAI        KOLKATA     F          35        8000
+
+CREATE VIEW CUST_VIEW AS 
+SELECT CUST_NAME AS NAME, CUST_ADDR AS ADDR, CUST-SALARY AS SALARY FROM CUSTOMER WHERE CUST-SALARY > 5000
+
+
+SELECT * FROM CUST_VIEW
+
+
+
+DCL Data Query Language. Use to grant or revoke permissions/authorization.
+	GRANT/REVOKE
+
+
+TCL Transaction control language. Save or revoke the changes made to database. (Cobol+DB2)
+       COMMIT/ROLL Back
+
+
+-----------------------------------------------------------------------COBOL+DB2 27/02---------------------------------------------------------------
+
+
+Cobol+DB2--> Cobol Program + SQL statements embedded inside it. Used to run SQL queries through Cobol pgm+JCL.
+
+
+1. SQL queries, DB2 copybook, DCLGEN must be coded within EXEC SQL and END EXEC.
+
+e.g.  UPDATE CUSTOMERS SET SALARY = 1500
+       WHERE CUST_ACCTNO = 0001;  
+
+      SQL queries are written in Procedure division. 
+	EXEC SQL
+ 	  UPDATE CUSTOMERS SET SALARY = 1500
+          WHERE CUST_ACCTNO = 0001;  
+	END-EXEC.
+
+
+       SPUFI: DB2table CUSOTMERS
+                       CUST_ID (INT)       CUST_NAME(CHAR)      CUST_SALARY(DECIMAL)    CUST_ACC_NO(INT)
+
+
+        01 WS-CUST-TABLE
+           05 WS-CUST-ID     PIC
+           05 WS-CUST-NAME   PIC
+           05 WS-CUST-SALARY PIC
+           05 WS-CUST-ACCNO  PIC
+
+              MOVE 1500 to WS-CUST-SALARY
+              MOVE 0001 to WS-CUST-ACCNO
+           
+	EXEC SQL
+ 	  UPDATE CUSTOMERS SET SALARY = :WS-CUST-SALARY                  --> :WS-CUST-SALARY :- Host variable
+          WHERE CUST_ACCTNO = :WS-CUST-ACCNO                             --> :WS-CUST-ACCNO  :- Host variable
+	END-EXEC.
+
+        IF SQLCODE=00
+            Display 'operation is successful
+        ELSE
+           IF SQLCODE = 100
+            Display 'no data/End of table'
+           ELSE
+             Display 'unsuccessful operation'
+	   END-IF
+        END-IF
+           
+
+        For INSERT/UPDATE/DELETE include COMMIT and ROLLBACK
+
+        EXEC SQL
+ 	  COMMIT                        --> Saves the changes to the database.
+	END-EXEC.
+
+        EXEC SQL
+          ROLLBACK                      --> roll backs the changes upto the last commit point in the database.
+	END-EXEC.
+
+
+      Predefined DB2 copybook = SQLCA     --> Working storage section along with INCLUDE command.
+
+	EXEC SQL
+           INCLUDE SQLCA                  --> SQLCODE,SQLERRD are the two important fields among many other fields inside SQLCA
+	END-EXEC.                         --> SQLCODE is a 3 byte code used to determine if the DB2 operation is successful or if there is any error.
+                                              SQLERRD contains error description and now of rows effected by the SQL query.
+
+      DCLGEN is a utility to create a copybook to define host variables.
+
+      host variables are variables that are used in SQL queries inside a cobol program. They are used as :<Variable name>
+      host variables can be defined by the programmer in WS section. or it can be defined by utility called as DCLGEN
+      TABLE CUSTOMERS --> DCLGEN --> Copybook (CUST001) --> host variables.
+
+
+	EXEC SQL
+           INCLUDE CUST001                  --> CUST001 is a DCLGEN copybook which contains HOST variables.
+	END-EXEC.
+
+
+DB2 TABLE: CUSOTMERS
+  CUST_ID (INT)       CUST_NAME(CHAR)      CUST_SALARY(DECIMAL)    CUST_ACC_NO(INT)             INSERT
+   0001                PRANCHAN             15000                   1234                        COMMIT--> Save
+   0002                ROHIT                25000                   1235                        COMMIT--> Save
+                                                                                                ROLLBACK--> 
+
+
+
+
+
+-------------------------------------------------------------CURSOR 03/03---------------------------------------------------------------------
+
+Select Query --> Executing a Select query through CObol+DB2 program, it will not be able to fetch multiple rows. If your select query attempts to fetch multiple rows, it gives -811 SQL code.
+
+SELECT CUST_ID, CUST_NAME INTO :HOST variables
+FROM TABLE NAME
+WHERE <CONDITION>
+
+CURSOR--> Fetches multiple rows. Executes SQL statement in loop until all the rows are fetched.
+          4 operations. All the operations should be coded inside EXEC SQL.. END-EXEC.
+
+DECLARE: Give name to the cursor. Write the SQL Query inside the cursor. Declare is coded in Data Division--> Working storage section.
+
+EXEC SQL
+  DECLARE <Name of cursor> CURSOR FOR <Select Query>
+END -EXEC
+
+e.g.
+
+EXEC SQL
+  DECLARE C1 CURSOR FOR select * from customers
+END -EXEC
+
+
+OPEN: Open the cursor. OPEN is coded in Procedure Division
+
+EXEC SQL
+  OPEN C1                      --> C1 is name of the cursor that is defined in DECLARE CURSOR
+END -EXEC
+
+FETCH: Executes the cursor--> Executes the SQL query that is defined inside Cursor; FETCH is coded in Procedure Division
+
+EXEC SQL
+  FETCH C1  INTO :HOST VARIABLES  --> C1 is name of the cursor that is defined in DECLARE CURSOR. The result of the SQL query will be stored in HOST VARIABLES
+END -EXEC
+
+
+CLOSE: Close the cursor --> Closes the loop of SQL query. CLOSE is coded in Procedure Division.
+
+
+EXEC SQL
+  CLOSE C1                      --> C1 is name of the cursor that is defined in DECLARE CURSOR
+END -EXEC
+
+
+CURSOR WITH HOLD.
+
+SELSQL01
+
+select * from customers --> C1
+
+Fetch
+100
+
+90th --> SELSQL01--> failed.--> Closes the cursor.
+
+
+
+CURSOR WITH HOLD.  --> Close the cursor only when the close statement is executed.
+
+
+DECLARE: Give name to the cursor. Write the SQL Query inside the cursor.
+
+EXEC SQL
+  DECLARE <Name of cursor> WITH HOLD CURSOR FOR <Select Query>
+END -EXEC
+
+
+----------------------------------------------------------------COBOL+DB2 BIND+Compilation+RUN---------------------------------------------------------------------------
+
+
+COBOL program:
+
+Step 1. Compile+Linkedit  --> Load module
+
+Step 2: Run
+
+
+Cobol+DB2--> SQL Query/Statements are included.
+
+Step 1: Precompile (DSNHPC) --> Separates/Extracts SQL statements from cobol program and creates DBRM (Database base req module) along with time stamp T1
+          
+
+        Compile+Linkedit --> Load module Associated with a timestamp T2.
+     
+ 
+Step 2: Bind --> Converts DBRM into PLAN (or PACKAGE) and passes the time stamp from DBRM to PLAN (T1) --> IKJEFT01
+Step 3: Run  --> Run the program (Load module) along with Plan. Checks T1 and T2. T1=T2, Else RUN jcl will fail with timestamp error -818
+                 EXEC PGM=IKJEFT01
+
+                 SYSTIN DD*
+                  PLAN ()
+                  PGM ()
+                  LIB ()
+
+                  
+Isolation level
+
+CS (Cursor stability)  - Row level lock
+RR (repeatable read) - Page level lock
+UR (Uncommitted Read) - Dirty read  --> Never used.
+
+CUTOMERS
+
+P1  
+1    Pranchan  --> Sriti  
+2    Abhishek  --> Sachin 
+3    Mounika   --> Aishwarya    
+4    Ajay
+5    SFJBS
+
+P2
+1    Pranchan  --> Sriti  
+2    Abhishek  --> Sachin 
+3    Mounika             
+4    Ajay
+5    SFJBS
+
+P3
+1    Pranchan  --> Sriti  
+2    Abhishek  --> Sachin 
+3    Mounika              lock is applied
+4    Ajay
+5    SFJBS
+
+Pranchan   harshini
+ UPDATE      Select
+ Delete
+ Add
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+VIEWS:-
+-------------------------------------------------------------------
+CREATE VIEW CUST_VIEW AS SELECT CUST_ACCTNO, CUST_NAME, CUST_GENDER 
+       FROM CUSTOMER_TABLE                                          
+       WHERE CUST_GENDER = 'M';                                     
+
+UPDATE CUST_VIEW SET CUST_GENDER = 'F'                              
+       WHERE CUST_ACCTNO = 'A0005';                                 
+
+INSERT INTO CUST_VIEW                                               
+      VALUES                                                       
+      ('A0011','SRINIVAS','M');                                     
+
+DROP VIEW CUST_VIEW;                                                
+
+SELECT * FROM CUST_VIEW;                                            
+
+
+TABLE:-
+-------------------------------------------------------------------
+CREATE TABLE ACTYPE_TABLE                          
+            (CUST_ACTYPE CHAR(1) NOT NULL,         
+             CUST_ACDESC CHAR(10))                 
+             IN DBMATE1.TSMATE01;                  
+INSERT INTO ACTYPE_TABLE                           
+       VALUES                                      
+      ('C','CURRENT');                             
+INSERT INTO ACTYPE_TABLE                           
+       VALUES                                      
+      ('S','SAVINGS');                             
+INSERT INTO ACTYPE_TABLE                           
+       VALUES                                      
+      ('D','FIXED DEP');                           
+SELECT * FROM ACTYPE_TABLE;                        
+
+
+JOINS:-
+-------------------------------------------------------------------
+SELECT CUST_ACCTNO, CUST_NAME, CUST_ACDESC         
+       FROM CUSTOMER_TABLE   C INNER JOIN            
+            ACTYPE_TABLE     A                   
+         ON C.CUST_ACTYPE  = A.CUST_ACTYPE;     
+                                                
+SELECT CUST_ACCTNO, CUST_NAME, CUST_ACDESC      
+       FROM CUSTOMER_TABLE   C LEFT OUTER JOIN    
+            ACTYPE_TABLE     A                   
+         ON C.CUST_ACTYPE  = A.CUST_ACTYPE;     
+                                                
+SELECT CUST_ACCTNO, CUST_NAME, CUST_ACDESC      
+       FROM CUSTOMER_TABLE   C RIGHT OUTER JOIN   
+            ACTYPE_TABLE     A                   
+         ON C.CUST_ACTYPE  = A.CUST_ACTYPE;     
+                                                
+SELECT CUST_ACCTNO, CUST_NAME, CUST_ACDESC      
+       FROM CUSTOMER_TABLE   C FULL OUTER JOIN    
+            ACTYPE_TABLE     A                   
+         ON C.CUST_ACTYPE  = A.CUST_ACTYPE;     
+
+SUB-QUERIES
+------------------------------------------------------------------
+SELECT * 
+FROM CUSTOMERS 
+WHERE ID IN (SELECT ID 
+FROM CUSTOMERS 
+WHERE SALARY > 4500) ;
+
+
+INSERT INTO CUSTOMERS_BKP 
+SELECT * FROM CUSTOMERS
+WHERE ID IN (SELECT ID 
+FROM CUSTOMERS) ;
+
+
+UPDATE CUSTOMERS 
+SET SALARY = SALARY * 0.25 
+WHERE AGE IN (SELECT AGE FROM CUSTOMERS_BKP 
+WHERE AGE >= 27 );
+
+
+DELETE FROM CUSTOMERS 
+WHERE AGE IN (SELECT AGE FROM CUSTOMERS_BKP 
+WHERE AGE > 27 );
+

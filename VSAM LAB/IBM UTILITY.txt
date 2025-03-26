@@ -1,0 +1,101 @@
+IEBR14 (CREATE)
+
+//OZA134A JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M  
+//* JCL TO CREATE PS FILES/PDS USING IEFBR14           
+//STEP001 EXEC PGM=IEFBR14                             
+//*                                                    
+//DD1 DD DSN=OZA134.SACHIN.IB2,                    
+//        DISP=(NEW,CATLG,DELETE),                     
+//        SPACE=(CYL,(5,5),RLSE),                      
+//        DCB=(RECFM=FB,LRECL=40,BLKSIZE=200)          
+//SYSOUT DD SYSOUT=*                                   
+//*                                                    
+//DD2 DD DSN=OZA134.SACHIN.IB1.PDS,                    
+//       DISP=(NEW,CATLG,DELETE),                     
+//       SPACE=(CYL,(5,5),RLSE),                      
+//       DCB=(RECFM=FB,LRECL=40,BLKSIZE=200,DSORG=PO) 
+//SYSOUT DD SYSOUT=*                                   
+
+-----------------+------------------+------------------+-------------+-------------------------+-----------------------+-------------------+------------------+---------------+------------
+
+IEFBR14(DELETE)
+
+//OZA134A JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M     
+//* JCL TO DELETE PS FILES/PDS USING IEFBR14              
+//STEP001 EXEC PGM=IEFBR14                                
+//*                                                       
+//DD1 DD DSN=OZA134.SACHIN.IB2,                           
+//        DISP=(MOD,DELETE,DELETE),                       
+//        SPACE=(CYL,(5,5),RLSE),                         
+//        DCB=(RECFM=FB,LRECL=40,BLKSIZE=200)             
+//SYSOUT DD SYSOUT=*                                      
+//*                                                       
+//DD2 DD DSN=OZA134.SACHIN.IB1.PDS,                       
+//        DISP=(MOD,DELETE,DELETE),                       
+//        SPACE=(CYL,(5,5),RLSE),                         
+//        DCB=(RECFM=FB,LRECL=40,BLKSIZE=200,DSORG=PO)    
+//SYSOUT DD SYSOUT=*  
+
+-----------------+------------------+------------------+-------------+-------------------------+-----------------------+-------------------+------------------+---------------+------------                                    
+
+IEBGENER
+
+//OZA134A JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M             
+//* JCL TO COPY RECORDS FROM ONE PS FILE TO ANOTHER WITHOUT SORT  
+//STEP001 EXEC PGM=IEBGENER                                       
+//*                                                               
+//SYSUT1 DD DSN=OZA134.AGENT.FILE,DISP=SHR                        
+//SYSUT2 DD DSN=OZA134.AGENT.UNSORT.FILE,                         
+//        DISP=(MOD,CATLG,DELETE),                                
+//        SPACE=(CYL,(5,5),RLSE),                                 
+//        DCB=(RECFM=FB,LRECL=80,BLKSIZE=400)                     
+//SYSIN DD DUMMY                                                  
+//SYSPRINT DD SYSOUT=*                                            
+
+-----------------+------------------+------------------+-------------+-------------------------+-----------------------+-------------------+------------------+---------------+------------
+
+IEBCOPY
+
+//OZA134B JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M       
+//* JCL TO COPY MEMBERS FROM ONE PDS TO ANOTHER PDS         
+//STEP001 EXEC PGM=IEBCOPY                                  
+//*                                                         
+//DDIN DD DSN=OZA134.SACHIN.JCL,DISP=SHR                    
+//DDOUT DD DSN=OZA134.SACHIN.JCL3,                          
+//        DISP=(MOD,CATLG,DELETE),                          
+//        SPACE=(TRK,(5,5,5),RLSE),                         
+//        DCB=(RECFM=FB,LRECL=80,BLKSIZE=400,DSORG=PO)      
+//SYSIN DD *                                                
+  COPY OUTDD=DDOUT,INDD=DDIN                                
+/*                                                          
+//SYSPRINT DD SYSOUT=*   
+
+-----------------+------------------+------------------+-------------+-------------------------+-----------------------+-------------------+------------------+---------------+------------                                   
+
+IDCAMS
+
+GDG BASE
+
+//OZA134C JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M   
+//* JCL TO CREATE A GDG BASE                            
+//STEP001 EXEC PGM=IDCAMS                               
+//*                                                     
+//SYSIN DD *                                            
+  DEFINE GDG(NAME(OZA134.SACHIN.GDG) -                  
+  LIMIT(15) NOEMPTY  SCRATCH)                           
+/*                                                      
+//SYSPRINT DD SYSOUT=*    
+
+
+VERSION
+
+//OZA134A JOB MSGLEVEL=(1,1),NOTIFY=&SYSUID,REGION=0M     
+//* JCL TO CREATE PS FILES/PDS USING IEFBR14              
+//STEP001 EXEC PGM=IEFBR14                                
+//*                                                       
+//DD1 DD DSN=OZA134.SACHIN.GDG(+1),                       
+//        DISP=(NEW,CATLG,DELETE),                        
+//        SPACE=(CYL,(5,5),RLSE),                         
+//        DCB=(RECFM=FB,LRECL=40,BLKSIZE=200)             
+//SYSOUT DD SYSOUT=*                                                                    
+
